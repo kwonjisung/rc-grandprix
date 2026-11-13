@@ -1,9 +1,10 @@
 // ---- 자동차 ----
 const CARS=[
- {id:'bolt',name:'번개',kind:'std',col:{body:'#ffcf1f',dark:'#1f3fae',light:'#7fb6ff',mid:'#d9a90d'},power:610,top:560,grip:1,mass:1,boost:2.4,desc:'모든 게 고른 기본 차. 처음 달리는 코스에 잘 맞아요.'},
- {id:'drift',name:'드리프트킹',kind:'low',col:{body:'#8f5bff',dark:'#2a1660',light:'#d9c8ff',mid:'#6f45d6'},power:600,top:605,grip:0.8,mass:0.95,boost:2.4,desc:'낮고 긴 차체. 꼬리가 잘 흐르고 최고 속도가 높아요. 코너는 미끄러뜨려 도세요.'},
- {id:'dozer',name:'불도저',kind:'wide',col:{body:'#ff8a1f',dark:'#2a1a0a',light:'#ffd2a0',mid:'#cc6a10'},power:560,top:540,grip:1.15,mass:1.6,boost:2.2,desc:'넓고 무거워서 부딪히면 상대가 튕겨 나가요. 가속은 느리지만 잘 붙어요.'},
- {id:'rocket',name:'로켓',kind:'rocket',col:{body:'#22c3e6',dark:'#0b3a48',light:'#c8f4ff',mid:'#1797b3'},power:680,top:545,grip:0.95,mass:0.8,boost:3.0,desc:'가볍고 출발이 빨라요. 방구 부스터가 가장 세지만 부딪히면 잘 밀려요.'},
+ {id:'bolt',name:'번개',design:'미드나잇 GT',kind:'A',col:{body:'#2b4a7c',dark:'#ff6a1a',light:'#9fb6d8',mid:'#1b2a44'},power:610,top:560,grip:1,mass:1,boost:2.4,desc:'남색 GT 레이서. 모든 능력이 고른 기본 차라 처음 달리는 코스에 잘 맞아요.'},
+ {id:'drift',name:'드리프트킹',design:'실버 프로토',kind:'B',col:{body:'#c9ced3',dark:'#0f6e78',light:'#eef1f3',mid:'#9aa1a8'},power:600,top:605,grip:0.8,mass:0.95,boost:2.4,desc:'낮고 긴 은색 프로토타입. 꼬리가 잘 흐르고 최고 속도가 높아요. 코너는 미끄러뜨려 도세요.'},
+ {id:'dozer',name:'불도저',design:'랠리 해치',kind:'C',col:{body:'#eef0ee',dark:'#d8262f',light:'#ffffff',mid:'#2a2d31'},power:560,top:540,grip:1.15,mass:1.6,boost:2.2,desc:'짧고 단단한 랠리 해치. 무거워서 부딪히면 상대가 튕겨 나가요. 가속은 느리지만 잘 붙어요.'},
+ {id:'rocket',name:'로켓',design:'그라파이트 드리프트',kind:'D',col:{body:'#4a4e55',dark:'#c6ff3d',light:'#8a8f96',mid:'#2b2e33'},power:680,top:545,grip:0.95,mass:0.8,boost:3.0,desc:'가벼운 드리프트 쿠페. 출발이 빠르고 방구 부스터가 가장 세지만 부딪히면 잘 밀려요.'},
+ {id:'classic',name:'클래식',design:'클래식 그린',kind:'E',col:{body:'#1f5c43',dark:'#efe6cf',light:'#5d8f78',mid:'#0f3b2a'},power:630,top:575,grip:1.05,mass:0.9,boost:2.3,desc:'둥근 앞코의 클래식 레이서. 조금 가볍고 잘 붙어서 굽은 길이 많은 코스에서 편해요.'},
 ];
 const STAT_DEF=[['최고 속도',c=>(c.top-520)/100],['가속',c=>(c.power-540)/160],['접지력',c=>(c.grip-0.7)/0.5],['무게',c=>(c.mass-0.7)/1.0],['방구 부스터',c=>(c.boost-2)/1.1]];
 const SEL={car:0,course:0,load(){try{const s=JSON.parse(localStorage.getItem('rcgp-sel')||'{}');if(s.car>=0&&s.car<CARS.length)this.car=s.car;if(s.course>=0&&s.course<VARIANTS.length)this.course=s.course;}catch(_){}},save(){try{localStorage.setItem('rcgp-sel',JSON.stringify({car:this.car,course:this.course}));}catch(_){}}};
@@ -63,14 +64,14 @@ function gxScene(c){
   const rim=new THREE.Mesh(new THREE.CylinderGeometry(2.68,2.68,0.3,48),new THREE.MeshLambertMaterial({color:c[3]}));rim.position.y=-0.42;sc.add(rim);
   GX.turn=new THREE.Group();sc.add(GX.turn);
   GX.cam=new THREE.PerspectiveCamera(36,1,0.1,50);GX.cam.position.set(0,2.6,5.6);GX.cam.lookAt(0,0.45,0);
-  const loop=()=>{if(!GX.open)return;const v=$('#gView'),W=v.clientWidth,H=v.clientHeight;if(GX._w!==W||GX._h!==H){r.setSize(W,H,false);const asp=W/H,dd=6.6*Math.max(1,1.35/asp);GX.cam.aspect=asp;GX.cam.position.set(0,dd*0.46,dd);GX.cam.lookAt(0,0.4,0);GX.cam.updateProjectionMatrix();GX._w=W;GX._h=H;}
+  const loop=()=>{if(!GX.open)return;const v=$('#gView'),W=v.clientWidth,H=v.clientHeight;if(GX._w!==W||GX._h!==H){r.setSize(W,H,false);const asp=W/H,dd=(matchMedia('(pointer:coarse)').matches?5.0:6.6)*Math.max(1,1.35/asp);GX.cam.aspect=asp;GX.cam.position.set(0,dd*0.46,dd);GX.cam.lookAt(0,0.4,0);GX.cam.updateProjectionMatrix();GX._w=W;GX._h=H;}
     GX.turn.rotation.y+=0.008;if(GX.mesh)GX.mesh.wheels.forEach(w=>w.rotation.z-=0.04);r.render(sc,GX.cam);GX.raf=requestAnimationFrame(loop);};
   GX._w=0;cancelAnimationFrame(GX.raf);GX.raf=requestAnimationFrame(loop);
 }
 function gxSet(i){
   GX.ci=((i%CARS.length)+CARS.length)%CARS.length;const k=CARS[GX.ci];
   if(GX.mesh)GX.turn.remove(GX.mesh.g);GX.mesh=carMesh(k.col,0.05,k.kind);GX.mesh.g.rotation.y=-0.6;GX.turn.add(GX.mesh.g);
-  $('#gNo').textContent=`CAR ${GX.ci+1} / ${CARS.length}`;$('#gName').textContent=k.name;$('#gDesc').textContent=k.desc;
+  $('#gNo').textContent=`CAR ${GX.ci+1} / ${CARS.length} · ${k.design}`;$('#gName').textContent=k.name;$('#gDesc').textContent=k.desc;
   $('#gStats').innerHTML=STAT_DEF.map(s=>{const v=clamp(s[1](k),0.08,1);return`<div class="gs"><span>${s[0]}</span><i><u style="width:${(v*100).toFixed(0)}%"></u></i></div>`;}).join('');
   CARS.forEach((_,j)=>{const b=$('#gchip-'+j);b.classList.toggle('on',j===GX.ci);b.setAttribute('aria-pressed',j===GX.ci?'true':'false');});
 }
@@ -87,3 +88,4 @@ document.querySelectorAll('.vtab').forEach(b=>b.onclick=()=>{document.querySelec
 addEventListener('keydown',e=>{if(e.code==='Escape'&&!$('#verModal').hidden)$('#verModal').hidden=true;});
 
 REC.init(()=>{renderCards();ttRender();});
+if(document.fonts)['700 40px "Chakra Petch"','italic 700 40px "Chakra Petch"','700 40px "Bodoni Moda"'].forEach(f=>document.fonts.load(f).catch(()=>{}));

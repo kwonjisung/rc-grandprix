@@ -1,7 +1,7 @@
 <title>미니 RC 그랑프리</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=Chakra+Petch:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,700&family=Bodoni+Moda:wght@700&display=swap">
 <style>
 /* 레이아웃: 초록 커팅매트 작업대 위에 시안 카드 5장, 게임은 전체 화면 스테이지 */
 :root{
@@ -189,7 +189,7 @@ body.fine .mm-keys{display:flex}
 #gStats{display:flex;flex-direction:column;gap:5px}
 .gs{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:8px;font-size:12px;color:#9db9a9}
 .gs i{height:8px;border-radius:4px;background:#0a1d16;overflow:hidden}.gs u{display:block;height:100%;background:var(--orange);text-decoration:none;transition:width .3s}
-#gPick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+#gPick{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
 .gchip{appearance:none;border:2px solid transparent;border-radius:12px;background:#0a1d16;color:#eef4ec;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:4px;font:500 11px var(--f-body);cursor:pointer;min-height:44px}
 .gchip i{width:26px;height:12px;border-radius:4px;background:var(--c);box-shadow:inset 0 -4px 0 var(--d)}
 .gchip.on{border-color:var(--orange)}
@@ -266,6 +266,45 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 .pbox .k{font-family:var(--f-num);font-size:12px;letter-spacing:.16em;color:var(--orange)}.pbox h3{margin:0 0 6px;font-family:var(--f-disp);font-weight:400;font-size:26px}
 .pbox button{height:46px}
 .cockpit #hClouds{bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+
+/* ---- 휴대폰: 코스·차 고르기 화면을 화면 크기에 맞춰 크게 ---- */
+@media (pointer:coarse){
+  .mm-top{top:calc(8px + env(safe-area-inset-top,0px))}
+  .mm-logo{font-size:clamp(18px,5.6vmin,28px)}#mmCount{font-size:clamp(11px,3.2vmin,15px)}#mmRecSum{font-size:clamp(12px,3.4vmin,16px);padding:6px 14px}
+  #ttCur{width:min(56vw,92vh);top:44%}
+  #ttPrev,#ttNext{width:min(30vw,50vh);top:44%}
+  #ttPrev{left:2%}#ttNext{left:98%}
+  .mm-arrow{width:clamp(48px,14vmin,64px);height:clamp(48px,14vmin,64px);top:44%}
+  #mmPrev{left:max(8px,calc(50% - min(28vw,46vh) - 70px))}#mmNext{left:auto;right:max(8px,calc(50% - min(28vw,46vh) - 70px))}
+  .mm-info{bottom:calc(10px + env(safe-area-inset-bottom,0px));right:calc(clamp(170px,30vw,260px) + 24px);gap:4px}
+  #mmName{font-size:clamp(26px,10vmin,52px)}
+  #mmMeta{font-size:clamp(12px,3.6vmin,17px)}#mmMeta b{font-size:clamp(14px,4vmin,19px)}
+  #mmDots i{width:clamp(8px,2.4vmin,11px);height:clamp(8px,2.4vmin,11px)}#mmDots i.on{width:clamp(26px,8vmin,36px)}
+  #mmGo{width:clamp(170px,30vw,260px);height:clamp(58px,17vmin,80px);font-size:clamp(24px,8vmin,36px);bottom:calc(14px + env(safe-area-inset-bottom,0px));border-radius:20px}
+  #verBtn{font-size:clamp(11px,3vmin,14px)}
+  #garage{gap:6px;padding-block:calc(8px + env(safe-area-inset-top,0px)) calc(8px + env(safe-area-inset-bottom,0px))}
+  .gx-top h2{font-size:clamp(20px,6vmin,30px)}#gCourse{font-size:clamp(11px,3vmin,14px)}
+  .gx-main{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:12px}
+  .gx-side{padding:clamp(12px,3.4vmin,22px) clamp(14px,3.8vmin,24px);gap:clamp(5px,1.8vmin,10px)}
+  #gNo{font-size:clamp(11px,3.2vmin,15px)}#gName{font-size:clamp(26px,9vmin,44px)}#gDesc{display:block;font-size:clamp(12px,3.4vmin,15px)}
+  .gs{grid-template-columns:clamp(70px,20vmin,96px) 1fr;font-size:clamp(12px,3.4vmin,15px)}.gs i{height:clamp(8px,2.4vmin,12px)}
+  .gchip{min-height:clamp(46px,13vmin,64px);font-size:clamp(11px,3.2vmin,14px)}.gchip i{width:clamp(26px,8vmin,36px);height:clamp(12px,3.6vmin,16px)}
+  #gGo{height:clamp(52px,15vmin,72px);font-size:clamp(21px,7vmin,30px)}
+  #garage .mm-arrow{width:clamp(48px,13vmin,60px);height:clamp(48px,13vmin,60px)}
+}
+@media (pointer:coarse) and (max-height:420px){#gDesc{display:none}.gs{line-height:1.1}}
+.gchip span{white-space:nowrap;letter-spacing:-.02em}
+@media (pointer:coarse){.gchip{font-size:clamp(10px,2.9vmin,13px)}}
+@media (pointer:coarse) and (orientation:portrait){.mm-logo{white-space:nowrap;font-size:20px}#mmCount{display:none}body.mobile #verBtn{top:calc(54px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px))}}
+@media (pointer:coarse) and (orientation:portrait){
+  #ttCur{width:min(88vw,50vh);top:42%}#ttPrev,#ttNext{width:min(46vw,26vh);top:42%;opacity:.3}
+  #mmPrev{left:8px}#mmNext{right:8px}
+  .mm-info{right:20px;bottom:calc(clamp(58px,17vmin,80px) + 30px + env(safe-area-inset-bottom,0px))}
+  #mmGo{left:20px;right:20px;width:auto}
+  .gx-main{grid-template-columns:1fr;grid-template-rows:minmax(40vh,1fr) auto}
+}
+#camToast{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%) scale(.9);background:rgba(16,24,28,.62);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:10px 22px;font-family:var(--f-disp);font-size:clamp(18px,5vmin,26px);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
+#camToast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 @media (prefers-reduced-motion:reduce){.go{transition:none}}
 </style>
 
@@ -296,7 +335,7 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
   <button class="mm-arrow" id="mmPrev" type="button" aria-label="이전 코스"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 L15 19"/></svg></button>
   <button class="mm-arrow" id="mmNext" type="button" aria-label="다음 코스"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 L16 12 L9 19"/></svg></button>
-  <div class="mm-info"><h2 id="mmName">코스</h2><div id="mmMeta"></div><div id="mmDots" aria-hidden="true"></div><div class="mm-keys"><span><kbd>←</kbd><kbd>→</kbd> 코스 넘기기</span><span><kbd>Enter</kbd> 출발</span><span>레이스: <kbd>W</kbd> 가속 <kbd>S</kbd> 브레이크 <kbd>←</kbd><kbd>→</kbd> 조향 <kbd>Space</kbd> 방구 <kbd>Shift</kbd> 드리프트</span></div></div>
+  <div class="mm-info"><h2 id="mmName">코스</h2><div id="mmMeta"></div><div id="mmDots" aria-hidden="true"></div><div class="mm-keys"><span><kbd>←</kbd><kbd>→</kbd> 코스 넘기기</span><span><kbd>Enter</kbd> 출발</span><span>레이스: <kbd>W</kbd> 가속 <kbd>S</kbd> 브레이크 <kbd>←</kbd><kbd>→</kbd> 조향 <kbd>Space</kbd> 방구 <kbd>Shift</kbd> 드리프트 <kbd>C</kbd> 시점 <kbd>V</kbd> 운전자 시점</span></div></div>
   <button id="mmGo" type="button">출발!</button>
 </div>
 
@@ -319,14 +358,16 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v2.1 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v2.3 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.1</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.3</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v2.3</b><span>자동차 디자인 새 단장: 차체를 옆모습 곡선으로 깎고 휠·브레이크·윙·스플리터 등 부품을 따로 만든 디테일 모델, 레이싱 배색과 데칼(번호·줄무늬·스폰서). 다섯 번째 차 클래식 추가.<em>2026.11.13</em></span></li>
+        <li><b>v2.2</b><span>시점 버튼에 운전자 시점 추가(전체 조망 → 드론 → 추격 → 운전자 순서로 바뀜), 바꿀 때 시점 이름 표시. 휴대폰 코스·차 고르기 화면을 화면 크기에 맞춰 크게.<em>2026.11.13</em></span></li>
         <li><b>v2.1</b><span>게임 화면 새 단장: 왼쪽에 실시간으로 자리를 바꾸는 순위 타워, 위쪽 가운데 P순위와 앞차·뒤차 시간 차, 오른쪽 아이콘 버튼(일시정지·소리·시점·차 안), 표정 있는 방구 구름 게이지와 뿡 버튼. 일시정지 메뉴 추가.<em>2026.11.12</em></span></li>
         <li><b>v2.0</b><span>휴대폰 코스 선택을 디오라마 턴테이블로 바꿨어요. 코스를 고른 뒤 차 4대(번개·드리프트킹·불도저·로켓) 중에서 고르는 차고 화면과 이 버전 정보 창을 추가했어요.<em>2026.11.12</em></span></li>
         <li><b>v1.5</b><span>휴대폰 터치 조작: 화면을 누르고 있으면 전진, 왼쪽 아래 ◀ ▶ 조향, 오른쪽 아래 방구·드리프트·브레이크.<em>2026.11.11</em></span></li>
@@ -366,10 +407,11 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
     <div id="hRail">
       <button class="rb" id="bPause" type="button" aria-label="일시정지"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg></button>
       <button class="rb" id="bSound" type="button" aria-label="소리 켜짐" aria-pressed="true"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5 H7.5 L12 5.5 V18.5 L7.5 14.5 H4 Z" fill="currentColor"/><g class="on"><path d="M15.5 9 Q17.5 12 15.5 15"/><path d="M18 6.5 Q21.8 12 18 17.5"/></g><g class="off"><path d="M15.5 9.5 L20.5 14.5 M20.5 9.5 L15.5 14.5"/></g></svg></button>
-      <button class="rb" id="bCam" type="button" aria-label="시점 바꾸기"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8 V5 H6 M18 5 H21 V8 M21 16 V19 H18 M6 19 H3 V16"/><circle cx="12" cy="12" r="3.2"/></svg></button>
-      <button class="rb" id="bCock" type="button" aria-label="차 안 시점" aria-pressed="false"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2"/><path d="M3.8 11 H10 M14 11 H20.2 M12 14 V20.4"/></svg></button>
+      <button class="rb" id="bCam" type="button" aria-label="시점 바꾸기" title="시점 바꾸기 (C)"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8 V5 H6 M18 5 H21 V8 M21 16 V19 H18 M6 19 H3 V16"/><circle cx="12" cy="12" r="3.2"/></svg></button>
+      <button class="rb" id="bCock" type="button" aria-label="운전자 시점" title="운전자 시점 (V)" aria-pressed="false"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2"/><path d="M3.8 11 H10 M14 11 H20.2 M12 14 V20.4"/></svg></button>
     </div>
     <div id="hClouds" role="img" aria-label="방구 게이지"></div>
+    <div id="camToast" aria-live="polite"></div>
     <div id="hint"></div>
     <div class="speedo">
       <div id="hBadge"></div>

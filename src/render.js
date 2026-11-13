@@ -1,25 +1,6 @@
 // ---- 3D 렌더러 ----
 function puffTexture(){const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d'),gr=x.createRadialGradient(32,32,2,32,32,30);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=gr;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);}
-// 차 모양: std 기본 · low 낮고 긴 드리프트카 · wide 넓고 무거운 불도저 · rocket 로켓 부스터
-function carMesh(col,S,kind){
-  kind=kind||'std';const K={std:{bw:20,len:38,wr:6.5,low:0,wb:13,tr:11.5},low:{bw:20,len:42,wr:6,low:-2.5,wb:14,tr:11.5},wide:{bw:27,len:40,wr:8,low:1.5,wb:13.5,tr:14.5},rocket:{bw:19,len:38,wr:6.2,low:0,wb:13,tr:11}}[kind];
-  const lam=c=>new THREE.MeshLambertMaterial({color:c}),g=new THREE.Group(),body=new THREE.Group();g.rotation.order='YZX';g.add(body);
-  const add=(geo,mat,x,y,z,par)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=true;(par||body).add(m);return m;};
-  const L=K.len,W=K.bw,y0=K.low+(K.wr-6.5);
-  add(new THREE.BoxGeometry(L,6,W),lam(col.dark),0,9+y0,0);add(new THREE.BoxGeometry(L-4,6,W-2),lam(col.body),1,14+y0,0);
-  const cab=add(new THREE.BoxGeometry(kind==='low'?12:14,kind==='low'?5:7,W-7),lam(col.light),-4,(kind==='low'?19:20)+y0,0);
-  const sp=kind==='low'?7:5;add(new THREE.BoxGeometry(sp,1.6,W+2),lam(col.dark),-L/2+1,24+y0+(kind==='low'?2:0),0);
-  add(new THREE.BoxGeometry(1.5,7,1.5),lam(0x222222),-L/2+2,20+y0,W*0.3);add(new THREE.BoxGeometry(1.5,7,1.5),lam(0x222222),-L/2+2,20+y0,-W*0.3);
-  add(new THREE.BoxGeometry(2,3,W-6),lam(0xfff3c4),L/2,13+y0,0);
-  if(kind==='wide'){add(new THREE.BoxGeometry(3,8,W+2),lam(0x2a2a2e),L/2+2,10+y0,0);add(new THREE.BoxGeometry(2,2,W+2),lam(0xbbbbbb),L/2+3.5,15+y0,0);}
-  if(kind==='rocket'){const r=new THREE.Mesh(new THREE.CylinderGeometry(4,4,16,12),lam(0xdddddd));r.rotation.z=Math.PI/2;r.position.set(-L/2-4,18+y0,0);r.castShadow=true;body.add(r);
-    const f=new THREE.Mesh(new THREE.ConeGeometry(3.6,8,12),new THREE.MeshBasicMaterial({color:0xff9a2a}));f.rotation.z=Math.PI/2;f.position.set(-L/2-15,18+y0,0);body.add(f);}
-  const wg=new THREE.CylinderGeometry(K.wr,K.wr,kind==='wide'?8:6,14);wg.rotateX(Math.PI/2);const wm=lam(0x18181b),wheels=[],fronts=[];
-  for(const[x,z]of[[K.wb,K.tr],[K.wb,-K.tr],[-K.wb,K.tr],[-K.wb,-K.tr]]){const piv=new THREE.Group();piv.position.set(x,K.wr,z);g.add(piv);const w=new THREE.Mesh(wg,wm);w.castShadow=true;piv.add(w);
-    const hub=new THREE.Mesh(new THREE.BoxGeometry(6,2,(kind==='wide'?8:6)+0.4),lam(0xbbbbbb));w.add(hub);wheels.push(w);if(x>0)fronts.push(piv);}
-  g.scale.setScalar(S);return{g,body,wheels,fronts,cab};
-}
-const CAM_NAMES={overview:'전체 조망 시점',drone:'드론 추격 시점',chase:'낮은 추격 시점',stand:'조종대 시점',cockpit:'차 안 시점'};
+const CAM_NAMES={overview:'전체 조망 시점',drone:'드론 추격 시점',chase:'낮은 추격 시점',stand:'조종대 시점',cockpit:'운전자 시점'};
 function make3D(opt){
   return{
   init(view,g){
@@ -150,14 +131,14 @@ function make3D(opt){
     const mode=this.camMode,ov=mode==='overview',vs=ov?1.8:1.4;
     g.cars.forEach((c,k)=>{const m=this.meshes[k];m.g.position.set(c.x*S,c.z*S,c.y*S);m.g.rotation.y=-c.h;m.g.rotation.z=c.gp;m.g.rotation.x=c.gr;
       m.body.rotation.z=c.pitch;m.body.rotation.x=c.roll;m.body.position.y=c.air?-1.5:0;
-      m.fronts.forEach(f=>f.rotation.y=-c.steer*0.5);m.wheels.forEach(w=>w.rotation.z=-c.dist/6.5);
+      m.fronts.forEach(f=>f.rotation.y=-c.steer*0.5);m.wheels.forEach(w=>w.rotation.z=-c.dist/6.5*(w.userData.sgn||1));
       m.g.scale.setScalar(S*vs);
       m.g.visible=mode==='cockpit'&&k===this.pi?false:!(c.flash>0&&((c.flash*10)|0)%2===0);});
     const p=g.player,k=1-Math.exp(-dt*5);
     if(this._ov!==ov){this._ov=ov;this._ovInit=0;const c2=this.dl.shadow.camera,e=ov?80:35;c2.left=c2.bottom=-e;c2.right=c2.top=e;c2.far=ov?400:200;c2.updateProjectionMatrix();this.sc.fog.near=ov?400:70;this.sc.fog.far=ov?1400:this.opt.fogFar;}
     this.mark.visible=ov;if(ov){this.mark.position.set(p.x*S,(p.z+75+Math.sin(performance.now()/180)*6)*S,p.y*S);}
     if(mode==='cockpit'){
-      const pm=this.meshes[this.pi];pm.g.updateMatrixWorld(true);const v=new THREE.Vector3(1,17,0);pm.body.localToWorld(v);this.cam.position.copy(v);
+      const pm=this.meshes[this.pi];pm.g.updateMatrixWorld(true);const v=new THREE.Vector3(2,14.5,0);pm.body.localToWorld(v);this.cam.position.copy(v);
       if(!this._qy)this._qy=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),-Math.PI/2);const q=new THREE.Quaternion();pm.body.getWorldQuaternion(q);this.cam.quaternion.copy(q).multiply(this._qy);
       if(g.shake)this.cam.rotateZ((Math.random()-0.5)*g.shake*0.002);
       this.cam.fov=lerp(this.cam.fov,74+p.speed*0.02+(p.boostT>0?8:0),0.08);this.cam.updateProjectionMatrix();
@@ -196,7 +177,7 @@ function make3D(opt){
     const ck=mode==='cockpit';for(let i=0;i<this.spr.length;i++){const s=this.spr[i],q=g.parts[i];if(!q||(ck&&q.o===p)){s.visible=false;continue;}s.visible=true;s.position.set(q.x*S,(q.z+q.r*0.4)*S,q.y*S);const sc=q.r*2.2*S*(ov?1.6:1);s.scale.set(sc,sc,1);s.material.color.set(q.col);s.material.opacity=(q.life/q.max)*0.6;}
     r.render(this.sc,this.cam);
   },
-  cycleCam(){const L=this.opt.cams;const base=this.camMode==='cockpit'?this.prevMode:this.camMode;const n=L[(L.indexOf(base)+1)%L.length];this.setMode(n);return CAM_NAMES[n];},
+  cycleCam(){const L=[...this.opt.cams,'cockpit'];const n=L[(L.indexOf(this.camMode)+1)%L.length];this.setMode(n);return CAM_NAMES[n];},
   toggleCockpit(){if(this.camMode==='cockpit'){this.setMode(this.prevMode);return CAM_NAMES[this.prevMode];}this.setMode('cockpit');return CAM_NAMES.cockpit;},
   dispose(){this.r.dispose();this.r.domElement.remove();}
   };

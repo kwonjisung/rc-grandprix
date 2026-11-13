@@ -111,11 +111,11 @@ const REC_DT=1/30,RF=11;
 function startGame(vi,ci){
   if(ci==null)ci=SEL.car;const CAR=CARS[ci],V=VARIANTS[vi],T=getTrack(V.id),N=T.p.length;closeGarage();
   const sp=Math.max(2,Math.round(50/(T.L/N)));
-  const grid=[[COLS.r,0.97],[COLS.g,0.95],[CAR.col,0],[COLS.p,0.92]];
-  const cars=grid.map((d,k)=>makeCar(T,Math.round(N-2-(k>>1)*sp*1.4),k%2?-45:45,d[0],k!==2,d[1]));
-  ['토마토','올리브',null,'핑키'].forEach((n,k)=>cars[k].name=n||('나 · '+CAR.name));
+  const others=CARS.filter((_,i)=>i!==ci),pick=[others[(vi)%others.length],others[(vi+1)%others.length],others[(vi+2)%others.length]];
+  const grid=[[pick[0],0.97],[pick[1],0.95],[CAR,0],[pick[2],0.92]];
+  const cars=grid.map((d,k)=>makeCar(T,Math.round(N-2-(k>>1)*sp*1.4),k%2?-45:45,d[0].col,k!==2,d[1]));
+  grid.forEach((d,k)=>{cars[k].kind=d[0].kind;cars[k].name=k===2?('나 · '+CAR.name):d[0].name;});
   const pc=cars[2];Object.assign(pc,{power:CAR.power,top:CAR.top,gripM:CAR.grip,mass:CAR.mass,boostM:CAR.boost,kind:CAR.kind});
-  cars[0].kind='std';cars[1].kind='low';cars[3].kind='wide';
   G={V,vi,ci,T,cars,player:cars[2],parts:[],skids:[],t:0,state:'count',count:3.4,shake:0,order:[],rec:[],recAcc:0,ranks:[],finishShow:0};
   clearInterval(resTimer);
   $('#menu').hidden=true;$('#mmenu').hidden=true;$('#verBtn').hidden=true;$('#stage').hidden=false;$('#result').hidden=true;$('#replayUI').hidden=true;$('#hud').hidden=false;$('#touch').classList.remove('off');touch.g=0;$('#tZone').classList.remove('on');$('#view').innerHTML='';
@@ -290,9 +290,10 @@ for(const[id,k]of[['tL','l'],['tR','r'],['tB','b'],['tH','h'],['tP','p']]){const
   const on=e=>{e.preventDefault();touch[k]=1;b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(_){}},off=()=>{touch[k]=0;b.classList.remove('on');};
   b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);}
 function flashHint(t){$('#hint').textContent=t;$('#hint').hidden=false;G.hintT=G.t+2;}
-function syncCamBtns(){const ck=REND&&REND.camMode==='cockpit';$('#bCock').setAttribute('aria-label',ck?'밖에서 보기':'차 안 시점');$('#bCock').setAttribute('aria-pressed',ck?'true':'false');$('#wheelWrap').hidden=!ck;$('#cockpitFrame').toggleAttribute('hidden',!ck);$('#stage').classList.toggle('cockpit',!!ck);}
-function camSwitch(){if(!REND||!G||G.state==='replay')return;flashHint(REND.cycleCam());syncCamBtns();}
-function cockpit(){if(!REND||!G||G.state==='replay')return;flashHint(REND.toggleCockpit());syncCamBtns();}
+function syncCamBtns(){const ck=REND&&REND.camMode==='cockpit';$('#bCock').setAttribute('aria-label',ck?'밖에서 보기':'운전자 시점');$('#bCock').setAttribute('aria-pressed',ck?'true':'false');$('#wheelWrap').hidden=!ck;$('#cockpitFrame').toggleAttribute('hidden',!ck);$('#stage').classList.toggle('cockpit',!!ck);}
+function camToast(t){const el=$('#camToast');el.textContent=t;el.classList.add('show');clearTimeout(camToast.tm);camToast.tm=setTimeout(()=>el.classList.remove('show'),1300);}
+function camSwitch(){if(!REND||!G||G.state==='replay')return;camToast(REND.cycleCam());syncCamBtns();}
+function cockpit(){if(!REND||!G||G.state==='replay')return;camToast(REND.toggleCockpit());syncCamBtns();}
 function toggleSound(){AU.toggle();const b=$('#bSound');b.classList.toggle('muted',!AU.on);b.setAttribute('aria-pressed',AU.on?'true':'false');b.setAttribute('aria-label',AU.on?'소리 켜짐':'소리 꺼짐');}
 $('#bSound').onclick=toggleSound;$('#bCam').onclick=camSwitch;$('#bCock').onclick=cockpit;$('#bPause').onclick=()=>setPause(true);$('#pResume').onclick=()=>setPause(false);$('#pMenu').onclick=()=>{G.paused=false;stopGame();};$('#pRestart').onclick=()=>{const v=G.vi,c=G.ci;G.paused=false;stopGame();startGame(v,c);};
 $('#rBack').onclick=stopGame;$('#rAgain').onclick=()=>{const v=G.vi,c=G.ci;stopGame();startGame(v,c);};
