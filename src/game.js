@@ -28,6 +28,15 @@ function paintGarden(c,x0,x1,y0,y1){
   for(const b of beds){c.fillStyle='#7a5636';c.beginPath();c.arc(b[0],b[1],b[2],0,TAU);c.fill();for(let k=0;k<14;k++){c.fillStyle=['#f2667a','#ffd34d','#b86ee8','#ffffff'][k%4];c.beginPath();c.arc(b[0]+Math.cos(k*2.4)*b[2]*0.6,b[1]+Math.sin(k*2.4)*b[2]*0.6,12,0,TAU);c.fill();}}
   c.fillStyle='#5fa3d6';c.beginPath();c.ellipse(650,720,110,70,0,0,TAU);c.fill();c.strokeStyle='#9fc9e8';c.lineWidth=10;c.stroke();
 }
+function paintHarbor(c,x0,x1,y0,y1,T){
+  c.fillStyle='#4a515c';c.fillRect(x0,y0,x1-x0,y1-y0);
+  c.fillStyle='rgba(255,255,255,.035)';for(let x=Math.floor(x0/160)*160;x<x1;x+=320)c.fillRect(x,y0,160,y1-y0);
+  c.strokeStyle='rgba(20,22,26,.5)';c.lineWidth=3;gridLines(c,x0,x1,y0,y1,160,'rgba(20,22,26,.45)',3);
+  c.strokeStyle='rgba(242,194,48,.55)';c.lineWidth=8;c.setLineDash([60,40]);for(const y of[-420,1200]){c.beginPath();c.moveTo(x0,y);c.lineTo(x1,y);c.stroke();}c.setLineDash([]);
+  c.fillStyle='rgba(242,194,48,.35)';for(let x=Math.floor(x0/300)*300;x<x1;x+=300)for(const y of[-520,1150])c.fillRect(x+20,y,180,24);
+  const cn=T.canal;if(cn){c.fillStyle='#24384a';c.fillRect(cn[0]-30,y0,cn[1]-cn[0]+60,280-y0);c.fillStyle='#2a6f9a';c.fillRect(cn[0]-14,y0,cn[1]-cn[0]+28,266-y0);c.fillStyle='#7a828c';c.fillRect(cn[0]-30,266,cn[1]-cn[0]+60,14);}
+  c.fillStyle='#7a828c';c.fillRect(x0,T.shore-30,x1-x0,30);c.fillStyle='#f2c230';for(let x=Math.floor(x0/120)*120;x<x1;x+=120)c.fillRect(x+40,T.shore-24,18,18);
+}
 const BOOKS=['#c0392b','#2e6da4','#e2b33c','#3c8d5a','#7d4ea3'];
 const THUMB=(bg,road,edge,pat)=>({bg,road,edge,pat});
 const VARIANTS=[
@@ -55,6 +64,10 @@ const VARIANTS=[
    roadFn:(i,P)=>i<2?(i%2?'#222':'#fff'):(P[i].z-P[i].zb>2?'#d3ccbd':['#bdb6a8','#b1aa9c','#c4bdae'][i%3])})},
  {id:'site',name:'공사장 점프',view:'구덩이 점프 · 파이프 터널',desc:'높은 흙더미 위를 달리다 구덩이를 뛰어넘고, 커다란 파이프 속을 통과하는 공사장 코스.',tags:['자갈','구덩이 점프','2랩'],dust:'#8d8273',puff:'#cfc6b6',th:THUMB('#9a8b70','#8f877a','#f2c230'),
   R:opt3({sky:'#e9d9b8',fogFar:460,hemiSky:0xfff2dc,hemiGround:0x6a5a40,sun:0xffe0b0,grass:[0.6,0.54,0.42],edge:[0.5,0.44,0.34],road:'#8f877a',road2:'#857d70',rampCol:'#9d9586',edge2:'hazard',trees:'piles',treeCount:24,gate:0xf2c230,tunnel:{wall:0xd9822b,roof:0xe0913a,portal:0xb86a1e,ribs:true}})},
+ {id:'harbor',name:'항구 컨테이너 부두',view:'도개교 점프 · 컨테이너 터널',desc:'불 켜진 밤 항구. 들린 도개교로 운하를 뛰어넘고, 쌓인 컨테이너 속 터널을 지나요. 젖은 철판 구간은 아주 미끄러워요.',tags:['아스팔트·철판','도개교 점프','3랩'],dust:'#8a919c',puff:'#c9d2de',th:Object.assign(THUMB('#4a515c','#2f333a','#f2c230','sea'),{sea:'#1f4a6e'}),
+  R:opt3({sky:'#1b2742',fogFar:560,hemiSky:0x9fb2e0,hemiGround:0x2a2a32,sun:0xffc988,hemiI:0.8,sunI:0.7,paint:paintHarbor,sea:0x1f4a6e,road:'#33373e',road2:'#2f333a',rampCol:'#c9a227',edge2:'dock',trees:'port',treeCount:40,lamps:true,gate:0xf2c230,
+   tunnel:{wall:0xb8432f,roof:0x3a3f47,portal:0x2e6da4,ribs:true},
+   roadFn:(i,P,T)=>{const a=P[i];if(i<2)return i%2?'#222':'#f4f4f4';if(a.z<-4)return null;if(a.z-a.zb>2)return i%2?'#c9a227':'#b8921f';for(const r of T.steel)if(a.x>r[0]&&a.x<r[1]&&a.y>r[2]&&a.y<r[3])return i%2?'#7d8590':'#6f7781';return i%6<3?'#33373e':'#2f333a';}})},
 ];
 const VI=Object.fromEntries(VARIANTS.map((v,i)=>[v.id,i]));
 const trackCache={};function getTrack(id){return trackCache[id]||(trackCache[id]=buildTrack(COURSES[id]));}
@@ -115,7 +128,7 @@ function startGame(vi,ci){
   const grid=[[pick[0],0.97],[pick[1],0.95],[CAR,0],[pick[2],0.92]];
   const cars=grid.map((d,k)=>makeCar(T,Math.round(N-2-(k>>1)*sp*1.4),k%2?-45:45,d[0].col,k!==2,d[1]));
   grid.forEach((d,k)=>{cars[k].kind=d[0].kind;cars[k].name=k===2?('나 · '+CAR.name):d[0].name;});
-  const pc=cars[2];Object.assign(pc,{power:CAR.power,top:CAR.top,gripM:CAR.grip,mass:CAR.mass,boostM:CAR.boost,kind:CAR.kind});
+  const pc=cars[2];Object.assign(pc,{power:CAR.power,top:CAR.top,gripM:CAR.grip,mass:CAR.mass,boostM:CAR.boost,offM:CAR.offM,susp:CAR.susp,kind:CAR.kind});
   G={V,vi,ci,T,cars,player:cars[2],parts:[],skids:[],t:0,state:'count',count:3.4,shake:0,order:[],rec:[],recAcc:0,ranks:[],finishShow:0};
   clearInterval(resTimer);
   $('#menu').hidden=true;$('#mmenu').hidden=true;$('#verBtn').hidden=true;$('#stage').hidden=false;$('#result').hidden=true;$('#replayUI').hidden=true;$('#hud').hidden=false;$('#touch').classList.remove('off');touch.g=0;$('#tZone').classList.remove('on');$('#view').innerHTML='';
@@ -252,8 +265,8 @@ function hud(){
     order.forEach((c,i)=>{const el=document.getElementById('tr'+g.cars.indexOf(c));el.style.top=(i*23)+'px';el.querySelector('b').textContent=i+1;el.querySelector('em').textContent=c.done?'완주':i===0?'선두':'+'+Math.min(99,gapS(lead,c)).toFixed(2);});
     $('#hPos').textContent='P'+rank;
     $('#hDots').innerHTML=order.map(c=>`<i${c===p?' class="me"':''} style="background:${c.col.body}"></i>`).join('');$('#hDots').setAttribute('aria-label','현재 순서 '+order.map((c,i)=>(i+1)+'위 '+c.name).join(', '));
-    $('#hGapF').innerHTML=rank>1?`−${Math.min(99,gapS(order[rank-2],p)).toFixed(2)} <small>앞차</small>`:'선두 <small>달리는 중</small>';
-    $('#hGapB').innerHTML=rank<order.length?`+${Math.min(99,gapS(p,order[rank])).toFixed(2)} <small>뒤차</small>`:'';
+    const wait=g.state==='count';$('#hGapF').innerHTML=wait?'출발 <small>대기 중</small>':rank>1?`−${Math.min(99,gapS(order[rank-2],p)).toFixed(2)} <small>앞차</small>`:'선두 <small>달리는 중</small>';
+    $('#hGapB').innerHTML=!wait&&rank<order.length?`+${Math.min(99,gapS(p,order[rank])).toFixed(2)} <small>뒤차</small>`:'';
     if(g.prevRank&&rank!==g.prevRank&&g.state==='race'){const up=rank<g.prevRank;const c=$('#hChg');c.className=up?'up':'down';c.textContent=up?`▲ ${g.prevRank}위 → ${rank}위`:`▼ ${g.prevRank}위 → ${rank}위`;g.chgT=now;const ps=$('#hPos');ps.classList.remove('pop');void ps.offsetWidth;ps.classList.add('pop');}
     if(g.chgT&&now-g.chgT>1800){$('#hChg').className='';g.chgT=0;}
     g.prevRank=rank;}
@@ -275,7 +288,7 @@ addEventListener('keydown',e=>{if(!G)return;keys[e.code]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','ShiftLeft','ShiftRight'].includes(e.code))e.preventDefault();
   if(e.repeat)return;
   if(G.state==='replay'){if(e.code==='Space'||e.code==='Enter'||e.code==='Escape'){if(!G.rp.done){G.rp.done=true;showResult();}else if(e.code==='Escape')stopGame();}return;}
-  if(G.paused)return;
+  if(G.paused){if(e.code==='Escape'||e.code==='KeyP')setPause(false);return;}
   if(e.code==='KeyR')respawn(G.player,G.T);
   if(e.code==='KeyC')camSwitch();
   if(e.code==='KeyV')cockpit();
@@ -306,7 +319,7 @@ function thumb(cv,V){
   const tx=x=>18+(x-b.x0)*s+((W-36)-(b.x1-b.x0)*s)/2,ty=y=>18+(y-b.y0)*s+((H-36)-(b.y1-b.y0)*s)/2;
   ctx.fillStyle=th.bg;ctx.fillRect(0,0,W,H);
   if(th.pat==='grid'){ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;for(let x=0;x<W;x+=16){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}for(let y=0;y<H;y+=16){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}}
-  if(th.pat==='sea'){ctx.fillStyle='#2f9fc9';ctx.fillRect(0,ty(930),W,H);}
+  if(th.pat==='sea'){ctx.fillStyle=th.sea||'#2f9fc9';ctx.fillRect(0,ty(T.shore||930),W,H);}
   ctx.lineJoin='round';ctx.lineCap='round';const P=T.p,N=P.length;
   const seg=(i,wd,col)=>{const a=P[i],c=P[(i+1)%N];ctx.strokeStyle=col;ctx.lineWidth=wd;ctx.beginPath();ctx.moveTo(tx(a.x),ty(a.y));ctx.lineTo(tx(c.x),ty(c.y));ctx.stroke();};
   const order=[...P.keys()].sort((i,j)=>P[i].z-P[j].z);

@@ -54,6 +54,7 @@ function make3D(opt){
     else if(ed==='plastic'){ribbon(a=>a.w/2-8,a=>a.w/2,1.7,stripe('#e8433c','#ffffff'));ribbon(a=>-a.w/2,a=>-a.w/2+8,1.7,stripe('#e8433c','#ffffff'));
       for(const sd of[1,-1])wall(sd,sd>0?'#b9542f':'#d26a3e',a=>a.z+1.5,()=>-2,i=>{const a=P[i],b=P[(i+1)%N];return(a.z<2&&b.z<2)||under[i];});
       ribbon(a=>-a.w/2,a=>a.w/2,-7,i=>under[i]?'#a9472a':null,true);}
+    else if(ed==='dock'){ribbon(a=>a.w/2,a=>a.w/2+12,1.6,stripe('#f2c230','#30343b'));ribbon(a=>-a.w/2-12,a=>-a.w/2,1.6,stripe('#f2c230','#30343b'));}
     else if(ed==='tape'){ribbon(a=>a.w/2-6,a=>a.w/2+6,1.8,()=>'#ecdca9');ribbon(a=>-a.w/2-6,a=>-a.w/2+6,1.8,()=>'#ecdca9');}
     else{ribbon(a=>a.w/2,a=>a.w/2+20,1.2,()=>opt.berm);ribbon(a=>-a.w/2-20,a=>-a.w/2,1.2,()=>opt.berm);}
     // 터널
@@ -70,6 +71,20 @@ function make3D(opt){
       addMesh(bg,bm,(gx+85)*S,17*S,(gy+85)*S);addMesh(new THREE.BoxGeometry(130*S,2*S,130*S),tm,(gx+85)*S,35*S,(gy+85)*S,false);}}
     // 바다
     if(opt.sea){const sw=new THREE.Mesh(new THREE.PlaneGeometry((bx1-bx0)*S,(by1-T.shore)*S),new THREE.MeshLambertMaterial({color:opt.sea,transparent:true,opacity:0.82}));sw.rotation.x=-Math.PI/2;sw.position.set(cx*S,1*S,((T.shore+by1)/2+20)*S);sc.add(sw);this.sea=sw;}
+    // 운하 물 (도개교 아래)
+    if(T.canal){const cw=new THREE.Mesh(new THREE.PlaneGeometry((T.canal[1]-T.canal[0]+40)*S,560*S),new THREE.MeshLambertMaterial({color:0x2a6f9a,transparent:true,opacity:0.85}));cw.rotation.x=-Math.PI/2;cw.position.set((T.canal[0]+T.canal[1])/2*S,-20*S,0);sc.add(cw);this.canalW=cw;
+      // 도개교: 들린 다리 끝의 탑 두 개와 위쪽 빔
+      const bb=T.bumps[0],l0=T.p.find(q=>q.s>=bb.s0+90)||T.p[0],ang=-Math.atan2(l0.ty,l0.tx),tm=lam(0x8c2f24),dm=lam(0x30343b);
+      for(const sd of[1,-1]){const o=sd*(l0.w/2+22);addMesh(new THREE.BoxGeometry(22*S,140*S,22*S),tm,(l0.x+l0.nx*o)*S,(l0.z+70)*S,(l0.y+l0.ny*o)*S).rotation.y=ang;
+        const cb=addMesh(new THREE.BoxGeometry(36*S,30*S,30*S),dm,(l0.x+l0.nx*o-l0.tx*14)*S,(l0.z+150)*S,(l0.y+l0.ny*o-l0.ty*14)*S);cb.rotation.y=ang;}
+      const bm2=addMesh(new THREE.BoxGeometry(14*S,12*S,(l0.w+66)*S),tm,l0.x*S,(l0.z+134)*S,l0.y*S);bm2.rotation.y=ang;
+      for(const sd of[1,-1])for(let q=0;q<3;q++){const o=sd*(l0.w/2+6),pp=T.p.find(z=>z.s>=bb.s0+q*30)||l0;addMesh(new THREE.CylinderGeometry(3*S,3*S,22*S,8),lam(q%2?0x111111:0xf2c230),(pp.x+pp.nx*o)*S,(pp.z+11)*S,(pp.y+pp.ny*o)*S);}}
+    // 가로등 (밤 항구)
+    if(opt.lamps){const pm2=lam(0x3a3f47),hm=new THREE.MeshBasicMaterial({color:0xffd27a}),gm=new THREE.MeshBasicMaterial({color:0xffc260,transparent:true,opacity:0.18,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-5,polygonOffsetUnits:-5});
+      for(let i=3;i<N;i+=10){const a=P[i];if(a.tun||a.z<-4)continue;const sd=(i/10|0)%2?1:-1,o=sd*(a.w/2+30),x=a.x+a.nx*o,y=a.y+a.ny*o,z=zAt(a,o);
+        addMesh(new THREE.CylinderGeometry(2.2*S,3*S,80*S,8),pm2,x*S,(z+40)*S,y*S);const arm=addMesh(new THREE.BoxGeometry(3*S,3*S,26*S),pm2,(x-a.nx*sd*12)*S,(z+80)*S,(y-a.ny*sd*12)*S,false);arm.rotation.y=-Math.atan2(a.ny,a.nx)+Math.PI/2;
+        addMesh(new THREE.BoxGeometry(10*S,4*S,10*S),hm,(x-a.nx*sd*24)*S,(z+78)*S,(y-a.ny*sd*24)*S,false);
+        const pool=new THREE.Mesh(new THREE.CircleGeometry(58*S,20),gm);pool.rotation.x=-Math.PI/2;pool.position.set((x-a.nx*sd*30)*S,(a.z+2.4)*S,(y-a.ny*sd*30)*S);sc.add(pool);}}
     // 빙판
     if(T.ice){const im=new THREE.MeshLambertMaterial({color:0xbfe6ff,transparent:true,opacity:0.6,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4});for(const c of T.ice){const l=locate(T,c[0],c[1],null),z=trackZ(T,l);const d=new THREE.Mesh(new THREE.CircleGeometry(c[2]*0.8*S,28),im);d.rotation.x=-Math.PI/2;d.position.set(c[0]*S,(z+2.2)*S,c[1]*S);sc.add(d);}}
     // 소품
@@ -81,9 +96,15 @@ function make3D(opt){
         cactus:()=>{const g=new THREE.Group(),m=lam(0x4f7a3a),b=new THREE.Mesh(new THREE.CylinderGeometry(9,10,80,8),m);b.position.y=40;b.castShadow=true;g.add(b);for(const sd of[-1,1]){const a=new THREE.Mesh(new THREE.CylinderGeometry(6,6,30,8),m);a.position.set(sd*16,50+sd*8,0);a.castShadow=true;const e=new THREE.Mesh(new THREE.CylinderGeometry(6,6,16,8),m);e.rotation.z=Math.PI/2;e.position.set(sd*9,36+sd*8,0);g.add(a,e);}return g;},
         palm:()=>{const g=new THREE.Group(),t=new THREE.Mesh(new THREE.CylinderGeometry(4,6,90,6),lam(0x8a6a44));t.position.y=45;t.rotation.z=0.12;t.castShadow=true;g.add(t);for(let k=0;k<6;k++){const l=new THREE.Mesh(new THREE.BoxGeometry(60,3,14),lam(k%2?0x3f8f3a:0x4fa646));l.position.set(Math.cos(k)*24+5,92,Math.sin(k)*24);l.rotation.y=-k;l.rotation.z=-0.35;l.castShadow=true;g.add(l);}return g;},
         bush:()=>{const g=new THREE.Group(),colr=[0x3f8a3c,0x4e9c48,0x357a35][(rand()*3)|0];for(let k=0;k<3;k++){const b=new THREE.Mesh(new THREE.SphereGeometry(20+rand()*10,9,7),lam(colr));b.position.set((k-1)*18,20,rand()*10-5);b.castShadow=true;g.add(b);}if(rand()<0.6){const f=new THREE.Mesh(new THREE.SphereGeometry(7,6,5),lam([0xf2667a,0xffd34d,0xffffff][(rand()*3)|0]));f.position.set(0,42,0);g.add(f);}return g;},
+        port:()=>{const g=new THREE.Group(),CC=[0xb8432f,0x2e6da4,0xe2b33c,0x3c8d5a,0xd9822b,0x8a8f96,0x1f6f78];
+          if(rand()<0.12){const cm=lam(0xf2c230);for(const x of[-40,40])for(const z of[-30,30]){const lg=new THREE.Mesh(new THREE.BoxGeometry(8,170,8),cm);lg.position.set(x,85,z);lg.castShadow=true;g.add(lg);}
+            const bm=new THREE.Mesh(new THREE.BoxGeometry(260,14,16),cm);bm.position.set(60,176,0);bm.castShadow=true;g.add(bm);const cab=new THREE.Mesh(new THREE.BoxGeometry(26,20,24),lam(0x30343b));cab.position.set(20,162,0);g.add(cab);
+            const ro=new THREE.Mesh(new THREE.BoxGeometry(2,70,2),lam(0x222222));ro.position.set(150,135,0);g.add(ro);const hk=new THREE.Mesh(new THREE.BoxGeometry(14,8,14),lam(0x222222));hk.position.set(150,98,0);g.add(hk);return g;}
+          const cols=1+(rand()*2|0),h=1+(rand()*3|0);for(let cI=0;cI<cols;cI++)for(let k=0;k<h-(cI&&rand()<0.5?1:0);k++){const cb=new THREE.Mesh(new THREE.BoxGeometry(120,44,46),lam(CC[(rand()*CC.length)|0]));cb.position.set(0,22+k*45,cI*48);cb.castShadow=true;g.add(cb);
+            for(let r=-2;r<=2;r++){const rib=new THREE.Mesh(new THREE.BoxGeometry(3,40,47),lam(0x000000));rib.material.transparent=true;rib.material.opacity=0.18;rib.position.set(r*22,22+k*45,cI*48);g.add(rib);}}return g;},
         piles:()=>{const g=new THREE.Group(),p=new THREE.Mesh(new THREE.ConeGeometry(60+rand()*30,50+rand()*20,9),lam(rand()<0.5?0xb89a6a:0x9a8a74));p.position.y=28;p.castShadow=true;g.add(p);return g;}}[tt];
       const cnt=opt.treeCount||70;
-      for(let k=0,tries=0;k<cnt&&tries<1500;tries++){const x=lerp(bx0+200,bx1-200,rand()),y=lerp(by0+200,by1-200,rand());if(opt.sea&&y>T.shore-60)continue;const th=terrainH(T,x,y);if(th.ex<T.falloff+40+(T.canyon?T.canyon.from+T.canyon.ramp:0))continue;
+      for(let k=0,tries=0;k<cnt&&tries<1500;tries++){const x=lerp(bx0+200,bx1-200,rand()),y=lerp(by0+200,by1-200,rand());if(opt.sea&&y>T.shore-60)continue;if(T.canal&&x>T.canal[0]-90&&x<T.canal[1]+90&&Math.abs(y)<340)continue;const th=terrainH(T,x,y);if(th.ex<T.falloff+40+(T.canyon?T.canyon.from+T.canyon.ramp:0))continue;
         const gT=mk();gT.scale.setScalar(S*(0.8+rand()*0.7));gT.rotation.y=rand()*TAU;gT.position.set(x*S,th.h*S,y*S);sc.add(gT);k++;}}
     if(opt.tires){const tg=new THREE.TorusGeometry(9*S,4*S,6,12),tm=lam(0x1f1f22),tm2=lam(0xeeeeee);
       for(let i=0;i<N;i+=7){const a=P[i];if(a.tun)continue;for(const sd of[1,-1]){if((i/7+(sd>0?0:1))%2)continue;const o=sd*(a.w/2+34);const x=a.x+a.nx*o,y=a.y+a.ny*o;const z=zAt(a,o);for(let k=0;k<2;k++){const t=new THREE.Mesh(tg,k?tm2:tm);t.rotation.x=Math.PI/2;t.position.set(x*S,(z+4+k*8)*S,y*S);t.castShadow=true;sc.add(t);}}}}
@@ -173,6 +194,7 @@ function make3D(opt){
     }
     if(mode!=='cockpit'){const sh=g.shake*0.004;this.cam.position.set(this.cp.x+(Math.random()-0.5)*sh,this.cp.y+(Math.random()-0.5)*sh,this.cp.z);this.cam.lookAt(this.lt);this.cam.updateProjectionMatrix();}
     if(!ov){this.dl.position.set(p.x*S+25,p.z*S+60,p.y*S+15);this.dl.target.position.set(p.x*S,p.z*S,p.y*S);}
+    if(this.canalW)this.canalW.position.y=(-20+Math.sin(performance.now()/600)*0.8)*S;
     if(this.sea)this.sea.position.y=(1+Math.sin(performance.now()/700)*0.8)*S;
     const ck=mode==='cockpit';for(let i=0;i<this.spr.length;i++){const s=this.spr[i],q=g.parts[i];if(!q||(ck&&q.o===p)){s.visible=false;continue;}s.visible=true;s.position.set(q.x*S,(q.z+q.r*0.4)*S,q.y*S);const sc=q.r*2.2*S*(ov?1.6:1);s.scale.set(sc,sc,1);s.material.color.set(q.col);s.material.opacity=(q.life/q.max)*0.6;}
     r.render(this.sc,this.cam);

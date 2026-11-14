@@ -111,7 +111,7 @@ function stepCar(c,inp,dt,T,racing){
     let acc=0;
     if(gas||bo)acc+=PW*clamp(1-vF/TP,0,1.3);
     if(brk)acc+=vF>15?-1250:-c.power*0.55*clamp(1+vF/(c.top*0.35),0,1);
-    acc-=vF*sf.drag;
+    acc-=vF*sf.drag*(c.off&&c.offM?c.offM:1);
     vF+=acc*dt;
     if(!gas&&!brk){const r=Math.min(Math.abs(vF),70*dt);vF-=Math.sign(vF)*r;}
     const sp=Math.abs(vF);
@@ -141,7 +141,7 @@ function stepCar(c,inp,dt,T,racing){
   c.gz=gz;
   if(c.air){
     c.vz-=GRAV*dt;c.z+=c.vz*dt;c.airT+=dt;
-    if(c.z<=gz){const imp=-c.vz;c.z=gz;if(imp>340){c.vz=imp*0.22;c.z+=0.01;}else{c.air=false;c.vz=0;}c.land=Math.max(c.land,imp);c.pitchV-=imp*0.0035;}
+    if(c.z<=gz){const imp=-c.vz;c.z=gz;if(imp>(c.susp||340)){c.vz=imp*0.22;c.z+=0.01;}else{c.air=false;c.vz=0;}c.land=Math.max(c.land,imp);c.pitchV-=imp*(c.susp?0.0018:0.0035);}
   }else{
     const vzg=Math.min(500,(gz-c.z)/dt);
     if(vzg<c.vz-GRAV*dt-22){c.air=true;c.airT=0;c.vz-=GRAV*dt;c.z+=c.vz*dt;if(c.z<gz){c.z=gz;c.air=false;c.vz=vzg;}}
@@ -223,6 +223,7 @@ const SF={
   redDirt:{grip:4.6,drag:0.4,name:'붉은 흙길'},gravel:{grip:3,drag:1.5,name:'자갈밭'},
   stone:{grip:6.5,drag:0.35,name:'돌길'},lawn:{grip:4,drag:1.4,name:'잔디밭'},
   site:{grip:3.8,drag:0.5,name:'공사장 자갈'},mud:{grip:2.2,drag:2.4,name:'진흙'},
+  steel:{grip:2.3,drag:0.22,name:'젖은 철판'},dock:{grip:4.4,drag:1.3,name:'부두 콘크리트'},canal:{grip:1.6,drag:3.8,name:'운하 물'},
 };
 const ICE=[[700,0,190],[1080,425,150],[300,860,170],[900,1300,160]];
 const COURSES={
@@ -258,5 +259,10 @@ const COURSES={
     falloff:60,laps:2,tunnels:[[0.74,0.81]],bumps:[{s:0.08,prof:[[0,0],[80,34],[92,0]]},{s:0.39,prof:[[0,0],[6,-58],[110,-58],[270,0]]},{s:0.9,prof:[[0,0],[60,24],[110,24],[170,0]]}],
     obstacles:[{x:1050,y:-70,w:24,h:24,kind:'cone',hgt:24},{x:1150,y:40,w:24,h:24,kind:'cone',hgt:24},{x:1250,y:-50,w:24,h:24,kind:'cone',hgt:24},{x:-360,y:1080,w:40,h:40,kind:'barrel'},{x:-250,y:840,w:40,h:40,kind:'barrel'}],
     surface:(x,y,l)=>onTrack(l)?SF.site:SF.mud},
+  harbor:{ctrl:[[0,0,0,175],[780,0,0,175],[1430,-52,0,175],[1885,195,0,175],[1950,650,0,175],[1625,975,0,175],[1040,1040,0,175],[520,910,0,175],[130,1105,0,175],[-325,1066,0,175],[-650,780,0,175],[-676,325,0,175],[-455,65,0,175]],
+    falloff:50,laps:3,shore:1290,canal:[700,810],steel:[[1780,2160,380,900],[-900,-560,450,900]],tunnels:[[0.5,0.57]],
+    bumps:[{s:0.09,prof:[[0,0],[90,34],[96,-30],[176,-30],[270,0]]},{s:0.64,prof:[[0,0],[10,8],[20,0],[60,0],[70,8],[80,0]]},{s:0.86,prof:[[0,0],[60,26],[66,0]]}],
+    surface:(x,y,l)=>{if(x>700&&x<810&&y>-260&&y<260)return SF.canal;if(!onTrack(l))return y>1290?SF.sea:SF.dock;
+      for(const r of COURSES.harbor.steel)if(x>r[0]&&x<r[1]&&y>r[2]&&y<r[3])return SF.steel;return SF.asphalt;}},
 };
 //#ENDCORE

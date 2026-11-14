@@ -31,6 +31,7 @@ function profileShape(sp){
   const s=new THREE.Shape(),t=sp.top;s.moveTo(t[0][0],t[0][1]);s.splineThru(t.slice(1).map(p=>V2(p[0],p[1])));
   const R=sp.R,cy=R,yb=sp.yb,r=R+1.5,a0=-Math.asin(Math.min(.95,(cy-yb)/r));
   const [xr,xf]=sp.axles;
+  if(sp.noArch){s.lineTo(t[t.length-1][0],yb);s.lineTo(t[0][0],t[0][1]);return s;}
   s.lineTo(xf+r*Math.cos(a0),yb);s.absarc(xf,cy,r,a0,Math.PI-a0,false);
   s.lineTo(xr+r*Math.cos(a0),yb);s.absarc(xr,cy,r,a0,Math.PI-a0,false);
   s.lineTo(t[0][0],t[0][1]);return s;
@@ -143,6 +144,34 @@ const DESIGNS=[
    paintTop(p){p.band(0,1,'#0f3b2a');p.band(.38,.46,'#efe6cf');p.band(.54,.62,'#efe6cf');},
    extras(g,S,mat){for(const s of[1,-1]){cyl(1.8,1,mat.chrome,21.6,11,s*6.2,g,'x');cyl(1.4,1.2,mat.glowW,21.8,11,s*6.2,g,'x');}box(1.2,1,S.W+1,mat.chrome,23,6.4,0,g);box(1.2,1,S.W+1,mat.chrome,-22.4,6.6,0,g);
      box(3,0.6,S.W-3,mat.body,-20.4,15.4,0,g,0.3);}}},
+ {k:'F',name:'데저트 버기',cls:'스카라브 · 오프로드 버기',desc:'긴 서스펜션 위에 얹은 낮은 욕조형 차체와 드러난 롤케이지, 큰 블록 타이어. 모래색 바탕에 블랙 아래판과 오렌지 사선 데칼, 지붕 라이트바.',
+  sw:[['#d9c49a','듄 샌드'],['#ff7a1a','시그널 오렌지'],['#2a2724','차콜'],['#b07a3a','브론즈 휠']],parts:['롤케이지','라이트바 4등','스페어 타이어','불바','블록 타이어'],
+  sp:{W:15,R:7.8,tw:7.6,yb:7.4,track:10.6,noArch:true,axles:[-14,14.5],top:[[-18,7.4],[-19.2,10.6],[-18.4,13.8],[-13,14.6],[-8,13.6],[0,13.2],[7,13.6],[12,14.4],[17.6,12.6],[20.6,9.6],[20.4,7.4]],
+   win:[[-6,15.6],[-5,15.8],[4,15.8],[5,15.6]],ws:[[4.6,21.4],[7.4,16.6]],
+   body:0xc9a66b,matte:true,wheel:{rim:0xb07a3a,caliper:0x2a2724,spokes:8},
+   paint(p,S){p.band(0,1,'#c9a66b');p.band(0,.34,'#2a2724');p.band(.34,.37,'#ff7a1a',.02,.98);
+     for(let i=0;i<3;i++)p.poly([[.62+i*.07,.33],[.66+i*.07,.33],[.74+i*.07,.8],[.7+i*.07,.8]],'#ff7a1a');
+     roundel(p,.4,.58,.17,'#f1e6c8','#2a2724','33','#2a2724');p.text('DUNE · PUFF',.16,.6,.08,'#2a2724');p.text('OFF-ROAD',.4,.18,.08,'#c9a66b');p.text('4X4',.9,.62,.08,'#2a2724');},
+   paintTop(p){p.band(0,1,'#c9a66b');p.band(.44,.56,'#2a2724');p.band(.42,.44,'#ff7a1a');p.band(.56,.58,'#ff7a1a');},
+   extras(g,S,mat,g0){const tube=(a,b,r,m)=>{const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),L=A.distanceTo(B),t=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,10),m);t.position.copy(A).add(B).multiplyScalar(.5);t.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize());t.castShadow=true;g0.add(t);return t;};
+     const cm=mat.black,zc=S.W/2-0.8,yb=12.6,yt=21.6;
+     for(const z of[-zc,zc]){tube([7,yb,z],[3.4,yt,z*0.9],0.75,cm);tube([-9,yb,z],[-7.6,yt,z*0.9],0.75,cm);tube([3.4,yt,z*0.9],[-7.6,yt,z*0.9],0.75,cm);tube([-7.6,yt,z*0.9],[-17,15.4,z*0.8],0.65,cm);}
+     tube([3.4,yt,-zc*0.9],[3.4,yt,zc*0.9],0.75,cm);tube([-7.6,yt,-zc*0.9],[-7.6,yt,zc*0.9],0.75,cm);tube([3.4,yt,-zc*0.9],[-7.6,yt,zc*0.9],0.55,cm);
+     // 지붕 패널 + 라이트바
+     const rf=new THREE.Mesh(new THREE.BoxGeometry(11.6,0.6,S.W-6.6),mat.body);rf.position.set(-2.1,yt+0.2,0);rf.castShadow=true;g0.add(rf);
+     box(1.6,1.8,S.W-5,mat.black,3.2,yt+1.4,0,g0);for(let i=0;i<4;i++){cyl(0.85,0.6,mat.chrome,4.1,yt+1.4,(i-1.5)*3.4,g0,'x');cyl(0.7,0.7,mat.glowW,4.3,yt+1.4,(i-1.5)*3.4,g0,'x');}
+     // 좌석 두 개 + 핸들
+     for(const z of[-3.6,3.6]){box(4,1.2,4.6,mat.black,-4,15.8,z,g0);box(1.2,6,4.6,mat.black,-6.2,18.4,z,g0,0.18);}
+     // 불바 + 스키드 플레이트
+     tube([21.6,9,-6],[21.6,9,6],0.7,mat.chrome);for(const z of[-6,6])tube([20.4,7.4,z],[21.6,13.4,z],0.6,mat.chrome);tube([21.6,13.4,-6],[21.6,13.4,6],0.6,mat.chrome);
+     box(30,0.6,S.W-3,mat.chrome,0,6.8,0,g0);
+     // 스페어 타이어 (뒤 데크)
+     const sp=new THREE.Mesh(new THREE.TorusGeometry(3.6,1.6,10,22),M.rubber());sp.rotation.x=Math.PI/2;sp.position.set(-15,17.6,0);sp.castShadow=true;g0.add(sp);cyl(2,1.4,M.metal(0xb07a3a),-15,17.6,0,g0);
+     // 배기구 + 쇽업소버
+     for(const z of[-3,3])tube([-19.6,12,z],[-22,13.6,z],0.8,mat.chrome);
+     const om=M.paint(0xff7a1a,{envMap:null});for(const x of S.axles)for(const z of[-1,1]){const hz=z*(S.track-3.6);
+       tube([x-3,8,z*(S.W/2-1)],[x,S.R,hz],0.55,cm);tube([x+3,8,z*(S.W/2-1)],[x,S.R,hz],0.55,cm);tube([x-3,11.4,z*(S.W/2-1)],[x,S.R+2,hz],0.5,cm);
+       tube([x,S.R+1,hz*0.92],[x+(x>0?-3.5:3.5),15.6,z*(S.W/2-1.2)],0.9,om);cyl(0.5,9,mat.chrome,x+(x>0?-1.7:1.7),S.R+4.6,hz*0.86,g0);}}}},
 ];
 function ctxRect(p,u,v,w,h,col){p.ctx.fillStyle=col;p.ctx.fillRect(u*p.cw,(1-v-h)*p.ch,w*p.cw,h*p.ch);}
 
@@ -161,16 +190,16 @@ function buildCar(D){
   slab(S.ws[0],S.ws[1],S.W*0.8,0.5,0.75,M.glass(),g);if(S.rw)slab(S.rw[0],S.rw[1],S.W*0.76,0.5,0.75,M.glass(),g);
   const [xr,xf]=S.axles,front=Math.max(...S.top.map(p=>p[0])),rear=Math.min(...S.top.map(p=>p[0]));
   box(xf-xr+10,1.2,S.W-3,mat.black,(xr+xf)/2,S.yb-1.4,0,g);box(5,0.7,S.W+1.5,mat.carbon,front-1.4,S.yb-0.9,0,g);
-  for(const s of[1,-1])box(xf-xr-2*(S.R+2),1.4,1,mat.carbon,(xr+xf)/2,S.yb+0.4,s*(S.W/2+0.2),g);
+  if(!S.noArch)for(const s of[1,-1])box(xf-xr-2*(S.R+2),1.4,1,mat.carbon,(xr+xf)/2,S.yb+0.4,s*(S.W/2+0.2),g);
   box(4,1.6,S.W-6,mat.carbon,rear+1.6,S.yb-0.2,0,g);for(let i=0;i<4;i++)box(4,2.4,0.3,mat.carbon,rear+1.6,S.yb-0.4,(i-1.5)*3.6,g);
   for(const s of[1,-1])cyl(0.7,2.4,mat.chrome,rear-0.4,S.yb+1.2,s*3.4,g,'x');
   const fy=S.top.find(p=>p[0]>front-3&&p[1]>S.yb+2)||[front,S.yb+5];
-  if(D.k!=='E')for(const s of[1,-1])box(0.6,1.1,4.2,mat.glowW,front-0.2,fy[1]-0.4,s*(S.W/2-3.4),g);
+  if(D.k!=='E'&&D.k!=='F')for(const s of[1,-1])box(0.6,1.1,4.2,mat.glowW,front-0.2,fy[1]-0.4,s*(S.W/2-3.4),g);
   box(0.5,1,S.W-4,M.glow(0xff2a2a),rear-0.1,S.top[2][1]-1.2,0,g);
   for(const s of[1,-1]){box(1.6,1.1,2.2,mat.body,S.ws[1][0]-1.4,S.ws[1][1]+0.4,s*(S.W/2+0.8),g);}
   const gx=new THREE.Group();gx.scale.y=SQ;gx.position.y=S.yb*(1-SQ);g.add(gx);S.extras(gx,S,mat,g);
   const wheels=[],fronts=[];
-  for(const x of S.axles)for(const s of[1,-1]){const piv=new THREE.Group();piv.position.set(x,S.R,s*(S.W/2-S.tw/2+1.6));inner.add(piv);
+  for(const x of S.axles)for(const s of[1,-1]){const piv=new THREE.Group();piv.position.set(x,S.R,s*(S.track||(S.W/2-S.tw/2+1.6)));inner.add(piv);
     const flip=new THREE.Group();if(s<0)flip.rotation.y=Math.PI;piv.add(flip);const wh=wheel(S,S.wheel);wh.position.set(0,0,0);wh.userData.sgn=s<0?-1:1;flip.add(wh);wheels.push(wh);if(x>0)fronts.push(piv);}
   root.traverse(o=>{if(o.isMesh)o.castShadow=true;});
   return{g:root,body:g,wheels,fronts,cab:new THREE.Group()};

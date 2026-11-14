@@ -191,7 +191,7 @@ body.fine .mm-keys{display:flex}
 #gStats{display:flex;flex-direction:column;gap:5px}
 .gs{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:8px;font-size:12px;color:#9db9a9}
 .gs i{height:8px;border-radius:4px;background:#0a1d16;overflow:hidden}.gs u{display:block;height:100%;background:var(--orange);text-decoration:none;transition:width .3s}
-#gPick{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+#gPick{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
 .gchip{appearance:none;border:2px solid transparent;border-radius:12px;background:#0a1d16;color:#eef4ec;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:4px;font:500 11px var(--f-body);cursor:pointer;min-height:44px}
 .gchip i{width:26px;height:12px;border-radius:4px;background:var(--c);box-shadow:inset 0 -4px 0 var(--d)}
 .gchip.on{border-color:var(--orange)}
@@ -295,8 +295,8 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   #garage .mm-arrow{width:clamp(48px,13vmin,60px);height:clamp(48px,13vmin,60px)}
 }
 @media (pointer:coarse) and (max-height:420px){#gDesc{display:none}.gs{line-height:1.1}}
-.gchip span{white-space:nowrap;letter-spacing:-.02em}
-@media (pointer:coarse){.gchip{font-size:clamp(10px,2.9vmin,13px)}}
+.gchip span{white-space:nowrap;letter-spacing:-.02em;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+@media (pointer:coarse){.gchip{font-size:clamp(10px,2.6vmin,12.5px)}}
 @media (pointer:coarse) and (orientation:portrait){.mm-logo{white-space:nowrap;font-size:20px}#mmCount{display:none}body.mobile #verBtn{top:calc(54px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px))}}
 @media (pointer:coarse) and (orientation:portrait){
   #ttCur{width:min(88vw,50vh);top:42%}#ttPrev,#ttNext{width:min(46vw,26vh);top:42%;opacity:.3}
@@ -305,6 +305,19 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   #mmGo{left:20px;right:20px;width:auto}
   .gx-main{grid-template-columns:1fr;grid-template-rows:minmax(40vh,1fr) auto}
 }
+/* ---- 휴대폰 세로 차고: 출발 버튼이 항상 화면 안에 (v2.4) ---- */
+@media (orientation:portrait){
+  .gx-main{grid-template-rows:minmax(120px,1fr) auto;gap:8px}
+  .gx-side{align-self:end;max-height:100%;padding:12px 14px;gap:6px}
+  #gPick{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .gchip{min-height:40px;flex-direction:row;justify-content:center;gap:6px;padding:4px 2px}
+  #gName{font-size:clamp(24px,7.4vmin,34px)}#gDesc{font-size:12.5px;line-height:1.45}
+  .gs{font-size:12px;grid-template-columns:76px 1fr}.gs i{height:8px}
+  #gGo{margin-top:6px;height:52px;font-size:22px}
+}
+@media (orientation:portrait) and (max-height:600px){#gDesc{display:none}}
+/* ---- 휴대폰 세로 리플레이: 태그를 라벨 아래로 (v2.4) ---- */
+@media (max-width:640px){#rpTag{top:calc(9vh + 40px);font-size:24px}}
 /* ---- 휴대폰 세로: 버튼이 겹치지 않게 재배치 ---- */
 @media (pointer:coarse) and (orientation:portrait){
   #touch .side{bottom:calc(14px + env(safe-area-inset-bottom,0px))}
@@ -389,11 +402,12 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 <button id="verBtn" type="button" aria-haspopup="dialog">v2.3 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.3</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.4</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v2.4</b><span>새 코스 11 항구 컨테이너 부두(밤 항구, 도개교 운하 점프, 컨테이너 터널, 젖은 철판, 가로등)와 여섯 번째 차 스카라브(롤케이지 오프로드 버기, 길 밖에서 덜 느려지고 점프 착지가 안정적). Esc·P로 일시정지 풀기, 휴대폰 세로 차고에서 출발 버튼이 잘리던 문제와 리플레이 글자 겹침 수정, 출발 전에는 시간 차 대신 '출발 대기 중' 표시.<em>2026.11.14</em></span></li>
         <li><b>v2.3</b><span>자동차 디자인 새 단장: 차체를 옆모습 곡선으로 깎고 휠·브레이크·윙·스플리터 등 부품을 따로 만든 디테일 모델, 레이싱 배색과 데칼(번호·줄무늬·스폰서). 다섯 번째 차 클래식 추가.<em>2026.11.13</em></span></li>
         <li><b>v2.2</b><span>시점 버튼에 운전자 시점 추가(전체 조망 → 드론 → 추격 → 운전자 순서로 바뀜), 바꿀 때 시점 이름 표시. 휴대폰 코스·차 고르기 화면을 화면 크기에 맞춰 크게.<em>2026.11.13</em></span></li>
         <li><b>v2.1</b><span>게임 화면 새 단장: 왼쪽에 실시간으로 자리를 바꾸는 순위 타워, 위쪽 가운데 P순위와 앞차·뒤차 시간 차, 오른쪽 아이콘 버튼(일시정지·소리·시점·차 안), 표정 있는 방구 구름 게이지와 뿡 버튼. 일시정지 메뉴 추가.<em>2026.11.12</em></span></li>
