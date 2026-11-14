@@ -344,6 +344,20 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   .cockpit #hClouds{right:calc(max(16px,env(safe-area-inset-right,0px)) + 200px);bottom:calc(88px + env(safe-area-inset-bottom,0px))}
   .cockpit #hClouds svg{width:34px;height:24px}
 }
+/* ---- 미니맵 · 사이드미러 ---- */
+#hMini{position:absolute;right:calc(max(10px,env(safe-area-inset-right,0px)) + 60px);top:calc(10px + env(safe-area-inset-top,0px));width:140px;height:140px;box-sizing:border-box;padding:7px;background:rgba(16,24,28,.4);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.28);border-radius:18px;overflow:visible}
+#hMini .road0{fill:none;stroke:rgba(10,14,16,.75);stroke-width:7px;stroke-linejoin:round}
+#hMini .road1{fill:none;stroke:#e9e2d4;stroke-width:3.5px;stroke-linejoin:round}
+#hMini .start{stroke:#ff7a1a;stroke-width:3px}
+#hMini circle{stroke:#10181c;stroke-width:1.4px}#hMini circle.me{stroke:#fff;stroke-width:2.4px}
+.mirrorF{position:absolute;z-index:2;pointer-events:none;box-sizing:border-box;border:5px solid #1b1e22;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.18)}
+.mirrorF::after{content:"";position:absolute;inset:0;border-radius:7px;background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,0) 45%)}
+@media (pointer:coarse) and (orientation:landscape){.cockpit #hint{top:calc(80px + env(safe-area-inset-top,0px))}#hMini{width:84px;height:84px;padding:4px;border-radius:14px}}
+@media (pointer:coarse) and (orientation:portrait){
+  #hMini{right:auto;top:auto;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(182px + env(safe-area-inset-bottom,0px));width:96px;height:96px;padding:5px;border-radius:14px}
+  #hint{top:calc(290px + env(safe-area-inset-top,0px))}
+  #tZone .tip{bottom:calc(300px + env(safe-area-inset-bottom,0px))}
+}
 #camToast{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%) scale(.9);background:rgba(16,24,28,.62);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:10px 22px;font-family:var(--f-disp);font-size:clamp(18px,5vmin,26px);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 #camToast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 @media (prefers-reduced-motion:reduce){.go{transition:none}}
@@ -399,14 +413,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v2.3 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v2.5 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.4</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.5</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v2.5</b><span>차 안(운전자) 시점에 좌우 사이드미러 추가 — 실제 거울처럼 좌우가 뒤집힌 뒤쪽 화면이 실시간으로 보여요. 레이스 화면에 미니맵 추가 — 코스 모양 위에 내 차(주황)와 상대 차 위치가 움직여요(전체 조망 시점에서는 숨김).<em>2026.11.15</em></span></li>
         <li><b>v2.4</b><span>새 코스 11 항구 컨테이너 부두(밤 항구, 도개교 운하 점프, 컨테이너 터널, 젖은 철판, 가로등)와 여섯 번째 차 스카라브(롤케이지 오프로드 버기, 길 밖에서 덜 느려지고 점프 착지가 안정적). Esc·P로 일시정지 풀기, 휴대폰 세로 차고에서 출발 버튼이 잘리던 문제와 리플레이 글자 겹침 수정, 출발 전에는 시간 차 대신 '출발 대기 중' 표시.<em>2026.11.14</em></span></li>
         <li><b>v2.3</b><span>자동차 디자인 새 단장: 차체를 옆모습 곡선으로 깎고 휠·브레이크·윙·스플리터 등 부품을 따로 만든 디테일 모델, 레이싱 배색과 데칼(번호·줄무늬·스폰서). 다섯 번째 차 클래식 추가.<em>2026.11.13</em></span></li>
         <li><b>v2.2</b><span>시점 버튼에 운전자 시점 추가(전체 조망 → 드론 → 추격 → 운전자 순서로 바뀜), 바꿀 때 시점 이름 표시. 휴대폰 코스·차 고르기 화면을 화면 크기에 맞춰 크게.<em>2026.11.13</em></span></li>
@@ -445,6 +460,7 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   <div id="hud">
     <div id="hLapBlk"><span class="k">LAP</span><b><span id="hLap">1</span><small id="hLapN"> / 3</small></b><span id="hTime">0:00.00</span><span class="k2">BEST <span id="hBest">—</span></span></div>
     <div id="hTower" aria-live="polite"><div id="hRows"></div><div id="hChg"></div></div>
+    <svg id="hMini" role="img" aria-label="미니맵: 코스에서 내 위치"><g id="hMiniT"></g><g id="hMiniC"></g></svg>
     <div id="hPill"><span id="hPos">P3</span><span id="hDots" role="img" aria-label="현재 순서"></span><span class="gaps"><span id="hGapF">—</span><span id="hGapB">—</span></span></div>
     <div id="hRail">
       <button class="rb" id="bPause" type="button" aria-label="일시정지"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg></button>

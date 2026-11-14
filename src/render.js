@@ -198,9 +198,32 @@ function make3D(opt){
     if(this.sea)this.sea.position.y=(1+Math.sin(performance.now()/700)*0.8)*S;
     const ck=mode==='cockpit';for(let i=0;i<this.spr.length;i++){const s=this.spr[i],q=g.parts[i];if(!q||(ck&&q.o===p)){s.visible=false;continue;}s.visible=true;s.position.set(q.x*S,(q.z+q.r*0.4)*S,q.y*S);const sc=q.r*2.2*S*(ov?1.6:1);s.scale.set(sc,sc,1);s.material.color.set(q.col);s.material.opacity=(q.life/q.max)*0.6;}
     r.render(this.sc,this.cam);
+    this.drawMirrors(ck,W,H);
+  },
+  // 차 안 시점 사이드미러: 장면을 좌우 반전해 뒤쪽을 작은 화면에 그린다
+  mirrorRects(W,H){
+    const co=matchMedia('(pointer:coarse)').matches;
+    if(H>W){const w=Math.min(W*0.34,150),h=Math.round(w*0.46);return[[24,214,w,h],[W-24-w,214,w,h]];}
+    if(co&&H<500){const w=Math.min(W*0.11,96),h=Math.round(w*0.5),cx=W/2,pw=262;return[[cx-pw/2-10-w,26,w,h],[cx+pw/2+10,26,w,h]];}
+    const w=Math.min(W*0.17,220),h=Math.round(w*0.46),y=Math.round(H*0.5),m=Math.round(W*0.06);return[[m,y,w,h],[W-m-w,y,w,h]];
+  },
+  drawMirrors(on,W,H){
+    const view=this.r.domElement.parentNode;
+    if(!this.mf){this.mf=[0,1].map(()=>{const d=document.createElement('div');d.className='mirrorF';d.hidden=true;view.appendChild(d);return d;});
+      this.mc=new THREE.PerspectiveCamera(30,2,0.5,900);}
+    if(!on){if(this._mOn){this.mf.forEach(d=>d.hidden=true);this._mOn=false;}return;}
+    const R=this.mirrorRects(W,H),key=W+'x'+H;
+    if(!this._mOn||this._mKey!==key){this._mOn=true;this._mKey=key;R.forEach((q,i)=>{const d=this.mf[i];d.hidden=false;Object.assign(d.style,{left:(q[0]-5)+'px',top:(q[1]-5)+'px',width:(q[2]+10)+'px',height:(q[3]+10)+'px'});});}
+    const r=this.r,sc=this.sc,mc=this.mc,pm=this.meshes[this.pi],au=r.shadowMap.autoUpdate;
+    const P=R.map((q,i)=>{const s=i?1:-1;return[pm.body.localToWorld(new THREE.Vector3(3,13,s*11)),pm.body.localToWorld(new THREE.Vector3(-80,7,s*30))];});
+    r.shadowMap.autoUpdate=false;sc.scale.x=-1;r.setScissorTest(true);
+    R.forEach((q,i)=>{const pos=P[i][0],tg=P[i][1];
+      mc.aspect=q[2]/q[3];mc.position.set(-pos.x,pos.y,pos.z);mc.up.set(0,1,0);mc.lookAt(-tg.x,tg.y,tg.z);mc.updateProjectionMatrix();
+      const y=H-q[1]-q[3];r.setViewport(q[0],y,q[2],q[3]);r.setScissor(q[0],y,q[2],q[3]);r.render(sc,mc);});
+    sc.scale.x=1;r.setScissorTest(false);r.setViewport(0,0,W,H);r.shadowMap.autoUpdate=au;
   },
   cycleCam(){const L=[...this.opt.cams,'cockpit'];const n=L[(L.indexOf(this.camMode)+1)%L.length];this.setMode(n);return CAM_NAMES[n];},
   toggleCockpit(){if(this.camMode==='cockpit'){this.setMode(this.prevMode);return CAM_NAMES[this.prevMode];}this.setMode('cockpit');return CAM_NAMES.cockpit;},
-  dispose(){this.r.dispose();this.r.domElement.remove();}
+  dispose(){if(this.mf)this.mf.forEach(d=>d.remove());this.r.dispose();this.r.domElement.remove();}
   };
 }
