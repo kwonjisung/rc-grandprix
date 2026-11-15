@@ -39,9 +39,23 @@ function ttRender(dir){
 function ttGo(i,silent){const n=VARIANTS.length,d=i-ttIdx;ttIdx=((i%n)+n)%n;SEL.course=ttIdx;SEL.save();ttRender(silent?0:(d>0||d<-n/2?1:-1));}
 $('#mmPrev').onclick=()=>ttGo(ttIdx-1);$('#mmNext').onclick=()=>ttGo(ttIdx+1);$('#ttPrev').onclick=()=>ttGo(ttIdx-1);$('#ttNext').onclick=()=>ttGo(ttIdx+1);
 $('#mmGo').onclick=()=>{if(!window.THREE){$('#mmGo').textContent='3D 엔진을 불러오지 못했어요';return;}openGarage(ttIdx);};
-{let sx=null,sy=0;const st=$('#mmStage');st.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY;});
-  st.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy))ttGo(ttIdx+(dx<0?1:-1));});
-  st.addEventListener('pointercancel',()=>{sx=null;});}
+// 좌우로 밀어서 넘기기 (손가락을 따라 움직이고, 충분히 밀면 다음/이전으로)
+function addSwipe(el,{onDrag,onEnd}){
+  let id=null,sx=0,sy=0,dx=0,horiz=null,t0=0,moved=false;
+  el.addEventListener('pointerdown',e=>{if(e.button>0)return;id=e.pointerId;sx=e.clientX;sy=e.clientY;dx=0;horiz=null;moved=false;t0=performance.now();});
+  el.addEventListener('pointermove',e=>{if(e.pointerId!==id)return;const mx=e.clientX-sx,my=e.clientY-sy;
+    if(horiz===null&&Math.hypot(mx,my)>8){horiz=Math.abs(mx)>Math.abs(my);if(horiz){try{el.setPointerCapture(id);}catch(_){}}}
+    if(horiz){dx=mx;moved=true;onDrag(dx);}});
+  const end=e=>{if(e.pointerId!==id)return;id=null;if(!horiz){return;}
+    const v=dx/Math.max(1,performance.now()-t0),W=el.clientWidth||innerWidth,go=Math.abs(dx)>Math.min(90,W*0.18)||(Math.abs(dx)>30&&Math.abs(v)>0.45);
+    onEnd(go?(dx<0?1:-1):0);horiz=null;};
+  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',e=>{if(e.pointerId!==id)return;id=null;if(horiz)onEnd(0);horiz=null;});
+  el.addEventListener('click',e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false;}},true);
+}
+addSwipe($('#mmStage'),{
+  onDrag:dx=>{const c=$('#ttCur');c.classList.remove('in-l','in-r');c.style.transition='none';c.style.transform=`translate(calc(-50% + ${dx}px),-50%) rotate(${dx*0.01}deg)`;c.style.opacity=String(Math.max(0.35,1-Math.abs(dx)/600));},
+  onEnd:d=>{const c=$('#ttCur');c.style.transition='';c.style.transform='';c.style.opacity='';if(d)ttGo(ttIdx+d);}
+});
 function setMobile(){document.body.classList.add('mobile');document.body.classList.toggle('fine',!matchMedia('(pointer:coarse)').matches);}
 addEventListener('keydown',e=>{if(G||GX.open||INTRO.open||!$('#verModal').hidden)return;if(e.code==='ArrowLeft'||e.code==='KeyA'){ttGo(ttIdx-1);}else if(e.code==='ArrowRight'||e.code==='KeyD'){ttGo(ttIdx+1);}else if(e.code==='Enter'||e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)$('#mmGo').click();}});
 addEventListener('resize',setMobile);setMobile();ttRender();
@@ -66,7 +80,7 @@ function gxScene(c){
   GX.turn=new THREE.Group();sc.add(GX.turn);
   GX.cam=new THREE.PerspectiveCamera(36,1,0.1,50);GX.cam.position.set(0,2.6,5.6);GX.cam.lookAt(0,0.45,0);
   const loop=()=>{if(!GX.open)return;const v=$('#gView'),W=v.clientWidth,H=v.clientHeight;if(GX._w!==W||GX._h!==H){r.setSize(W,H,false);const asp=W/H,dd=(matchMedia('(pointer:coarse)').matches?5.0:6.6)*Math.max(1,1.35/asp);GX.cam.aspect=asp;GX.cam.position.set(0,dd*0.46,dd);GX.cam.lookAt(0,0.4,0);GX.cam.updateProjectionMatrix();GX._w=W;GX._h=H;}
-    GX.turn.rotation.y+=0.008;if(GX.mesh)GX.mesh.wheels.forEach(w=>w.rotation.z-=0.04);r.render(sc,GX.cam);GX.raf=requestAnimationFrame(loop);};
+    GX.turn.rotation.y+=0.008;{const W=$('#gView').clientWidth||1,tx=(GX.drag||0)/W*5.5;GX.slide=(GX.slide||0)*0.82;GX.turn.position.x+=(tx+GX.slide-GX.turn.position.x)*0.35;}if(GX.mesh)GX.mesh.wheels.forEach(w=>w.rotation.z-=0.04);r.render(sc,GX.cam);GX.raf=requestAnimationFrame(loop);};
   GX._w=0;cancelAnimationFrame(GX.raf);GX.raf=requestAnimationFrame(loop);
 }
 function gxSet(i){
@@ -77,6 +91,7 @@ function gxSet(i){
   CARS.forEach((_,j)=>{const b=$('#gchip-'+j);b.classList.toggle('on',j===GX.ci);b.setAttribute('aria-pressed',j===GX.ci?'true':'false');});
 }
 $('#gPrev').onclick=()=>gxSet(GX.ci-1);$('#gNext').onclick=()=>gxSet(GX.ci+1);
+addSwipe($('#gView'),{onDrag:dx=>{GX.drag=dx;},onEnd:d=>{GX.drag=0;if(d){gxSet(GX.ci+d);GX.slide=d*2.6;}}});
 $('#gBack').onclick=closeGarage;
 $('#gGo').onclick=()=>{SEL.car=GX.ci;SEL.course=GX.vi;SEL.save();startGame(GX.vi,GX.ci);};
 addEventListener('keydown',e=>{if(!GX.open||e.repeat||performance.now()-GX.t0<250)return;if(e.code==='ArrowLeft')gxSet(GX.ci-1);else if(e.code==='ArrowRight')gxSet(GX.ci+1);else if(e.code==='Enter'||e.code==='Space'){e.preventDefault();$('#gGo').click();}else if(e.code==='Escape')closeGarage();});
@@ -115,3 +130,11 @@ const INTRO={open:false};
 
 // 휴대폰인데 브라우저가 '데스크톱 사이트'로 열어 화면 폭이 PC처럼 넓을 때 안내
 if(matchMedia('(pointer:coarse)').matches&&innerWidth>820&&screen.width&&screen.width<600){$('#dskWarn').hidden=false;$('#dskClose').onclick=()=>{$('#dskWarn').hidden=true;};}
+
+// ---- 전체화면: 브라우저는 사용자의 첫 터치·클릭·키 입력 때만 허락하므로, 첫 입력과 출발 버튼에서 요청 ----
+function goFull(){const d=document.documentElement,f=d.requestFullscreen||d.webkitRequestFullscreen;
+  if(!f||document.fullscreenElement||document.webkitFullscreenElement)return;
+  try{const r=f.call(d,{navigationUI:'hide'});if(r&&r.catch)r.catch(()=>{});}catch(_){}}
+{const first=()=>{goFull();removeEventListener('pointerdown',first,true);removeEventListener('keydown',first,true);};
+ addEventListener('pointerdown',first,true);addEventListener('keydown',first,true);}
+{const g=$('#gGo').onclick;$('#gGo').onclick=()=>{goFull();g();};}

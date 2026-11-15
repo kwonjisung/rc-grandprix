@@ -184,7 +184,7 @@ body.fine .mm-keys{display:flex}
 #gCourse{font-family:var(--f-num);font-size:11.5px;letter-spacing:.14em;opacity:.8}
 .gx-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px}
 .gx-viewwrap{position:relative;min-height:0}
-#gView{position:absolute;inset:0}#gView canvas{width:100%;height:100%;display:block}
+#gView{position:absolute;inset:0;touch-action:pan-y;cursor:grab}#gView canvas{width:100%;height:100%;display:block}
 .gx-viewwrap .mm-arrow{top:50%}#gPrev{left:4px}#gNext{right:4px}
 .gx-side{min-width:0;background:#0f2a20;color:#eef4ec;border-radius:22px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;overflow:auto}
 #gNo{font-family:var(--f-num);font-weight:700;font-size:12px;letter-spacing:.16em;color:var(--orange)}
@@ -455,14 +455,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v2.6 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v2.7 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.6</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.7</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v2.7</b><span>코스 고르기와 차고에서 화면을 좌우로 밀어 넘기기 — 손가락을 따라 디오라마·자동차가 움직이고, 충분히 밀면 다음/이전으로 넘어가요. 첫 터치(또는 클릭·키)와 출발 버튼에서 전체화면으로 전환.<em>2026.11.16</em></span></li>
         <li><b>v2.6</b><span>게임 시작 인트로 추가 — 탁자 위에 늘어선 코스 디오라마를 미니어처 사진처럼(위아래 흐림) 훑고, 마지막으로 고른 코스에서 멈춘 뒤 로고와 함께 코스 고르기로 넘어가요. 화면을 누르거나 아무 키나 누르면 건너뛰어요. 휴대폰 세로 코스 고르기 화면에서 코스 이름을 위로, 디오라마를 가운데로 옮김. 브라우저 탭 아이콘(RC카 + 방구 구름) 추가. 운전자 시점에서 카메라가 반대편에 놓여 뒤로 가는 것처럼 보이던 오류 수정(사이드미러를 그린 뒤 장면 좌표가 뒤집힌 채 남던 문제), 사이드미러 축소.<em>2026.11.16</em></span></li>
         <li><b>v2.5</b><span>차 안(운전자) 시점에 좌우 사이드미러 추가 — 실제 거울처럼 좌우가 뒤집힌 뒤쪽 화면이 실시간으로 보여요. 레이스 화면에 미니맵 추가 — 코스 모양 위에 내 차(주황)와 상대 차 위치가 움직여요(전체 조망 시점에서는 숨김).<em>2026.11.15</em></span></li>
         <li><b>v2.4</b><span>새 코스 11 항구 컨테이너 부두(밤 항구, 도개교 운하 점프, 컨테이너 터널, 젖은 철판, 가로등)와 여섯 번째 차 스카라브(롤케이지 오프로드 버기, 길 밖에서 덜 느려지고 점프 착지가 안정적). Esc·P로 일시정지 풀기, 휴대폰 세로 차고에서 출발 버튼이 잘리던 문제와 리플레이 글자 겹침 수정, 출발 전에는 시간 차 대신 '출발 대기 중' 표시.<em>2026.11.14</em></span></li>

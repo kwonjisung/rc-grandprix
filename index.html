@@ -185,7 +185,7 @@ body.fine .mm-keys{display:flex}
 #gCourse{font-family:var(--f-num);font-size:11.5px;letter-spacing:.14em;opacity:.8}
 .gx-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px}
 .gx-viewwrap{position:relative;min-height:0}
-#gView{position:absolute;inset:0}#gView canvas{width:100%;height:100%;display:block}
+#gView{position:absolute;inset:0;touch-action:pan-y;cursor:grab}#gView canvas{width:100%;height:100%;display:block}
 .gx-viewwrap .mm-arrow{top:50%}#gPrev{left:4px}#gNext{right:4px}
 .gx-side{min-width:0;background:#0f2a20;color:#eef4ec;border-radius:22px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;overflow:auto}
 #gNo{font-family:var(--f-num);font-weight:700;font-size:12px;letter-spacing:.16em;color:var(--orange)}
@@ -456,14 +456,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v2.6 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v2.7 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.6</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.7</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v2.7</b><span>코스 고르기와 차고에서 화면을 좌우로 밀어 넘기기 — 손가락을 따라 디오라마·자동차가 움직이고, 충분히 밀면 다음/이전으로 넘어가요. 첫 터치(또는 클릭·키)와 출발 버튼에서 전체화면으로 전환.<em>2026.11.16</em></span></li>
         <li><b>v2.6</b><span>게임 시작 인트로 추가 — 탁자 위에 늘어선 코스 디오라마를 미니어처 사진처럼(위아래 흐림) 훑고, 마지막으로 고른 코스에서 멈춘 뒤 로고와 함께 코스 고르기로 넘어가요. 화면을 누르거나 아무 키나 누르면 건너뛰어요. 휴대폰 세로 코스 고르기 화면에서 코스 이름을 위로, 디오라마를 가운데로 옮김. 브라우저 탭 아이콘(RC카 + 방구 구름) 추가. 운전자 시점에서 카메라가 반대편에 놓여 뒤로 가는 것처럼 보이던 오류 수정(사이드미러를 그린 뒤 장면 좌표가 뒤집힌 채 남던 문제), 사이드미러 축소.<em>2026.11.16</em></span></li>
         <li><b>v2.5</b><span>차 안(운전자) 시점에 좌우 사이드미러 추가 — 실제 거울처럼 좌우가 뒤집힌 뒤쪽 화면이 실시간으로 보여요. 레이스 화면에 미니맵 추가 — 코스 모양 위에 내 차(주황)와 상대 차 위치가 움직여요(전체 조망 시점에서는 숨김).<em>2026.11.15</em></span></li>
         <li><b>v2.4</b><span>새 코스 11 항구 컨테이너 부두(밤 항구, 도개교 운하 점프, 컨테이너 터널, 젖은 철판, 가로등)와 여섯 번째 차 스카라브(롤케이지 오프로드 버기, 길 밖에서 덜 느려지고 점프 착지가 안정적). Esc·P로 일시정지 풀기, 휴대폰 세로 차고에서 출발 버튼이 잘리던 문제와 리플레이 글자 겹침 수정, 출발 전에는 시간 차 대신 '출발 대기 중' 표시.<em>2026.11.14</em></span></li>
@@ -1657,9 +1658,23 @@ function ttRender(dir){
 function ttGo(i,silent){const n=VARIANTS.length,d=i-ttIdx;ttIdx=((i%n)+n)%n;SEL.course=ttIdx;SEL.save();ttRender(silent?0:(d>0||d<-n/2?1:-1));}
 $('#mmPrev').onclick=()=>ttGo(ttIdx-1);$('#mmNext').onclick=()=>ttGo(ttIdx+1);$('#ttPrev').onclick=()=>ttGo(ttIdx-1);$('#ttNext').onclick=()=>ttGo(ttIdx+1);
 $('#mmGo').onclick=()=>{if(!window.THREE){$('#mmGo').textContent='3D 엔진을 불러오지 못했어요';return;}openGarage(ttIdx);};
-{let sx=null,sy=0;const st=$('#mmStage');st.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY;});
-  st.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy))ttGo(ttIdx+(dx<0?1:-1));});
-  st.addEventListener('pointercancel',()=>{sx=null;});}
+// 좌우로 밀어서 넘기기 (손가락을 따라 움직이고, 충분히 밀면 다음/이전으로)
+function addSwipe(el,{onDrag,onEnd}){
+  let id=null,sx=0,sy=0,dx=0,horiz=null,t0=0,moved=false;
+  el.addEventListener('pointerdown',e=>{if(e.button>0)return;id=e.pointerId;sx=e.clientX;sy=e.clientY;dx=0;horiz=null;moved=false;t0=performance.now();});
+  el.addEventListener('pointermove',e=>{if(e.pointerId!==id)return;const mx=e.clientX-sx,my=e.clientY-sy;
+    if(horiz===null&&Math.hypot(mx,my)>8){horiz=Math.abs(mx)>Math.abs(my);if(horiz){try{el.setPointerCapture(id);}catch(_){}}}
+    if(horiz){dx=mx;moved=true;onDrag(dx);}});
+  const end=e=>{if(e.pointerId!==id)return;id=null;if(!horiz){return;}
+    const v=dx/Math.max(1,performance.now()-t0),W=el.clientWidth||innerWidth,go=Math.abs(dx)>Math.min(90,W*0.18)||(Math.abs(dx)>30&&Math.abs(v)>0.45);
+    onEnd(go?(dx<0?1:-1):0);horiz=null;};
+  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',e=>{if(e.pointerId!==id)return;id=null;if(horiz)onEnd(0);horiz=null;});
+  el.addEventListener('click',e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false;}},true);
+}
+addSwipe($('#mmStage'),{
+  onDrag:dx=>{const c=$('#ttCur');c.classList.remove('in-l','in-r');c.style.transition='none';c.style.transform=`translate(calc(-50% + ${dx}px),-50%) rotate(${dx*0.01}deg)`;c.style.opacity=String(Math.max(0.35,1-Math.abs(dx)/600));},
+  onEnd:d=>{const c=$('#ttCur');c.style.transition='';c.style.transform='';c.style.opacity='';if(d)ttGo(ttIdx+d);}
+});
 function setMobile(){document.body.classList.add('mobile');document.body.classList.toggle('fine',!matchMedia('(pointer:coarse)').matches);}
 addEventListener('keydown',e=>{if(G||GX.open||INTRO.open||!$('#verModal').hidden)return;if(e.code==='ArrowLeft'||e.code==='KeyA'){ttGo(ttIdx-1);}else if(e.code==='ArrowRight'||e.code==='KeyD'){ttGo(ttIdx+1);}else if(e.code==='Enter'||e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)$('#mmGo').click();}});
 addEventListener('resize',setMobile);setMobile();ttRender();
@@ -1684,7 +1699,7 @@ function gxScene(c){
   GX.turn=new THREE.Group();sc.add(GX.turn);
   GX.cam=new THREE.PerspectiveCamera(36,1,0.1,50);GX.cam.position.set(0,2.6,5.6);GX.cam.lookAt(0,0.45,0);
   const loop=()=>{if(!GX.open)return;const v=$('#gView'),W=v.clientWidth,H=v.clientHeight;if(GX._w!==W||GX._h!==H){r.setSize(W,H,false);const asp=W/H,dd=(matchMedia('(pointer:coarse)').matches?5.0:6.6)*Math.max(1,1.35/asp);GX.cam.aspect=asp;GX.cam.position.set(0,dd*0.46,dd);GX.cam.lookAt(0,0.4,0);GX.cam.updateProjectionMatrix();GX._w=W;GX._h=H;}
-    GX.turn.rotation.y+=0.008;if(GX.mesh)GX.mesh.wheels.forEach(w=>w.rotation.z-=0.04);r.render(sc,GX.cam);GX.raf=requestAnimationFrame(loop);};
+    GX.turn.rotation.y+=0.008;{const W=$('#gView').clientWidth||1,tx=(GX.drag||0)/W*5.5;GX.slide=(GX.slide||0)*0.82;GX.turn.position.x+=(tx+GX.slide-GX.turn.position.x)*0.35;}if(GX.mesh)GX.mesh.wheels.forEach(w=>w.rotation.z-=0.04);r.render(sc,GX.cam);GX.raf=requestAnimationFrame(loop);};
   GX._w=0;cancelAnimationFrame(GX.raf);GX.raf=requestAnimationFrame(loop);
 }
 function gxSet(i){
@@ -1695,6 +1710,7 @@ function gxSet(i){
   CARS.forEach((_,j)=>{const b=$('#gchip-'+j);b.classList.toggle('on',j===GX.ci);b.setAttribute('aria-pressed',j===GX.ci?'true':'false');});
 }
 $('#gPrev').onclick=()=>gxSet(GX.ci-1);$('#gNext').onclick=()=>gxSet(GX.ci+1);
+addSwipe($('#gView'),{onDrag:dx=>{GX.drag=dx;},onEnd:d=>{GX.drag=0;if(d){gxSet(GX.ci+d);GX.slide=d*2.6;}}});
 $('#gBack').onclick=closeGarage;
 $('#gGo').onclick=()=>{SEL.car=GX.ci;SEL.course=GX.vi;SEL.save();startGame(GX.vi,GX.ci);};
 addEventListener('keydown',e=>{if(!GX.open||e.repeat||performance.now()-GX.t0<250)return;if(e.code==='ArrowLeft')gxSet(GX.ci-1);else if(e.code==='ArrowRight')gxSet(GX.ci+1);else if(e.code==='Enter'||e.code==='Space'){e.preventDefault();$('#gGo').click();}else if(e.code==='Escape')closeGarage();});
@@ -1733,4 +1749,12 @@ const INTRO={open:false};
 
 // 휴대폰인데 브라우저가 '데스크톱 사이트'로 열어 화면 폭이 PC처럼 넓을 때 안내
 if(matchMedia('(pointer:coarse)').matches&&innerWidth>820&&screen.width&&screen.width<600){$('#dskWarn').hidden=false;$('#dskClose').onclick=()=>{$('#dskWarn').hidden=true;};}
+
+// ---- 전체화면: 브라우저는 사용자의 첫 터치·클릭·키 입력 때만 허락하므로, 첫 입력과 출발 버튼에서 요청 ----
+function goFull(){const d=document.documentElement,f=d.requestFullscreen||d.webkitRequestFullscreen;
+  if(!f||document.fullscreenElement||document.webkitFullscreenElement)return;
+  try{const r=f.call(d,{navigationUI:'hide'});if(r&&r.catch)r.catch(()=>{});}catch(_){}}
+{const first=()=>{goFull();removeEventListener('pointerdown',first,true);removeEventListener('keydown',first,true);};
+ addEventListener('pointerdown',first,true);addEventListener('keydown',first,true);}
+{const g=$('#gGo').onclick;$('#gGo').onclick=()=>{goFull();g();};}
 </script>
