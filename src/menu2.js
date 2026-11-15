@@ -43,7 +43,7 @@ $('#mmGo').onclick=()=>{if(!window.THREE){$('#mmGo').textContent='3D 엔진을 �
   st.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy))ttGo(ttIdx+(dx<0?1:-1));});
   st.addEventListener('pointercancel',()=>{sx=null;});}
 function setMobile(){document.body.classList.add('mobile');document.body.classList.toggle('fine',!matchMedia('(pointer:coarse)').matches);}
-addEventListener('keydown',e=>{if(G||GX.open||!$('#verModal').hidden)return;if(e.code==='ArrowLeft'||e.code==='KeyA'){ttGo(ttIdx-1);}else if(e.code==='ArrowRight'||e.code==='KeyD'){ttGo(ttIdx+1);}else if(e.code==='Enter'||e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)$('#mmGo').click();}});
+addEventListener('keydown',e=>{if(G||GX.open||INTRO.open||!$('#verModal').hidden)return;if(e.code==='ArrowLeft'||e.code==='KeyA'){ttGo(ttIdx-1);}else if(e.code==='ArrowRight'||e.code==='KeyD'){ttGo(ttIdx+1);}else if(e.code==='Enter'||e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)$('#mmGo').click();}});
 addEventListener('resize',setMobile);setMobile();ttRender();
 
 // ---- 차고 (자동차 선택) ----
@@ -90,3 +90,25 @@ addEventListener('keydown',e=>{if(e.code==='Escape'&&!$('#verModal').hidden)$('#
 
 REC.init(()=>{renderCards();ttRender();});
 if(document.fonts)['700 40px "Chakra Petch"','italic 700 40px "Chakra Petch"','700 40px "Bodoni Moda"'].forEach(f=>document.fonts.load(f).catch(()=>{}));
+
+// ---- 인트로: 탁자 위 코스 디오라마를 틸트시프트로 훑고, 고른 코스에서 멈춘 뒤 코스 고르기로 ----
+const INTRO={open:false};
+(function(){
+  const el=$('#intro');if(!el)return;
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  const n=VARIANTS.length,sel=ttIdx,order=[];for(let k=1;k<=n;k++)order.push((sel+k)%n);
+  $('#inStrip').innerHTML=order.map(i=>`<div class="in-item"><div class="in-tile">${tileHTML(VARIANTS[i].id)}</div><small>COURSE ${String(i+1).padStart(2,'0')}</small><b>${VARIANTS[i].name}</b></div>`).join('');
+  $('#inSub').textContent=`${n}개 코스가 기다려요 · 화면을 눌러 시작`;
+  INTRO.open=true;el.hidden=false;
+  let anim=null,tEnd=0,done=false;
+  const finish=()=>{if(done)return;done=true;clearTimeout(tEnd);el.classList.add('out');INTRO.open=false;setTimeout(()=>{el.hidden=true;if(anim)anim.cancel();},520);};
+  requestAnimationFrame(()=>{
+    const st=$('#inStrip'),items=st.children,W=innerWidth,c=it=>it.offsetLeft+it.offsetWidth/2;
+    const x0=W*0.15-c(items[0])+W*0.3,x1=W/2-c(items[items.length-1]);
+    const dur=Math.min(6500,Math.max(4000,(x0-x1)/W*900));
+    anim=st.animate([{transform:`translate(${x0}px,-50%)`},{transform:`translate(${x1}px,-50%)`}],{duration:dur,easing:'cubic-bezier(.45,0,.4,1)',fill:'forwards'});
+    anim.onfinish=()=>{el.classList.add('end');tEnd=setTimeout(finish,1600);};
+  });
+  el.addEventListener('click',finish);
+  addEventListener('keydown',e=>{if(!INTRO.open)return;e.preventDefault();e.stopImmediatePropagation();finish();},true);
+})();

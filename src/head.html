@@ -1,5 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ff7a1a'/%3E%3Ccircle cx='13' cy='41' r='8' fill='%23b7e36a' stroke='%232b1a0e' stroke-width='3'/%3E%3Ccircle cx='8' cy='31' r='5.5' fill='%23b7e36a' stroke='%232b1a0e' stroke-width='3'/%3E%3Cline x1='41' y1='29' x2='46' y2='9' stroke='%232b1a0e' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='46' cy='9' r='3.5' fill='%232b1a0e'/%3E%3Cpath d='M19 45 C20 34 29 29 38 29 L46 29 C53 29 58 34 60 40 L60 46 L19 46Z' fill='%231d2a44' stroke='%232b1a0e' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M33 32 L46 32 L51 38 L29 38Z' fill='%23cfe3f0'/%3E%3Crect x='20' y='40' width='39' height='3' fill='%23f4efe4'/%3E%3Ccircle cx='28' cy='47' r='7' fill='%23111' stroke='%232b1a0e' stroke-width='1.5'/%3E%3Ccircle cx='51' cy='47' r='7' fill='%23111' stroke='%232b1a0e' stroke-width='1.5'/%3E%3Ccircle cx='28' cy='47' r='2.5' fill='%239aa3ad'/%3E%3Ccircle cx='51' cy='47' r='2.5' fill='%239aa3ad'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#17382b">
 <title>미니 RC 그랑프리</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -368,6 +370,25 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   .mm-arrow{top:50%}
   .mm-floor{top:60%;width:86vw}
 }
+/* ---- 인트로: 미니어처 틸트시프트 투어 (v2.6) ---- */
+#intro{position:fixed;inset:0;z-index:40;overflow:hidden;cursor:pointer;background:repeating-linear-gradient(90deg,#e3c79f 0 78px,#dcbf95 78px 80px);transition:opacity .5s;font-family:var(--f-body);color:#2b1a0e}
+#intro.out{opacity:0;pointer-events:none}
+#inStrip{position:absolute;left:0;top:47%;display:flex;align-items:center;gap:min(7vw,60px);transform:translateY(-50%);will-change:transform}
+.in-item{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+.in-tile{width:min(40vw,46vh);aspect-ratio:10/7;margin-bottom:min(4vh,30px)}
+.in-item small{font:700 11px var(--f-num);letter-spacing:.16em;color:#6a4a2c}
+.in-item b{font:400 clamp(17px,2.6vw,24px) var(--f-disp);white-space:nowrap}
+.in-blur{position:absolute;left:0;right:0;height:34%;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);pointer-events:none}
+.in-blur.t{top:0;-webkit-mask-image:linear-gradient(#000,transparent);mask-image:linear-gradient(#000,transparent)}
+.in-blur.b{bottom:0;-webkit-mask-image:linear-gradient(transparent,#000);mask-image:linear-gradient(transparent,#000)}
+.in-sun{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,240,200,.55),rgba(255,240,200,0) 50%);animation:inSun 6s ease-in-out infinite}
+@keyframes inSun{50%{opacity:.35}}
+.in-logo{position:absolute;left:max(24px,env(safe-area-inset-left,0px));bottom:calc(26px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:4px;opacity:0;transform:translateY(14px);transition:opacity .6s,transform .6s}
+#intro.end .in-logo{opacity:1;transform:none}
+.in-logo b{font:400 clamp(34px,6vw,56px)/1 var(--f-disp);color:#ff7a1a;text-shadow:0 3px 0 #2b1a0e}
+.in-logo span{font-size:14px;font-weight:700}
+#inSkip{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:calc(14px + env(safe-area-inset-top,0px));min-height:40px;padding:0 16px;border-radius:99px;border:1px solid rgba(43,26,14,.3);background:rgba(255,255,255,.55);color:#2b1a0e;font:600 13px var(--f-body);cursor:pointer}
+@media (orientation:portrait){.in-tile{width:min(72vw,40vh)}#inStrip{top:44%}}
 #camToast{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%) scale(.9);background:rgba(16,24,28,.62);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:10px 22px;font-family:var(--f-disp);font-size:clamp(18px,5vmin,26px);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 #camToast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 @media (prefers-reduced-motion:reduce){.go{transition:none}}
@@ -404,6 +425,13 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   <button id="mmGo" type="button">출발!</button>
 </div>
 
+<div id="intro" hidden aria-label="인트로">
+  <div id="inStrip"></div>
+  <div class="in-blur t" aria-hidden="true"></div><div class="in-blur b" aria-hidden="true"></div><div class="in-sun" aria-hidden="true"></div>
+  <div class="in-logo"><b>미니 RC 그랑프리</b><span id="inSub">11개 코스가 기다려요 · 화면을 눌러 시작</span></div>
+  <button id="inSkip" type="button">건너뛰기 ›</button>
+</div>
+
 <div id="garage" hidden>
   <div class="gx-top">
     <button id="gBack" type="button" aria-label="코스 다시 고르기"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 L15 19"/></svg></button>
@@ -423,14 +451,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v2.5 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v2.6 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.5</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.6</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v2.6</b><span>게임 시작 인트로 추가 — 탁자 위에 늘어선 코스 디오라마를 미니어처 사진처럼(위아래 흐림) 훑고, 마지막으로 고른 코스에서 멈춘 뒤 로고와 함께 코스 고르기로 넘어가요. 화면을 누르거나 아무 키나 누르면 건너뛰어요. 휴대폰 세로 코스 고르기 화면에서 코스 이름을 위로, 디오라마를 가운데로 옮김. 브라우저 탭 아이콘(RC카 + 방구 구름) 추가.<em>2026.11.16</em></span></li>
         <li><b>v2.5</b><span>차 안(운전자) 시점에 좌우 사이드미러 추가 — 실제 거울처럼 좌우가 뒤집힌 뒤쪽 화면이 실시간으로 보여요. 레이스 화면에 미니맵 추가 — 코스 모양 위에 내 차(주황)와 상대 차 위치가 움직여요(전체 조망 시점에서는 숨김).<em>2026.11.15</em></span></li>
         <li><b>v2.4</b><span>새 코스 11 항구 컨테이너 부두(밤 항구, 도개교 운하 점프, 컨테이너 터널, 젖은 철판, 가로등)와 여섯 번째 차 스카라브(롤케이지 오프로드 버기, 길 밖에서 덜 느려지고 점프 착지가 안정적). Esc·P로 일시정지 풀기, 휴대폰 세로 차고에서 출발 버튼이 잘리던 문제와 리플레이 글자 겹침 수정, 출발 전에는 시간 차 대신 '출발 대기 중' 표시.<em>2026.11.14</em></span></li>
         <li><b>v2.3</b><span>자동차 디자인 새 단장: 차체를 옆모습 곡선으로 깎고 휠·브레이크·윙·스플리터 등 부품을 따로 만든 디테일 모델, 레이싱 배색과 데칼(번호·줄무늬·스폰서). 다섯 번째 차 클래식 추가.<em>2026.11.13</em></span></li>
