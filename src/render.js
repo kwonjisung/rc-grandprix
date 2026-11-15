@@ -159,7 +159,7 @@ function make3D(opt){
     if(this._ov!==ov){this._ov=ov;this._ovInit=0;const c2=this.dl.shadow.camera,e=ov?80:35;c2.left=c2.bottom=-e;c2.right=c2.top=e;c2.far=ov?400:200;c2.updateProjectionMatrix();this.sc.fog.near=ov?400:70;this.sc.fog.far=ov?1400:this.opt.fogFar;}
     this.mark.visible=ov;if(ov){this.mark.position.set(p.x*S,(p.z+75+Math.sin(performance.now()/180)*6)*S,p.y*S);}
     if(mode==='cockpit'){
-      const pm=this.meshes[this.pi];pm.g.updateMatrixWorld(true);const v=new THREE.Vector3(2,14.5,0);pm.body.localToWorld(v);this.cam.position.copy(v);
+      const pm=this.meshes[this.pi];this.sc.updateMatrixWorld(true);const v=new THREE.Vector3(2,14.5,0);pm.body.localToWorld(v);this.cam.position.copy(v);
       if(!this._qy)this._qy=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),-Math.PI/2);const q=new THREE.Quaternion();pm.body.getWorldQuaternion(q);this.cam.quaternion.copy(q).multiply(this._qy);
       if(g.shake)this.cam.rotateZ((Math.random()-0.5)*g.shake*0.002);
       const asp=this.cam.aspect||1,base=asp>=1?72:Math.min(92,2*Math.atan(Math.tan(39/57.3)/asp)*57.3);this.cam.fov=lerp(this.cam.fov,base+Math.min(p.speed,700)*0.003+(p.boostT>0?2.5:0),0.06);this.cam.updateProjectionMatrix();
@@ -220,7 +220,7 @@ function make3D(opt){
     R.forEach((q,i)=>{const pos=P[i][0],tg=P[i][1];
       mc.aspect=q[2]/q[3];mc.position.set(-pos.x,pos.y,pos.z);mc.up.set(0,1,0);mc.lookAt(-tg.x,tg.y,tg.z);mc.updateProjectionMatrix();
       const y=H-q[1]-q[3];r.setViewport(q[0],y,q[2],q[3]);r.setScissor(q[0],y,q[2],q[3]);r.render(sc,mc);});
-    sc.scale.x=1;r.setScissorTest(false);r.setViewport(0,0,W,H);r.shadowMap.autoUpdate=au;
+    sc.scale.x=1;sc.updateMatrixWorld(true);r.setScissorTest(false);r.setViewport(0,0,W,H);r.shadowMap.autoUpdate=au;
   },
   cycleCam(){const L=[...this.opt.cams,'cockpit'];const n=L[(L.indexOf(this.camMode)+1)%L.length];this.setMode(n);return CAM_NAMES[n];},
   toggleCockpit(){if(this.camMode==='cockpit'){this.setMode(this.prevMode);return CAM_NAMES[this.prevMode];}this.setMode('cockpit');return CAM_NAMES.cockpit;},
