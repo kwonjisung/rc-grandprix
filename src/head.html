@@ -389,6 +389,9 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 .in-logo span{font-size:14px;font-weight:700}
 #inSkip{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:calc(14px + env(safe-area-inset-top,0px));min-height:40px;padding:0 16px;border-radius:99px;border:1px solid rgba(43,26,14,.3);background:rgba(255,255,255,.55);color:#2b1a0e;font:600 13px var(--f-body);cursor:pointer}
 @media (orientation:portrait){.in-tile{width:min(72vw,40vh)}#inStrip{top:44%}}
+#dskWarn{position:fixed;left:2%;right:2%;bottom:2%;z-index:60;display:flex;flex-direction:column;gap:1.2vw;padding:3vw 3.4vw;border-radius:2.4vw;background:#10202a;color:#fff;font:400 3.2vw/1.45 var(--f-body);box-shadow:0 1vw 3vw rgba(0,0,0,.4)}
+#dskWarn b{font-weight:700}#dskWarn>b{font-size:3.8vw}
+#dskClose{align-self:flex-end;font:600 3.2vw var(--f-body);padding:1.4vw 3.6vw;border-radius:99px;border:0;background:#ff7a1a;color:#2b1a0e}
 #camToast{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%) scale(.9);background:rgba(16,24,28,.62);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:10px 22px;font-family:var(--f-disp);font-size:clamp(18px,5vmin,26px);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 #camToast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 @media (prefers-reduced-motion:reduce){.go{transition:none}}
@@ -425,6 +428,7 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   <button id="mmGo" type="button">출발!</button>
 </div>
 
+<div id="dskWarn" hidden role="alert"><b>화면이 작게 보이나요?</b><span>브라우저가 PC 화면(데스크톱 사이트)으로 열고 있어요. 크롬 오른쪽 위 ⋮ 메뉴에서 <b>데스크톱 사이트</b> 체크를 끄면 휴대폰 화면에 맞게 보여요.</span><button id="dskClose" type="button">닫기</button></div>
 <div id="intro" hidden aria-label="인트로">
   <div id="inStrip"></div>
   <div class="in-blur t" aria-hidden="true"></div><div class="in-blur b" aria-hidden="true"></div><div class="in-sun" aria-hidden="true"></div>

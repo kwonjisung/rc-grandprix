@@ -112,3 +112,6 @@ const INTRO={open:false};
   el.addEventListener('click',finish);
   addEventListener('keydown',e=>{if(!INTRO.open)return;e.preventDefault();e.stopImmediatePropagation();finish();},true);
 })();
+
+// 휴대폰인데 브라우저가 '데스크톱 사이트'로 열어 화면 폭이 PC처럼 넓을 때 안내
+if(matchMedia('(pointer:coarse)').matches&&innerWidth>820&&screen.width&&screen.width<600){$('#dskWarn').hidden=false;$('#dskClose').onclick=()=>{$('#dskWarn').hidden=true;};}
