@@ -359,6 +359,16 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   #hint{top:calc(290px + env(safe-area-inset-top,0px))}
   #tZone .tip{bottom:calc(300px + env(safe-area-inset-bottom,0px))}
 }
+/* ---- 휴대폰 세로 코스 고르기: 위쪽 빈 공간 정리 (v2.5.1) ---- */
+@media (pointer:coarse) and (orientation:portrait){
+  .mm-info{top:calc(98px + env(safe-area-inset-top,0px));bottom:auto;right:20px}
+  #mmName{font-size:clamp(28px,8.4vw,38px)}
+  #ttCur{width:min(84vw,46vh);top:50%;z-index:1}
+  #ttPrev,#ttNext{width:min(40vw,24vh);top:50%;opacity:.22;z-index:0}
+  #ttPrev{left:-6%}#ttNext{left:106%}
+  .mm-arrow{top:50%}
+  .mm-floor{top:60%;width:86vw}
+}
 #camToast{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%) scale(.9);background:rgba(16,24,28,.62);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:10px 22px;font-family:var(--f-disp);font-size:clamp(18px,5vmin,26px);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 #camToast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 @media (prefers-reduced-motion:reduce){.go{transition:none}}
