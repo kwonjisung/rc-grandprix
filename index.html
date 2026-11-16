@@ -543,7 +543,7 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   <div id="touch">
     <div id="tZone"><span class="tip">화면을 누르고 있으면 전진</span></div>
     <div class="side l"><button id="tL" type="button" aria-label="왼쪽">◀</button><button id="tR" type="button" aria-label="오른쪽">▶</button></div>
-    <div class="side r"><div class="stack"><button id="tH" type="button">드리프트</button><button id="tB" type="button">브레이크</button></div><button id="tP" type="button" aria-label="방구 부스터"><svg aria-hidden="true" width="44" height="30" viewBox="0 0 32 22"><path d="M9 20 C4 20 2 16.5 4 13.5 C3 9 7.5 6.5 11 8.5 C12.5 4 19 3.5 21.5 7.5 C26 6.5 29.5 10 28 14 C31 16.5 29 20 25.5 20 Z" fill="#c9f07a" stroke="#2b1a0e" stroke-width="1.8"/></svg><b>뿡!</b></button></div>
+    <div class="side r"><div class="stack"><button id="tB" type="button">브레이크</button></div><button id="tP" type="button" aria-label="방구 부스터"><svg aria-hidden="true" width="44" height="30" viewBox="0 0 32 22"><path d="M9 20 C4 20 2 16.5 4 13.5 C3 9 7.5 6.5 11 8.5 C12.5 4 19 3.5 21.5 7.5 C26 6.5 29.5 10 28 14 C31 16.5 29 20 25.5 20 Z" fill="#c9f07a" stroke="#2b1a0e" stroke-width="1.8"/></svg><b>뿡!</b></button></div>
   </div>
   <div id="pauseOv" hidden><div class="pbox"><span class="k">일시정지</span><h3 id="pName">코스</h3><button class="go" id="pResume" type="button">계속 달리기</button><button class="ghost" id="pRestart" type="button">처음부터 다시</button><button class="ghost" id="pMenu" type="button">코스 목록으로</button></div></div>
   <div id="replayUI" hidden>
@@ -1593,7 +1593,7 @@ addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
 {const z=$('#tZone'),ids=new Set();const up=e=>{ids.delete(e.pointerId);touch.g=ids.size?1:0;z.classList.toggle('on',!!ids.size);};
   z.addEventListener('pointerdown',e=>{e.preventDefault();ids.add(e.pointerId);touch.g=1;z.classList.add('on','used');try{z.setPointerCapture(e.pointerId);}catch(_){}});
   z.addEventListener('pointerup',up);z.addEventListener('pointercancel',up);z.addEventListener('lostpointercapture',up);}
-for(const[id,k]of[['tL','l'],['tR','r'],['tB','b'],['tH','h'],['tP','p']]){const b=$('#'+id);
+for(const[id,k]of[['tL','l'],['tR','r'],['tB','b'],['tP','p']]){const b=$('#'+id);
   const on=e=>{e.preventDefault();touch[k]=1;b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(_){}},off=()=>{touch[k]=0;b.classList.remove('on');};
   b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);}
 function flashHint(t){$('#hint').textContent=t;$('#hint').hidden=false;G.hintT=G.t+2;}
