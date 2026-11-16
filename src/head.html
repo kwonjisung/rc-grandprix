@@ -1,6 +1,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ff7a1a'/%3E%3Ccircle cx='13' cy='41' r='8' fill='%23b7e36a' stroke='%232b1a0e' stroke-width='3'/%3E%3Ccircle cx='8' cy='31' r='5.5' fill='%23b7e36a' stroke='%232b1a0e' stroke-width='3'/%3E%3Cline x1='41' y1='29' x2='46' y2='9' stroke='%232b1a0e' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='46' cy='9' r='3.5' fill='%232b1a0e'/%3E%3Cpath d='M19 45 C20 34 29 29 38 29 L46 29 C53 29 58 34 60 40 L60 46 L19 46Z' fill='%231d2a44' stroke='%232b1a0e' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M33 32 L46 32 L51 38 L29 38Z' fill='%23cfe3f0'/%3E%3Crect x='20' y='40' width='39' height='3' fill='%23f4efe4'/%3E%3Ccircle cx='28' cy='47' r='7' fill='%23111' stroke='%232b1a0e' stroke-width='1.5'/%3E%3Ccircle cx='51' cy='47' r='7' fill='%23111' stroke='%232b1a0e' stroke-width='1.5'/%3E%3Ccircle cx='28' cy='47' r='2.5' fill='%239aa3ad'/%3E%3Ccircle cx='51' cy='47' r='2.5' fill='%239aa3ad'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3Cpattern id='ck' width='64' height='64' patternUnits='userSpaceOnUse' patternTransform='rotate%28-18%29'%3E%3Crect width='64' height='64' fill='%23f4efe4'/%3E%3Crect width='32' height='32' fill='%231a1d22'/%3E%3Crect x='32' y='32' width='32' height='32' fill='%231a1d22'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='512' height='512' fill='url%28%23ck%29'/%3E%3Ccircle cx='256' cy='262' r='168' fill='%23ff7a1a' stroke='%232b1a0e' stroke-width='14'/%3E%3Ccircle cx='256' cy='262' r='140' fill='none' stroke='%23ffd2a6' stroke-width='5' stroke-dasharray='14 12'/%3E%3Cg stroke='%232b1a0e' stroke-width='9' stroke-linejoin='round'%3E%3Cline x1='296' y1='200' x2='320' y2='132' stroke-linecap='round'/%3E%3Ccircle cx='322' cy='128' r='11' fill='%232b1a0e'/%3E%3Cpath d='M148 300 C152 246 198 220 248 218 L296 218 C338 218 364 244 374 278 L374 304 L148 304Z' fill='%231d2a44'/%3E%3Cpath d='M232 232 L292 232 L318 266 L214 266Z' fill='%23cfe3f0' stroke-width='6'/%3E%3C/g%3E%3Crect x='154' y='272' width='214' height='13' fill='%23f4efe4'/%3E%3Cg stroke='%232b1a0e' stroke-width='7'%3E%3Ccircle cx='196' cy='310' r='34' fill='%2315181c'/%3E%3Ccircle cx='330' cy='310' r='34' fill='%2315181c'/%3E%3C/g%3E%3Ccircle cx='196' cy='310' r='12' fill='%239aa3ad'/%3E%3Ccircle cx='330' cy='310' r='12' fill='%239aa3ad'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="RC 그랑프리">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#17382b">
 <title>미니 RC 그랑프리</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -508,14 +512,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v3.1 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v3.2 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.1</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.2</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v3.2</b><span>홈 화면 아이콘 추가 — 체커 무늬 바탕에 주황 엠블럼과 RC카. 휴대폰 '홈 화면에 추가' 시 이 아이콘과 'RC 그랑프리' 이름으로 저장되고, 홈 화면에서 열면 전체화면으로 실행돼요. 브라우저 탭 아이콘도 같은 그림으로 교체.<em>2026.11.16</em></span></li>
         <li><b>v3.1</b><span>붉은 협곡 벽 정리 — 길이 굽어 붙은 곳에서 화면의 바위 벽과 실제 충돌 벽이 어긋나 차가 바위 속으로 들어가 보이던 문제 수정. 벽에 부딪히면 타고 오르거나 튀어 오르지 않고 아래에서 '퉁' 막히며 되튕겨요(불꽃·충돌음). 카메라도 바위 속으로 들어가지 않고 길 위에 머물러요. 휴대폰 브레이크 칸을 가속 페달 왼쪽으로 옮김(누르거나 왼쪽으로 밀면 브레이크).<em>2026.11.16</em></span></li>
         <li><b>v3.0</b><span>휴대폰 조작 확정 — 왼손 ◀ ▶, 오른손 가속 존(가운데 페달을 누르고 있으면 가속 · 위쪽 N₂O 부스터 칸을 누르거나 위로 밀면 방구 · 아래쪽 브레이크 칸을 누르거나 아래로 끌면 브레이크). 설명 글자는 출발 때만 6초 표시. 드라이버 이름: 처음 시작 때 추천 이름을 채워 묻고(그대로 시작 가능), 메뉴 위 이름표로 언제든 변경, 기록·순위표에 이름이 남아요.<em>2026.11.16</em></span></li>
         <li><b>v2.9</b><span>휴대폰 조작 새 단장 — B 페달(기본): 오른손 큰 가속 페달(위쪽을 누를수록 세게)·브레이크 페달·뿡!, 왼손 ◀ ▶. C 슬라이더: 왼손 슬라이더를 미는 만큼 꺾이고, 오른쪽 가속 존에 엄지를 올리면 가속·위로 튕기면 방구·아래로 끌면 브레이크. 일시정지 메뉴의 '조작 바꾸기'로 전환. 드리프트 버튼은 제거(조향만으로 미끄러짐).<em>2026.11.16</em></span></li>
