@@ -312,18 +312,18 @@ addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
   z.addEventListener('pointerdown',e=>{e.preventDefault();ids.add(e.pointerId);touch.g=1;z.classList.add('on','used');try{z.setPointerCapture(e.pointerId);}catch(_){}});
   z.addEventListener('pointerup',up);z.addEventListener('pointercancel',up);z.addEventListener('lostpointercapture',up);}
 // ---- 휴대폰 조작: 왼손 ◀ ▶, 오른손 가속 존 (누르면 가속 · 위쪽/위로 밀기 = 방구 · 아래쪽/아래로 끌기 = 브레이크) ----
-function ctlHint(){return '왼손 ◀ ▶ 조향 · 오른쪽 페달을 누르고 있으면 가속 · 위로 밀면 방구 · 페달 오른쪽 칸은 브레이크';}
+function ctlHint(){return '왼손 ◀ ▶ 조향 · 오른쪽 페달을 누르고 있으면 가속 · 위로 밀면 방구 · 페달 왼쪽 칸은 브레이크';}
 function ctlHelp(){const t=$('#touch');t.classList.add('helptxt');clearTimeout(ctlHelp.tm);ctlHelp.tm=setTimeout(()=>t.classList.remove('helptxt'),6000);}
 {const z=$('#cZone'),bz=z.querySelector('.zbrk'),tb=z.querySelector('.zboost');let id=null,x0=0,y0=0,fired=false;
   const boost=()=>{touch.p=1;z.classList.add('boost');setTimeout(()=>{touch.p=0;z.classList.remove('boost');},140);};
   const setBrk=on=>{touch.b=on?1:0;touch.g=on?0:1;z.classList.toggle('brk',on);};
-  const inBrk=e=>{const r=bz.getBoundingClientRect();return e.clientX>=r.left-6&&e.clientY>=r.top-6;};
+  const inBrk=e=>{const r=bz.getBoundingClientRect();return e.clientX<=r.right+6&&e.clientY>=r.top-6;};
   z.addEventListener('pointerdown',e=>{e.preventDefault();id=e.pointerId;x0=e.clientX;y0=e.clientY;fired=false;z.classList.add('on');try{z.setPointerCapture(id);}catch(_){}
     setBrk(inBrk(e));if(e.clientY<tb.getBoundingClientRect().bottom){fired=true;boost();}});
   z.addEventListener('pointermove',e=>{if(e.pointerId!==id)return;const dy=e.clientY-y0;
     if(!fired&&dy<-30){fired=true;boost();y0=e.clientY;}
     if(e.clientY>y0+10)fired=false;
-    setBrk(inBrk(e)||e.clientX-x0>34);});
+    setBrk(inBrk(e)||x0-e.clientX>34);});
   const off=e=>{if(e.pointerId!==id)return;id=null;touch.g=0;touch.b=0;z.classList.remove('on','brk');};
   z.addEventListener('pointerup',off);z.addEventListener('pointercancel',off);z.addEventListener('lostpointercapture',off);}
 for(const[id,k]of[['tL','l'],['tR','r']]){const b=$('#'+id);
