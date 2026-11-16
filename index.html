@@ -394,6 +394,38 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 #dskWarn{position:fixed;left:2%;right:2%;bottom:2%;z-index:60;display:flex;flex-direction:column;gap:1.2vw;padding:3vw 3.4vw;border-radius:2.4vw;background:#10202a;color:#fff;font:400 3.2vw/1.45 var(--f-body);box-shadow:0 1vw 3vw rgba(0,0,0,.4)}
 #dskWarn b{font-weight:700}#dskWarn>b{font-size:3.8vw}
 #dskClose{align-self:flex-end;font:600 3.2vw var(--f-body);padding:1.4vw 3.6vw;border-radius:99px;border:0;background:#ff7a1a;color:#2b1a0e}
+/* ---- 휴대폰 조작 B(페달) / C(슬라이더+가속 존) (v2.9) ---- */
+#tZone{display:none!important}
+#touch[data-ctl="C"] .side,#touch[data-ctl="B"] .cOnly{display:none}
+#touch .side.r{align-items:flex-end;gap:12px}
+#touch .gcol{display:contents}
+#touch #tP{order:0}#touch #tB{order:1}#touch #tG{order:2}
+#touch .pedal{border:0;color:#2b1a0e;font:400 17px var(--f-disp);box-shadow:inset 0 -8px 0 rgba(0,0,0,.25),0 4px 0 #1a120a;transition:transform .08s}
+#touch .pedal.gas{width:86px;height:122px;border-radius:14px 14px 22px 22px;background:repeating-linear-gradient(#ff8f3a 0 12px,#f07a22 12px 16px)}
+#touch .pedal.brk{width:64px;height:84px;border-radius:12px 12px 18px 18px;background:linear-gradient(#69727c,#353b42);color:#fff;font:600 12.5px var(--f-body)}
+#touch .pedal.on{transform:perspective(300px) rotateX(16deg) translateY(3px);box-shadow:inset 0 -4px 0 rgba(0,0,0,.25),0 1px 0 #1a120a}
+#touch .gcol #tP,#touch .side.r #tP{width:72px;height:72px;box-shadow:0 4px 0 #2b1a0e}#touch .side.r #tP b{font-size:18px}#touch .side.r #tP svg{width:32px;height:22px}
+#cSteer{position:absolute;left:max(18px,env(safe-area-inset-left,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:220px;height:72px;border-radius:99px;background:rgba(16,24,28,.45);border:2px solid rgba(255,255,255,.5);backdrop-filter:blur(6px);touch-action:none}
+#cSteer .ar{position:absolute;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.75);font-size:15px;pointer-events:none}#cSteer .ar.l{left:14px}#cSteer .ar.r{right:14px}
+#cKnob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:#f4efe4;box-shadow:0 3px 0 #2b1a0e;pointer-events:none;transition:transform .12s}
+#cSteer.on #cKnob{transition:none}
+#cZone{position:absolute;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));width:156px;height:150px;border-radius:28px;background:rgba(255,122,26,.3);border:2px solid rgba(255,255,255,.6);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none}
+#cZone b{font:400 24px var(--f-disp)}#cZone small{font:700 11px var(--f-body);opacity:.85}
+#cZone.on{background:rgba(255,122,26,.55)}#cZone.brk{background:rgba(70,80,92,.7)}#cZone.boost{background:rgba(201,240,122,.75);color:#2b1a0e}
+@media (pointer:coarse) and (orientation:landscape){
+  #hClouds{left:50%;right:auto;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+  .cockpit .speedo{right:calc(max(16px,env(safe-area-inset-right,0px)) + 250px)}
+  .cockpit #hClouds{left:auto;transform:none;right:calc(max(16px,env(safe-area-inset-right,0px)) + 250px);bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+  #cZone{width:140px;height:128px}
+}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:420px){#touch .pedal.gas{width:78px;height:106px}#touch .pedal.brk{width:58px;height:76px}#touch .side.r #tP{width:62px;height:62px}}
+@media (pointer:coarse) and (orientation:portrait){
+  #touch .gcol{display:flex;flex-direction:column;align-items:center;gap:10px;order:2}
+  #touch .pedal.gas{width:76px;height:108px}#touch .pedal.brk{width:58px;height:76px}#touch .side.r #tP{width:60px;height:60px}
+  #touch .side.r{flex-direction:row;gap:10px}
+  #hClouds,.cockpit #hClouds{bottom:calc(206px + env(safe-area-inset-bottom,0px))}
+  #cSteer{width:170px;height:66px}#cZone{width:136px;height:140px}
+}
 #camToast{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%) scale(.9);background:rgba(16,24,28,.62);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:10px 22px;font-family:var(--f-disp);font-size:clamp(18px,5vmin,26px);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 #camToast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 @media (prefers-reduced-motion:reduce){.go{transition:none}}
@@ -458,14 +490,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v2.8 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v2.9 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.8</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.9</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v2.9</b><span>휴대폰 조작 새 단장 — B 페달(기본): 오른손 큰 가속 페달(위쪽을 누를수록 세게)·브레이크 페달·뿡!, 왼손 ◀ ▶. C 슬라이더: 왼손 슬라이더를 미는 만큼 꺾이고, 오른쪽 가속 존에 엄지를 올리면 가속·위로 튕기면 방구·아래로 끌면 브레이크. 일시정지 메뉴의 '조작 바꾸기'로 전환. 드리프트 버튼은 제거(조향만으로 미끄러짐).<em>2026.11.16</em></span></li>
         <li><b>v2.8</b><span>인트로를 드론 시네마 하이라이트로 교체 — 매번 무작위 코스에서 AI 차 4대가 실제로 달리고, 영화처럼 위아래가 검은 화면에 드론 스윕 → 슬로모 사이드(점프하면 더 느리게) → 방구 부스터 클로즈업 → 정면 돌파 → 로고 순으로 컷 편집해 보여줘요. 약 11초, 화면을 누르거나 건너뛰기로 바로 코스 고르기.<em>2026.11.16</em></span></li>
         <li><b>v2.7</b><span>코스 고르기와 차고에서 화면을 좌우로 밀어 넘기기 — 손가락을 따라 디오라마·자동차가 움직이고, 충분히 밀면 다음/이전으로 넘어가요. 첫 터치(또는 클릭·키)와 출발 버튼에서 전체화면으로 전환.<em>2026.11.16</em></span></li>
         <li><b>v2.6</b><span>게임 시작 인트로 추가 — 탁자 위에 늘어선 코스 디오라마를 미니어처 사진처럼(위아래 흐림) 훑고, 마지막으로 고른 코스에서 멈춘 뒤 로고와 함께 코스 고르기로 넘어가요. 화면을 누르거나 아무 키나 누르면 건너뛰어요. 휴대폰 세로 코스 고르기 화면에서 코스 이름을 위로, 디오라마를 가운데로 옮김. 브라우저 탭 아이콘(RC카 + 방구 구름) 추가. 운전자 시점에서 카메라가 반대편에 놓여 뒤로 가는 것처럼 보이던 오류 수정(사이드미러를 그린 뒤 장면 좌표가 뒤집힌 채 남던 문제), 사이드미러 축소.<em>2026.11.16</em></span></li>
@@ -543,9 +576,11 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   <div id="touch">
     <div id="tZone"><span class="tip">화면을 누르고 있으면 전진</span></div>
     <div class="side l"><button id="tL" type="button" aria-label="왼쪽">◀</button><button id="tR" type="button" aria-label="오른쪽">▶</button></div>
-    <div class="side r"><div class="stack"><button id="tB" type="button">브레이크</button></div><button id="tP" type="button" aria-label="방구 부스터"><svg aria-hidden="true" width="44" height="30" viewBox="0 0 32 22"><path d="M9 20 C4 20 2 16.5 4 13.5 C3 9 7.5 6.5 11 8.5 C12.5 4 19 3.5 21.5 7.5 C26 6.5 29.5 10 28 14 C31 16.5 29 20 25.5 20 Z" fill="#c9f07a" stroke="#2b1a0e" stroke-width="1.8"/></svg><b>뿡!</b></button></div>
+    <div class="side r"><button id="tB" class="pedal brk" type="button">브레이크</button><div class="gcol"><button id="tP" type="button" aria-label="방구 부스터"><svg aria-hidden="true" width="44" height="30" viewBox="0 0 32 22"><path d="M9 20 C4 20 2 16.5 4 13.5 C3 9 7.5 6.5 11 8.5 C12.5 4 19 3.5 21.5 7.5 C26 6.5 29.5 10 28 14 C31 16.5 29 20 25.5 20 Z" fill="#c9f07a" stroke="#2b1a0e" stroke-width="1.8"/></svg><b>뿡!</b></button><button id="tG" class="pedal gas" type="button">가속</button></div></div>
+    <div id="cSteer" class="cOnly" aria-label="조향 슬라이더"><span class="ar l">◀</span><span class="ar r">▶</span><i id="cKnob"></i></div>
+    <div id="cZone" class="cOnly" aria-label="가속 존"><small>↑ 튕기면 방구</small><b>가속</b><small>↓ 끌면 브레이크</small></div>
   </div>
-  <div id="pauseOv" hidden><div class="pbox"><span class="k">일시정지</span><h3 id="pName">코스</h3><button class="go" id="pResume" type="button">계속 달리기</button><button class="ghost" id="pRestart" type="button">처음부터 다시</button><button class="ghost" id="pMenu" type="button">코스 목록으로</button></div></div>
+  <div id="pauseOv" hidden><div class="pbox"><span class="k">일시정지</span><h3 id="pName">코스</h3><button class="go" id="pResume" type="button">계속 달리기</button><button class="ghost" id="pRestart" type="button">처음부터 다시</button><button class="ghost" id="pCtl" type="button">조작 바꾸기</button><button class="ghost" id="pMenu" type="button">코스 목록으로</button></div></div>
   <div id="replayUI" hidden>
     <div class="rp-top"><span class="dot"></span>REPLAY <em>베스트 하이라이트</em></div>
     <div id="rpTag"></div>
@@ -670,11 +705,11 @@ function stepCar(c,inp,dt,T,racing){
   const fx=Math.cos(c.h),fy=Math.sin(c.h);
   let vF=c.vx*fx+c.vy*fy,vL=-c.vx*fy+c.vy*fx;const vF0=vF;
   const ts=inp.steer||0;c.steer+=(ts-c.steer)*Math.min(1,dt*(ts===0?10:6.5));
-  const gas=racing&&inp.gas,brk=racing&&inp.brake,hand=racing&&!!inp.hand;c.hand=hand;c.gas=gas;
+  const ga=typeof inp.gas==='number'?clamp(inp.gas,0,1):(inp.gas?1:0),gas=racing&&ga>0,brk=racing&&inp.brake,hand=racing&&!!inp.hand;c.hand=hand;c.gas=gas;
   const bo=c.boostT>0;c.boostT=Math.max(0,c.boostT-dt);const PW=c.power*(bo?(c.boostM||2.4):1),TP=c.top*(bo?1.45:1);
   if(!c.air){
     let acc=0;
-    if(gas||bo)acc+=PW*clamp(1-vF/TP,0,1.3);
+    if(gas||bo)acc+=PW*(bo?1:ga)*clamp(1-vF/TP,0,1.3);
     if(brk)acc+=vF>15?-1250:-c.power*0.55*clamp(1+vF/(c.top*0.35),0,1);
     acc-=vF*sf.drag*(c.off&&c.offM?c.offM:1);
     vF+=acc*dt;
@@ -1417,13 +1452,13 @@ function startGame(vi,ci){
   G={V,vi,ci,T,cars,player:cars[2],parts:[],skids:[],t:0,state:'count',count:3.4,shake:0,order:[],rec:[],recAcc:0,ranks:[],finishShow:0};
   clearInterval(resTimer);
   $('#menu').hidden=true;$('#mmenu').hidden=true;$('#verBtn').hidden=true;$('#stage').hidden=false;$('#result').hidden=true;$('#replayUI').hidden=true;$('#hud').hidden=false;$('#touch').classList.remove('off');touch.g=0;$('#tZone').classList.remove('on');$('#view').innerHTML='';
-$('#hint').textContent=(matchMedia('(pointer:coarse)').matches?'화면 아무 곳이나 누르고 있으면 전진 · ◀ ▶ 조향 · 방구 버튼으로 부스터':HINT)+(innerHeight>innerWidth?' 휴대폰을 가로로 돌리면 코스가 크게 보여요.':'');$('#hint').hidden=false;
+$('#hint').textContent=(matchMedia('(pointer:coarse)').matches?ctlHint():HINT)+(innerHeight>innerWidth?' 휴대폰을 가로로 돌리면 코스가 크게 보여요.':'');$('#hint').hidden=false;
   REND=V.R();REND.init($('#view'),G);syncCamBtns();hudInit(G);$('#pauseOv').hidden=true;
   AU.init();last=performance.now();acc=0;cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
 }
 function stopGame(){cancelAnimationFrame(raf);clearInterval(resTimer);if(REND)REND.dispose();const vi=G?G.vi:null;REND=null;G=null;AU.silence();$('#stage').hidden=true;$('#menu').hidden=false;$('#mmenu').hidden=false;$('#verBtn').hidden=false;renderCards();if(vi!=null)ttGo(vi,true);
   if(vi!=null){const el=document.getElementById('card-'+VARIANTS[vi].id);if(el){el.scrollIntoView({block:'center'});el.classList.add('just');setTimeout(()=>el.classList.remove('just'),1800);}}}
-function playerInput(){return{steer:((keys.ArrowRight||keys.KeyD||touch.r)?1:0)-((keys.ArrowLeft||keys.KeyA||touch.l)?1:0),gas:!!(keys.KeyW||keys.ArrowUp||touch.g),brake:!!(keys.KeyS||keys.ArrowDown||touch.b),hand:!!(keys.ShiftLeft||keys.ShiftRight||touch.h),boost:!!(keys.Space||touch.p)};}
+function playerInput(){const kb=((keys.ArrowRight||keys.KeyD||touch.r)?1:0)-((keys.ArrowLeft||keys.KeyA||touch.l)?1:0);return{steer:kb||(touch.sa||0),gas:(keys.KeyW||keys.ArrowUp)?1:(touch.g||0),brake:!!(keys.KeyS||keys.ArrowDown||touch.b),hand:!!(keys.ShiftLeft||keys.ShiftRight||touch.h),boost:!!(keys.Space||touch.p)};}
 function fireBoost(c){if(c.gauge<0.333||c.boostT>0)return false;c.gauge=Math.max(0,c.gauge-1/3);c.boostT=0.9;c.boosts++;const fx=Math.cos(c.h),fy=Math.sin(c.h);for(let k=0;k<10;k++)puff(c.x-fx*20,c.y-fy*20,c.z+6,'#c9c46a',14+k,1.4,-fx*120+(Math.random()-0.5)*90,-fy*120+(Math.random()-0.5)*90,25,c);if(c===G.player){AU.fart();bang(Math.random()<0.5?'뿡!':'뿌우웅!');G.shake=Math.max(G.shake,8);}return true;}
 function bang(t){const b=$('#bang');b.textContent=t;b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}
 function puff(x,y,z,col,r,life,vx,vy,vz,o){if(G.parts.length>220)G.parts.shift();G.parts.push({x,y,z,col,r,life,max:life,vx:vx||0,vy:vy||0,vz:vz||0,gr:r*1.4,o});}
@@ -1593,6 +1628,29 @@ addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
 {const z=$('#tZone'),ids=new Set();const up=e=>{ids.delete(e.pointerId);touch.g=ids.size?1:0;z.classList.toggle('on',!!ids.size);};
   z.addEventListener('pointerdown',e=>{e.preventDefault();ids.add(e.pointerId);touch.g=1;z.classList.add('on','used');try{z.setPointerCapture(e.pointerId);}catch(_){}});
   z.addEventListener('pointerup',up);z.addEventListener('pointercancel',up);z.addEventListener('lostpointercapture',up);}
+// ---- 휴대폰 조작 방식: B 페달 / C 슬라이더 + 가속 존 ----
+let CTL='B';try{CTL=localStorage.getItem('rcgp.ctl')==='C'?'C':'B';}catch(_){}
+function ctlHint(){return CTL==='C'?'왼쪽 슬라이더를 미는 만큼 조향 · 오른쪽 네모에 엄지를 올리면 가속, 위로 튕기면 방구, 아래로 끌면 브레이크':'오른쪽 큰 페달 가속(위쪽을 누를수록 세게) · 옆 페달 브레이크 · ◀ ▶ 조향 · 뿡! 방구';}
+function applyCtl(){$('#touch').dataset.ctl=CTL;$('#pCtl').textContent=CTL==='C'?'조작 바꾸기 → B 페달':'조작 바꾸기 → C 슬라이더';for(const k of['g','b','p','l','r'])touch[k]=0;touch.sa=0;}
+function setCtl(m){CTL=m;try{localStorage.setItem('rcgp.ctl',m);}catch(_){}applyCtl();if(G){$('#hint').textContent=ctlHint();$('#hint').hidden=false;G.hintT=G.t+4;}}
+applyCtl();
+$('#pCtl').onclick=()=>{setCtl(CTL==='C'?'B':'C');setPause(false);camToast(CTL==='C'?'C · 슬라이더 + 가속 존':'B · 가속·브레이크 페달');};
+{const b=$('#tG');const set=e=>{const r=b.getBoundingClientRect();touch.g=clamp(1-(e.clientY-r.top)/r.height,0,1)*0.45+0.55;};
+  b.addEventListener('pointerdown',e=>{e.preventDefault();set(e);b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(_){}});
+  b.addEventListener('pointermove',e=>{if(b.classList.contains('on'))set(e);});
+  const off=()=>{touch.g=0;b.classList.remove('on');};b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);}
+{const el=$('#cSteer'),kn=$('#cKnob');let id=null;
+  const set=e=>{const r=el.getBoundingClientRect(),half=r.width/2-30,v=clamp((e.clientX-(r.left+r.width/2))/half,-1,1);touch.sa=Math.sign(v)*Math.pow(Math.abs(v),1.2);kn.style.transform=`translateX(${(v*half).toFixed(0)}px)`;};
+  el.addEventListener('pointerdown',e=>{e.preventDefault();id=e.pointerId;el.classList.add('on');try{el.setPointerCapture(id);}catch(_){}set(e);});
+  el.addEventListener('pointermove',e=>{if(e.pointerId===id)set(e);});
+  const off=e=>{if(e.pointerId!==id)return;id=null;touch.sa=0;el.classList.remove('on');kn.style.transform='';};el.addEventListener('pointerup',off);el.addEventListener('pointercancel',off);el.addEventListener('lostpointercapture',off);}
+{const z=$('#cZone');let id=null,y0=0,yMin=0,fired=false;
+  z.addEventListener('pointerdown',e=>{e.preventDefault();id=e.pointerId;y0=yMin=e.clientY;fired=false;touch.g=1;touch.b=0;z.classList.add('on');try{z.setPointerCapture(id);}catch(_){}});
+  z.addEventListener('pointermove',e=>{if(e.pointerId!==id)return;const dy=e.clientY-y0;
+    if(!fired&&dy<-36){fired=true;touch.p=1;z.classList.add('boost');setTimeout(()=>{touch.p=0;z.classList.remove('boost');},120);y0=e.clientY;}
+    if(e.clientY>y0)fired=false;
+    const brk=e.clientY-y0>30;touch.b=brk?1:0;touch.g=brk?0:1;z.classList.toggle('brk',brk);});
+  const off=e=>{if(e.pointerId!==id)return;id=null;touch.g=0;touch.b=0;z.classList.remove('on','brk');};z.addEventListener('pointerup',off);z.addEventListener('pointercancel',off);z.addEventListener('lostpointercapture',off);}
 for(const[id,k]of[['tL','l'],['tR','r'],['tB','b'],['tP','p']]){const b=$('#'+id);
   const on=e=>{e.preventDefault();touch[k]=1;b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(_){}},off=()=>{touch[k]=0;b.classList.remove('on');};
   b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);}

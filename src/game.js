@@ -132,13 +132,13 @@ function startGame(vi,ci){
   G={V,vi,ci,T,cars,player:cars[2],parts:[],skids:[],t:0,state:'count',count:3.4,shake:0,order:[],rec:[],recAcc:0,ranks:[],finishShow:0};
   clearInterval(resTimer);
   $('#menu').hidden=true;$('#mmenu').hidden=true;$('#verBtn').hidden=true;$('#stage').hidden=false;$('#result').hidden=true;$('#replayUI').hidden=true;$('#hud').hidden=false;$('#touch').classList.remove('off');touch.g=0;$('#tZone').classList.remove('on');$('#view').innerHTML='';
-$('#hint').textContent=(matchMedia('(pointer:coarse)').matches?'화면 아무 곳이나 누르고 있으면 전진 · ◀ ▶ 조향 · 방구 버튼으로 부스터':HINT)+(innerHeight>innerWidth?' 휴대폰을 가로로 돌리면 코스가 크게 보여요.':'');$('#hint').hidden=false;
+$('#hint').textContent=(matchMedia('(pointer:coarse)').matches?ctlHint():HINT)+(innerHeight>innerWidth?' 휴대폰을 가로로 돌리면 코스가 크게 보여요.':'');$('#hint').hidden=false;
   REND=V.R();REND.init($('#view'),G);syncCamBtns();hudInit(G);$('#pauseOv').hidden=true;
   AU.init();last=performance.now();acc=0;cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
 }
 function stopGame(){cancelAnimationFrame(raf);clearInterval(resTimer);if(REND)REND.dispose();const vi=G?G.vi:null;REND=null;G=null;AU.silence();$('#stage').hidden=true;$('#menu').hidden=false;$('#mmenu').hidden=false;$('#verBtn').hidden=false;renderCards();if(vi!=null)ttGo(vi,true);
   if(vi!=null){const el=document.getElementById('card-'+VARIANTS[vi].id);if(el){el.scrollIntoView({block:'center'});el.classList.add('just');setTimeout(()=>el.classList.remove('just'),1800);}}}
-function playerInput(){return{steer:((keys.ArrowRight||keys.KeyD||touch.r)?1:0)-((keys.ArrowLeft||keys.KeyA||touch.l)?1:0),gas:!!(keys.KeyW||keys.ArrowUp||touch.g),brake:!!(keys.KeyS||keys.ArrowDown||touch.b),hand:!!(keys.ShiftLeft||keys.ShiftRight||touch.h),boost:!!(keys.Space||touch.p)};}
+function playerInput(){const kb=((keys.ArrowRight||keys.KeyD||touch.r)?1:0)-((keys.ArrowLeft||keys.KeyA||touch.l)?1:0);return{steer:kb||(touch.sa||0),gas:(keys.KeyW||keys.ArrowUp)?1:(touch.g||0),brake:!!(keys.KeyS||keys.ArrowDown||touch.b),hand:!!(keys.ShiftLeft||keys.ShiftRight||touch.h),boost:!!(keys.Space||touch.p)};}
 function fireBoost(c){if(c.gauge<0.333||c.boostT>0)return false;c.gauge=Math.max(0,c.gauge-1/3);c.boostT=0.9;c.boosts++;const fx=Math.cos(c.h),fy=Math.sin(c.h);for(let k=0;k<10;k++)puff(c.x-fx*20,c.y-fy*20,c.z+6,'#c9c46a',14+k,1.4,-fx*120+(Math.random()-0.5)*90,-fy*120+(Math.random()-0.5)*90,25,c);if(c===G.player){AU.fart();bang(Math.random()<0.5?'뿡!':'뿌우웅!');G.shake=Math.max(G.shake,8);}return true;}
 function bang(t){const b=$('#bang');b.textContent=t;b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}
 function puff(x,y,z,col,r,life,vx,vy,vz,o){if(G.parts.length>220)G.parts.shift();G.parts.push({x,y,z,col,r,life,max:life,vx:vx||0,vy:vy||0,vz:vz||0,gr:r*1.4,o});}
@@ -308,6 +308,29 @@ addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
 {const z=$('#tZone'),ids=new Set();const up=e=>{ids.delete(e.pointerId);touch.g=ids.size?1:0;z.classList.toggle('on',!!ids.size);};
   z.addEventListener('pointerdown',e=>{e.preventDefault();ids.add(e.pointerId);touch.g=1;z.classList.add('on','used');try{z.setPointerCapture(e.pointerId);}catch(_){}});
   z.addEventListener('pointerup',up);z.addEventListener('pointercancel',up);z.addEventListener('lostpointercapture',up);}
+// ---- 휴대폰 조작 방식: B 페달 / C 슬라이더 + 가속 존 ----
+let CTL='B';try{CTL=localStorage.getItem('rcgp.ctl')==='C'?'C':'B';}catch(_){}
+function ctlHint(){return CTL==='C'?'왼쪽 슬라이더를 미는 만큼 조향 · 오른쪽 네모에 엄지를 올리면 가속, 위로 튕기면 방구, 아래로 끌면 브레이크':'오른쪽 큰 페달 가속(위쪽을 누를수록 세게) · 옆 페달 브레이크 · ◀ ▶ 조향 · 뿡! 방구';}
+function applyCtl(){$('#touch').dataset.ctl=CTL;$('#pCtl').textContent=CTL==='C'?'조작 바꾸기 → B 페달':'조작 바꾸기 → C 슬라이더';for(const k of['g','b','p','l','r'])touch[k]=0;touch.sa=0;}
+function setCtl(m){CTL=m;try{localStorage.setItem('rcgp.ctl',m);}catch(_){}applyCtl();if(G){$('#hint').textContent=ctlHint();$('#hint').hidden=false;G.hintT=G.t+4;}}
+applyCtl();
+$('#pCtl').onclick=()=>{setCtl(CTL==='C'?'B':'C');setPause(false);camToast(CTL==='C'?'C · 슬라이더 + 가속 존':'B · 가속·브레이크 페달');};
+{const b=$('#tG');const set=e=>{const r=b.getBoundingClientRect();touch.g=clamp(1-(e.clientY-r.top)/r.height,0,1)*0.45+0.55;};
+  b.addEventListener('pointerdown',e=>{e.preventDefault();set(e);b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(_){}});
+  b.addEventListener('pointermove',e=>{if(b.classList.contains('on'))set(e);});
+  const off=()=>{touch.g=0;b.classList.remove('on');};b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);}
+{const el=$('#cSteer'),kn=$('#cKnob');let id=null;
+  const set=e=>{const r=el.getBoundingClientRect(),half=r.width/2-30,v=clamp((e.clientX-(r.left+r.width/2))/half,-1,1);touch.sa=Math.sign(v)*Math.pow(Math.abs(v),1.2);kn.style.transform=`translateX(${(v*half).toFixed(0)}px)`;};
+  el.addEventListener('pointerdown',e=>{e.preventDefault();id=e.pointerId;el.classList.add('on');try{el.setPointerCapture(id);}catch(_){}set(e);});
+  el.addEventListener('pointermove',e=>{if(e.pointerId===id)set(e);});
+  const off=e=>{if(e.pointerId!==id)return;id=null;touch.sa=0;el.classList.remove('on');kn.style.transform='';};el.addEventListener('pointerup',off);el.addEventListener('pointercancel',off);el.addEventListener('lostpointercapture',off);}
+{const z=$('#cZone');let id=null,y0=0,yMin=0,fired=false;
+  z.addEventListener('pointerdown',e=>{e.preventDefault();id=e.pointerId;y0=yMin=e.clientY;fired=false;touch.g=1;touch.b=0;z.classList.add('on');try{z.setPointerCapture(id);}catch(_){}});
+  z.addEventListener('pointermove',e=>{if(e.pointerId!==id)return;const dy=e.clientY-y0;
+    if(!fired&&dy<-36){fired=true;touch.p=1;z.classList.add('boost');setTimeout(()=>{touch.p=0;z.classList.remove('boost');},120);y0=e.clientY;}
+    if(e.clientY>y0)fired=false;
+    const brk=e.clientY-y0>30;touch.b=brk?1:0;touch.g=brk?0:1;z.classList.toggle('brk',brk);});
+  const off=e=>{if(e.pointerId!==id)return;id=null;touch.g=0;touch.b=0;z.classList.remove('on','brk');};z.addEventListener('pointerup',off);z.addEventListener('pointercancel',off);z.addEventListener('lostpointercapture',off);}
 for(const[id,k]of[['tL','l'],['tR','r'],['tB','b'],['tP','p']]){const b=$('#'+id);
   const on=e=>{e.preventDefault();touch[k]=1;b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(_){}},off=()=>{touch[k]=0;b.classList.remove('on');};
   b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);}

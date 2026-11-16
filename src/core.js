@@ -105,11 +105,11 @@ function stepCar(c,inp,dt,T,racing){
   const fx=Math.cos(c.h),fy=Math.sin(c.h);
   let vF=c.vx*fx+c.vy*fy,vL=-c.vx*fy+c.vy*fx;const vF0=vF;
   const ts=inp.steer||0;c.steer+=(ts-c.steer)*Math.min(1,dt*(ts===0?10:6.5));
-  const gas=racing&&inp.gas,brk=racing&&inp.brake,hand=racing&&!!inp.hand;c.hand=hand;c.gas=gas;
+  const ga=typeof inp.gas==='number'?clamp(inp.gas,0,1):(inp.gas?1:0),gas=racing&&ga>0,brk=racing&&inp.brake,hand=racing&&!!inp.hand;c.hand=hand;c.gas=gas;
   const bo=c.boostT>0;c.boostT=Math.max(0,c.boostT-dt);const PW=c.power*(bo?(c.boostM||2.4):1),TP=c.top*(bo?1.45:1);
   if(!c.air){
     let acc=0;
-    if(gas||bo)acc+=PW*clamp(1-vF/TP,0,1.3);
+    if(gas||bo)acc+=PW*(bo?1:ga)*clamp(1-vF/TP,0,1.3);
     if(brk)acc+=vF>15?-1250:-c.power*0.55*clamp(1+vF/(c.top*0.35),0,1);
     acc-=vF*sf.drag*(c.off&&c.offM?c.offM:1);
     vF+=acc*dt;
