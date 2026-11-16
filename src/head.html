@@ -395,18 +395,19 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 #dskClose{align-self:flex-end;font:600 3.2vw var(--f-body);padding:1.4vw 3.6vw;border-radius:99px;border:0;background:#ff7a1a;color:#2b1a0e}
 /* ---- 휴대폰 조작: 왼손 ◀ ▶ + 오른손 가속 존(위 N₂O 부스터 · 가운데 페달 · 아래 브레이크) (v3.0) ---- */
 #tZone{display:none!important}
-#cZone{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));width:132px;height:190px;box-sizing:border-box;padding:6px;border-radius:26px;background:rgba(12,18,16,.5);border:2px solid rgba(255,255,255,.5);backdrop-filter:blur(6px);display:flex;flex-direction:column;gap:5px;touch-action:none;user-select:none;-webkit-user-select:none;transition:background .12s}
+#cZone{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));width:186px;height:176px;box-sizing:border-box;padding:6px;border-radius:26px;background:rgba(12,18,16,.5);border:2px solid rgba(255,255,255,.5);backdrop-filter:blur(6px);display:flex;flex-direction:column;gap:5px;touch-action:none;user-select:none;-webkit-user-select:none;transition:background .12s}
 #cZone .zb{position:relative;flex:none;height:30%;border-radius:18px;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .12s,opacity .2s}
 #cZone .zboost{background:rgba(61,139,255,.18)}
-#cZone .zbrk{height:22%;background:rgba(255,90,74,.14);color:#ff6a5a}
+#cZone .zrow{flex:1;min-height:0;display:flex;gap:5px}
+#cZone .zbrk{height:auto;width:40%;flex-direction:column;background:rgba(255,90,74,.14);color:#ff6a5a}
 #cZone .can{width:22px;height:32px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.3))}
 #cZone .bk{width:30px;height:24px}
 #cZone .chev{display:flex;flex-direction:column;gap:2px}#cZone .chev i{width:12px;height:12px;border-left:3px solid #c9f07a;border-top:3px solid #c9f07a;transform:rotate(45deg);opacity:.85}
 #cZone.ready .chev i{animation:zChev 1s ease-in-out infinite}#cZone.ready .chev i:last-child{animation-delay:.15s}
 @keyframes zChev{0%,100%{transform:translateY(2px) rotate(45deg);opacity:.5}50%{transform:translateY(-2px) rotate(45deg);opacity:1}}
 #cZone:not(.ready) .zboost{opacity:.45}
-#cZone .zp{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
-#cZone .pd{width:64%;height:100%;border-radius:12px 12px 18px 18px;background:repeating-linear-gradient(#ff8f3a 0 10px,#e8721c 10px 14px);box-shadow:inset 0 -6px 0 rgba(0,0,0,.25),0 3px 0 #1a120a;transition:transform .08s,filter .12s}
+#cZone .zp{flex:1;min-width:0;display:flex;align-items:center;justify-content:center}
+#cZone .pd{width:78%;height:100%;border-radius:12px 12px 18px 18px;background:repeating-linear-gradient(#ff8f3a 0 10px,#e8721c 10px 14px);box-shadow:inset 0 -6px 0 rgba(0,0,0,.25),0 3px 0 #1a120a;transition:transform .08s,filter .12s}
 #cZone.on .pd{transform:perspective(260px) rotateX(18deg) translateY(2px);filter:brightness(1.12)}
 #cZone.boost .zboost{background:rgba(201,240,122,.85)}#cZone.boost .pd{filter:brightness(1.3) saturate(1.2)}
 #cZone.brk .zbrk{background:rgba(255,90,74,.75);color:#fff}#cZone.brk .pd{filter:grayscale(.8) brightness(.8);transform:none}
@@ -418,10 +419,10 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   .cockpit .speedo{right:calc(max(16px,env(safe-area-inset-right,0px)) + 250px)}
   .cockpit #hClouds{left:auto;transform:none;right:calc(max(16px,env(safe-area-inset-right,0px)) + 250px);bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 }
-@media (pointer:coarse) and (orientation:landscape) and (max-height:440px){#cZone{right:calc(max(14px,env(safe-area-inset-right,0px)) + 66px);height:min(178px,calc(100vh - 40px));width:124px}}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:440px){#cZone{right:calc(max(14px,env(safe-area-inset-right,0px)) + 66px);height:min(166px,calc(100vh - 40px));width:180px}}
 @media (pointer:coarse) and (orientation:portrait){
-  #cZone{width:124px;height:186px;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px))}
-  #hClouds,.cockpit #hClouds{bottom:calc(212px + env(safe-area-inset-bottom,0px))}
+  #cZone{width:min(168px,calc(100vw - 196px));height:176px;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  #hClouds,.cockpit #hClouds{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
 }
 /* ---- 드라이버 이름 (v3.0) ---- */
 #nameChip{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 12px;margin-left:10px;border-radius:99px;border:1px solid rgba(0,0,0,.18);background:rgba(255,255,255,.55);color:inherit;font:600 13px var(--f-body);cursor:pointer;vertical-align:middle;max-width:46vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -515,7 +516,7 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
-        <li><b>v3.1</b><span>붉은 협곡 벽 정리 — 길이 굽어 붙은 곳에서 화면의 바위 벽과 실제 충돌 벽이 어긋나 차가 바위 속으로 들어가 보이던 문제 수정. 벽에 부딪히면 타고 오르거나 튀어 오르지 않고 아래에서 '퉁' 막히며 되튕겨요(불꽃·충돌음). 카메라도 바위 속으로 들어가지 않고 길 위에 머물러요.<em>2026.11.16</em></span></li>
+        <li><b>v3.1</b><span>붉은 협곡 벽 정리 — 길이 굽어 붙은 곳에서 화면의 바위 벽과 실제 충돌 벽이 어긋나 차가 바위 속으로 들어가 보이던 문제 수정. 벽에 부딪히면 타고 오르거나 튀어 오르지 않고 아래에서 '퉁' 막히며 되튕겨요(불꽃·충돌음). 카메라도 바위 속으로 들어가지 않고 길 위에 머물러요. 휴대폰 브레이크 칸을 가속 페달 오른쪽으로 옮김(누르거나 오른쪽으로 밀면 브레이크).<em>2026.11.16</em></span></li>
         <li><b>v3.0</b><span>휴대폰 조작 확정 — 왼손 ◀ ▶, 오른손 가속 존(가운데 페달을 누르고 있으면 가속 · 위쪽 N₂O 부스터 칸을 누르거나 위로 밀면 방구 · 아래쪽 브레이크 칸을 누르거나 아래로 끌면 브레이크). 설명 글자는 출발 때만 6초 표시. 드라이버 이름: 처음 시작 때 추천 이름을 채워 묻고(그대로 시작 가능), 메뉴 위 이름표로 언제든 변경, 기록·순위표에 이름이 남아요.<em>2026.11.16</em></span></li>
         <li><b>v2.9</b><span>휴대폰 조작 새 단장 — B 페달(기본): 오른손 큰 가속 페달(위쪽을 누를수록 세게)·브레이크 페달·뿡!, 왼손 ◀ ▶. C 슬라이더: 왼손 슬라이더를 미는 만큼 꺾이고, 오른쪽 가속 존에 엄지를 올리면 가속·위로 튕기면 방구·아래로 끌면 브레이크. 일시정지 메뉴의 '조작 바꾸기'로 전환. 드리프트 버튼은 제거(조향만으로 미끄러짐).<em>2026.11.16</em></span></li>
         <li><b>v2.8</b><span>인트로를 드론 시네마 하이라이트로 교체 — 매번 무작위 코스에서 AI 차 4대가 실제로 달리고, 영화처럼 위아래가 검은 화면에 드론 스윕 → 슬로모 사이드(점프하면 더 느리게) → 방구 부스터 클로즈업 → 정면 돌파 → 로고 순으로 컷 편집해 보여줘요. 약 11초, 화면을 누르거나 건너뛰기로 바로 코스 고르기.<em>2026.11.16</em></span></li>
@@ -595,10 +596,10 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   <div id="touch">
     <div id="tZone"><span class="tip">화면을 누르고 있으면 전진</span></div>
     <div class="side l"><button id="tL" type="button" aria-label="왼쪽">◀</button><button id="tR" type="button" aria-label="오른쪽">▶</button></div>
-    <div id="cZone" aria-label="가속 페달: 누르고 있으면 가속, 위로 밀거나 위쪽을 누르면 방구 부스터, 아래로 끌거나 아래쪽을 누르면 브레이크">
+    <div id="cZone" aria-label="가속 페달: 누르고 있으면 가속, 위로 밀거나 위쪽을 누르면 방구 부스터, 오른쪽 칸을 누르거나 오른쪽으로 밀면 브레이크">
       <div class="zb zboost"><svg class="can" aria-hidden="true" viewBox="0 0 26 38"><rect x="5" y="7" width="16" height="29" rx="6" fill="#3d8bff" stroke="#0b1a33" stroke-width="2"/><rect x="9.5" y="1.5" width="7" height="6.5" rx="1.6" fill="#d6dde6" stroke="#0b1a33" stroke-width="1.6"/><rect x="5" y="15" width="16" height="10" fill="#0b1a33" opacity=".35"/><text x="13" y="23.2" font-size="7" font-weight="700" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif">N₂O</text></svg><span class="chev" aria-hidden="true"><i></i><i></i></span><small class="zt">위로 밀면 방구</small></div>
-      <div class="zp" aria-hidden="true"><span class="pd"></span></div>
-      <div class="zb zbrk"><svg class="bk" aria-hidden="true" viewBox="0 0 36 28"><circle cx="18" cy="14" r="8.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M8 5 A13 13 0 0 0 8 23 M28 5 A13 13 0 0 1 28 23" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M18 9v6.4" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><circle cx="18" cy="19" r="1.6" fill="currentColor"/></svg><small class="zt">아래로 끌면 브레이크</small></div>
+      <div class="zrow"><div class="zp" aria-hidden="true"><span class="pd"></span></div>
+      <div class="zb zbrk"><svg class="bk" aria-hidden="true" viewBox="0 0 36 28"><circle cx="18" cy="14" r="8.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M8 5 A13 13 0 0 0 8 23 M28 5 A13 13 0 0 1 28 23" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M18 9v6.4" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><circle cx="18" cy="19" r="1.6" fill="currentColor"/></svg><small class="zt">오른쪽은 브레이크</small></div></div>
     </div>
 
   </div>
