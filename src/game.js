@@ -74,6 +74,8 @@ const trackCache={};function getTrack(id){return trackCache[id]||(trackCache[id]
 const HINT='왼손 W 가속 · S 브레이크 · Space 방구 · Shift 드리프트 / 오른손 ← → 조향. V는 차 안 시점, C는 시점 전환.';
 
 // ---- 기록 저장 (계정 저장소, 없으면 이 브라우저) ----
+const PLAYER={name:(()=>{try{return localStorage.getItem('rcgp.name')||'';}catch(_){return'';}})(),
+  setName(v){this.name=v;try{localStorage.setItem('rcgp.name',v);}catch(_){}if(REC.db)REC.db.collection('data/users/'+REC.uid).doc('profile').set({name:v}).catch(()=>{});}};
 const REC={data:{},db:null,uid:null,where:'local',
   load(){try{const s=localStorage.getItem('rcgp-records');if(s)this.data=JSON.parse(s)||{};}catch(_){}},
   saveLocal(){try{localStorage.setItem('rcgp-records',JSON.stringify(this.data));}catch(_){}},
@@ -85,12 +87,12 @@ const REC={data:{},db:null,uid:null,where:'local',
     try{if(!window.claude||!window.claude.use)return;const[db,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!user)return;const id=await user.id();if(!id)return;
       this.db=db;this.uid=id;this.where='account';
       const snap=await Promise.race([db.collection('data/users/'+id).get(),new Promise((_,rj)=>setTimeout(()=>rj('timeout'),10000))]);
-      for(const d of snap.docs){const v=d.data();if(v&&VI[d.id]!=null)this.data[d.id]=this.merge(this.data[d.id],v);}
+      for(const d of snap.docs){const v=d.data();if(d.id==='profile'&&v&&v.name&&!PLAYER.name){PLAYER.name=v.name;try{localStorage.setItem('rcgp.name',v.name);}catch(_){}if(window.showName)showName();}if(v&&VI[d.id]!=null)this.data[d.id]=this.merge(this.data[d.id],v);}
       this.saveLocal();onReady();}catch(_){if(!this.db)this.where='local';onReady();}},
   add(id,run){const r=this.data[id]||{best:null,bestLap:null,bestScore:0,bestGrade:null,plays:0,hist:[]};
     const isBest=r.best==null||run.t<r.best;
     r.plays=(r.plays||0)+1;if(isBest)r.best=run.t;if(r.bestLap==null||run.lap<r.bestLap)r.bestLap=run.lap;if(run.score>(r.bestScore||0)){r.bestScore=run.score;r.bestGrade=run.g;}
-    r.hist=[{t:run.t,g:run.g,p:run.p,d:Date.now()},...(r.hist||[])].slice(0,8);this.data[id]=r;this.saveLocal();
+    r.hist=[{t:run.t,g:run.g,p:run.p,d:Date.now(),n:PLAYER.name||''},...(r.hist||[])].slice(0,8);this.data[id]=r;this.saveLocal();
     if(this.db)this.db.collection('data/users/'+this.uid).doc(id).set(r).catch(()=>{});
     return{rec:r,isBest};}
 };
@@ -127,12 +129,12 @@ function startGame(vi,ci){
   const others=CARS.filter((_,i)=>i!==ci),pick=[others[(vi)%others.length],others[(vi+1)%others.length],others[(vi+2)%others.length]];
   const grid=[[pick[0],0.97],[pick[1],0.95],[CAR,0],[pick[2],0.92]];
   const cars=grid.map((d,k)=>makeCar(T,Math.round(N-2-(k>>1)*sp*1.4),k%2?-45:45,d[0].col,k!==2,d[1]));
-  grid.forEach((d,k)=>{cars[k].kind=d[0].kind;cars[k].name=k===2?('나 · '+CAR.name):d[0].name;});
+  grid.forEach((d,k)=>{cars[k].kind=d[0].kind;cars[k].name=k===2?(PLAYER.name||('나 · '+CAR.name)):d[0].name;});
   const pc=cars[2];Object.assign(pc,{power:CAR.power,top:CAR.top,gripM:CAR.grip,mass:CAR.mass,boostM:CAR.boost,offM:CAR.offM,susp:CAR.susp,kind:CAR.kind});
   G={V,vi,ci,T,cars,player:cars[2],parts:[],skids:[],t:0,state:'count',count:3.4,shake:0,order:[],rec:[],recAcc:0,ranks:[],finishShow:0};
   clearInterval(resTimer);
   $('#menu').hidden=true;$('#mmenu').hidden=true;$('#verBtn').hidden=true;$('#stage').hidden=false;$('#result').hidden=true;$('#replayUI').hidden=true;$('#hud').hidden=false;$('#touch').classList.remove('off');touch.g=0;$('#tZone').classList.remove('on');$('#view').innerHTML='';
-$('#hint').textContent=(matchMedia('(pointer:coarse)').matches?ctlHint():HINT)+(innerHeight>innerWidth?' 휴대폰을 가로로 돌리면 코스가 크게 보여요.':'');$('#hint').hidden=false;
+ctlHelp();$('#hint').textContent=(matchMedia('(pointer:coarse)').matches?ctlHint():HINT)+(innerHeight>innerWidth?' 휴대폰을 가로로 돌리면 코스가 크게 보여요.':'');$('#hint').hidden=false;
   REND=V.R();REND.init($('#view'),G);syncCamBtns();hudInit(G);$('#pauseOv').hidden=true;
   AU.init();last=performance.now();acc=0;cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
 }
@@ -281,6 +283,7 @@ function hud(){
   if(g.t>(g.hintT||6))$('#hint').hidden=true;
   const mh=REND.camMode==='overview';if(mh!==g.miniHid){g.miniHid=mh;$('#hMini').toggleAttribute('hidden',mh);}
   if(!mh)for(const[el,c]of g.miniDots){el.setAttribute('cx',c.x.toFixed(0));el.setAttribute('cy',c.y.toFixed(0));}
+  {const rd=p.gauge>=0.333&&p.boostT<=0;if(rd!==g.zReady){g.zReady=rd;$('#cZone').classList.toggle('ready',rd);}}
   $('#wheel').style.transform=`rotate(${(p.steer*110).toFixed(1)}deg)`;
 }
 function setPause(on){if(!G||G.state==='replay'||G.state==='done'||!$('#result').hidden)return;G.paused=on;$('#pauseOv').hidden=!on;if(on){AU.silence();$('#pName').textContent=`코스 ${G.vi+1} · ${G.V.name}`;$('#pResume').focus();}for(const k in keys)keys[k]=false;}
@@ -308,30 +311,21 @@ addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
 {const z=$('#tZone'),ids=new Set();const up=e=>{ids.delete(e.pointerId);touch.g=ids.size?1:0;z.classList.toggle('on',!!ids.size);};
   z.addEventListener('pointerdown',e=>{e.preventDefault();ids.add(e.pointerId);touch.g=1;z.classList.add('on','used');try{z.setPointerCapture(e.pointerId);}catch(_){}});
   z.addEventListener('pointerup',up);z.addEventListener('pointercancel',up);z.addEventListener('lostpointercapture',up);}
-// ---- 휴대폰 조작 방식: B 페달 / C 슬라이더 + 가속 존 ----
-let CTL='B';try{CTL=localStorage.getItem('rcgp.ctl')==='C'?'C':'B';}catch(_){}
-function ctlHint(){return CTL==='C'?'왼쪽 슬라이더를 미는 만큼 조향 · 오른쪽 네모에 엄지를 올리면 가속, 위로 튕기면 방구, 아래로 끌면 브레이크':'오른쪽 큰 페달 가속(위쪽을 누를수록 세게) · 옆 페달 브레이크 · ◀ ▶ 조향 · 뿡! 방구';}
-function applyCtl(){$('#touch').dataset.ctl=CTL;$('#pCtl').textContent=CTL==='C'?'조작 바꾸기 → B 페달':'조작 바꾸기 → C 슬라이더';for(const k of['g','b','p','l','r'])touch[k]=0;touch.sa=0;}
-function setCtl(m){CTL=m;try{localStorage.setItem('rcgp.ctl',m);}catch(_){}applyCtl();if(G){$('#hint').textContent=ctlHint();$('#hint').hidden=false;G.hintT=G.t+4;}}
-applyCtl();
-$('#pCtl').onclick=()=>{setCtl(CTL==='C'?'B':'C');setPause(false);camToast(CTL==='C'?'C · 슬라이더 + 가속 존':'B · 가속·브레이크 페달');};
-{const b=$('#tG');const set=e=>{const r=b.getBoundingClientRect();touch.g=clamp(1-(e.clientY-r.top)/r.height,0,1)*0.45+0.55;};
-  b.addEventListener('pointerdown',e=>{e.preventDefault();set(e);b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(_){}});
-  b.addEventListener('pointermove',e=>{if(b.classList.contains('on'))set(e);});
-  const off=()=>{touch.g=0;b.classList.remove('on');};b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);}
-{const el=$('#cSteer'),kn=$('#cKnob');let id=null;
-  const set=e=>{const r=el.getBoundingClientRect(),half=r.width/2-30,v=clamp((e.clientX-(r.left+r.width/2))/half,-1,1);touch.sa=Math.sign(v)*Math.pow(Math.abs(v),1.2);kn.style.transform=`translateX(${(v*half).toFixed(0)}px)`;};
-  el.addEventListener('pointerdown',e=>{e.preventDefault();id=e.pointerId;el.classList.add('on');try{el.setPointerCapture(id);}catch(_){}set(e);});
-  el.addEventListener('pointermove',e=>{if(e.pointerId===id)set(e);});
-  const off=e=>{if(e.pointerId!==id)return;id=null;touch.sa=0;el.classList.remove('on');kn.style.transform='';};el.addEventListener('pointerup',off);el.addEventListener('pointercancel',off);el.addEventListener('lostpointercapture',off);}
-{const z=$('#cZone');let id=null,y0=0,yMin=0,fired=false;
-  z.addEventListener('pointerdown',e=>{e.preventDefault();id=e.pointerId;y0=yMin=e.clientY;fired=false;touch.g=1;touch.b=0;z.classList.add('on');try{z.setPointerCapture(id);}catch(_){}});
+// ---- 휴대폰 조작: 왼손 ◀ ▶, 오른손 가속 존 (누르면 가속 · 위쪽/위로 밀기 = 방구 · 아래쪽/아래로 끌기 = 브레이크) ----
+function ctlHint(){return '왼손 ◀ ▶ 조향 · 오른쪽 페달을 누르고 있으면 가속 · 위로 밀면 방구 · 아래로 끌면 브레이크';}
+function ctlHelp(){const t=$('#touch');t.classList.add('helptxt');clearTimeout(ctlHelp.tm);ctlHelp.tm=setTimeout(()=>t.classList.remove('helptxt'),6000);}
+{const z=$('#cZone');let id=null,y0=0,fired=false;
+  const boost=()=>{touch.p=1;z.classList.add('boost');setTimeout(()=>{touch.p=0;z.classList.remove('boost');},140);};
+  const setBrk=on=>{touch.b=on?1:0;touch.g=on?0:1;z.classList.toggle('brk',on);};
+  z.addEventListener('pointerdown',e=>{e.preventDefault();id=e.pointerId;y0=e.clientY;fired=false;z.classList.add('on');try{z.setPointerCapture(id);}catch(_){}
+    const r=z.getBoundingClientRect(),f=(e.clientY-r.top)/r.height;setBrk(f>0.76);if(f<0.32){fired=true;boost();}});
   z.addEventListener('pointermove',e=>{if(e.pointerId!==id)return;const dy=e.clientY-y0;
-    if(!fired&&dy<-36){fired=true;touch.p=1;z.classList.add('boost');setTimeout(()=>{touch.p=0;z.classList.remove('boost');},120);y0=e.clientY;}
-    if(e.clientY>y0)fired=false;
-    const brk=e.clientY-y0>30;touch.b=brk?1:0;touch.g=brk?0:1;z.classList.toggle('brk',brk);});
-  const off=e=>{if(e.pointerId!==id)return;id=null;touch.g=0;touch.b=0;z.classList.remove('on','brk');};z.addEventListener('pointerup',off);z.addEventListener('pointercancel',off);z.addEventListener('lostpointercapture',off);}
-for(const[id,k]of[['tL','l'],['tR','r'],['tB','b'],['tP','p']]){const b=$('#'+id);
+    if(!fired&&dy<-30){fired=true;boost();y0=e.clientY;}
+    if(e.clientY>y0+10)fired=false;
+    const r=z.getBoundingClientRect(),f=(e.clientY-r.top)/r.height;setBrk(dy>26||f>0.76);});
+  const off=e=>{if(e.pointerId!==id)return;id=null;touch.g=0;touch.b=0;z.classList.remove('on','brk');};
+  z.addEventListener('pointerup',off);z.addEventListener('pointercancel',off);z.addEventListener('lostpointercapture',off);}
+for(const[id,k]of[['tL','l'],['tR','r']]){const b=$('#'+id);
   const on=e=>{e.preventDefault();touch[k]=1;b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(_){}},off=()=>{touch[k]=0;b.classList.remove('on');};
   b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);}
 function flashHint(t){$('#hint').textContent=t;$('#hint').hidden=false;G.hintT=G.t+2;}

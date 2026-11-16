@@ -57,7 +57,7 @@ addSwipe($('#mmStage'),{
   onEnd:d=>{const c=$('#ttCur');c.style.transition='';c.style.transform='';c.style.opacity='';if(d)ttGo(ttIdx+d);}
 });
 function setMobile(){document.body.classList.add('mobile');document.body.classList.toggle('fine',!matchMedia('(pointer:coarse)').matches);}
-addEventListener('keydown',e=>{if(G||GX.open||INTRO.open||!$('#verModal').hidden)return;if(e.code==='ArrowLeft'||e.code==='KeyA'){ttGo(ttIdx-1);}else if(e.code==='ArrowRight'||e.code==='KeyD'){ttGo(ttIdx+1);}else if(e.code==='Enter'||e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)$('#mmGo').click();}});
+addEventListener('keydown',e=>{if(G||GX.open||INTRO.open||!$('#nameDlg').hidden||!$('#verModal').hidden)return;if(e.code==='ArrowLeft'||e.code==='KeyA'){ttGo(ttIdx-1);}else if(e.code==='ArrowRight'||e.code==='KeyD'){ttGo(ttIdx+1);}else if(e.code==='Enter'||e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)$('#mmGo').click();}});
 addEventListener('resize',setMobile);setMobile();ttRender();
 
 // ---- 차고 (자동차 선택) ----
@@ -114,7 +114,7 @@ const INTRO={open:false};
   const SHOTS=[['sweep','드론 스윕',2.6,1],['side','슬로모 사이드',2.4,0.45],['rear','방구 부스터 클로즈업',2.1,1],['front','정면 돌파',1.9,1],['title','',2.6,1]];
   let raf=0,done=false,si=-1,st=0,clock=0,lastTs=0,acc2=0;
   const finish=()=>{if(done)return;done=true;INTRO.open=false;el.classList.add('out');cancelAnimationFrame(raf);
-    $('#mmenu').hidden=false;$('#verBtn').hidden=false;
+    $('#mmenu').hidden=false;$('#verBtn').hidden=false;askNameIfNeeded();
     setTimeout(()=>{el.hidden=true;if(G&&G.intro){if(REND)REND.dispose();REND=null;G=null;$('#stage').hidden=true;$('#view').innerHTML='';$('#bang').classList.remove('pop');}},520);};
   try{
     const vi=Math.floor(Math.random()*VARIANTS.length),V=VARIANTS[vi],T=getTrack(V.id),N=T.p.length,sp=Math.max(2,Math.round(50/(T.L/N)));
@@ -162,3 +162,15 @@ function goFull(){const d=document.documentElement,f=d.requestFullscreen||d.webk
 {const first=()=>{goFull();removeEventListener('pointerdown',first,true);removeEventListener('keydown',first,true);};
  addEventListener('pointerdown',first,true);addEventListener('keydown',first,true);}
 {const g=$('#gGo').onclick;$('#gGo').onclick=()=>{goFull();g();};}
+
+// ---- 드라이버 이름: 인트로가 끝나면 처음 한 번 묻고(추천 이름 미리 채움), 메뉴 위 이름표를 눌러 언제든 변경 ----
+function randName(){const A=['번개','씽씽','부릉','뿡뿡','쌩쌩','질주','회오리','로켓','바람','불꽃','흙먼지','미끄럼'],B=['바퀴','레이서','드리프터','꼬마차','부스터','엔진','타이어','핸들','머플러','RC킹'];
+  return A[Math.random()*A.length|0]+B[Math.random()*B.length|0]+(10+Math.random()*90|0);}
+function showName(){$('#nameTxt').textContent=PLAYER.name||'드라이버';}
+function askName(){const d=$('#nameDlg'),i=$('#nameIn');i.value=PLAYER.name||randName();d.hidden=false;setTimeout(()=>{try{i.focus();i.select();}catch(_){}},60);}
+function askNameIfNeeded(){if(!PLAYER.name)askName();}
+$('#nameDice').onclick=()=>{$('#nameIn').value=randName();$('#nameIn').focus();};
+$('#nameForm').addEventListener('submit',e=>{e.preventDefault();const v=$('#nameIn').value.replace(/\s+/g,' ').trim().slice(0,10)||randName();PLAYER.setName(v);showName();$('#nameDlg').hidden=true;});
+$('#nameChip').onclick=askName;
+showName();
+if(!INTRO.open)askNameIfNeeded();

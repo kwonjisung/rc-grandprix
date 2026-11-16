@@ -394,38 +394,47 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 #dskWarn{position:fixed;left:2%;right:2%;bottom:2%;z-index:60;display:flex;flex-direction:column;gap:1.2vw;padding:3vw 3.4vw;border-radius:2.4vw;background:#10202a;color:#fff;font:400 3.2vw/1.45 var(--f-body);box-shadow:0 1vw 3vw rgba(0,0,0,.4)}
 #dskWarn b{font-weight:700}#dskWarn>b{font-size:3.8vw}
 #dskClose{align-self:flex-end;font:600 3.2vw var(--f-body);padding:1.4vw 3.6vw;border-radius:99px;border:0;background:#ff7a1a;color:#2b1a0e}
-/* ---- 휴대폰 조작 B(페달) / C(슬라이더+가속 존) (v2.9) ---- */
+/* ---- 휴대폰 조작: 왼손 ◀ ▶ + 오른손 가속 존(위 N₂O 부스터 · 가운데 페달 · 아래 브레이크) (v3.0) ---- */
 #tZone{display:none!important}
-#touch[data-ctl="C"] .side,#touch[data-ctl="B"] .cOnly{display:none}
-#touch .side.r{align-items:flex-end;gap:12px}
-#touch .gcol{display:contents}
-#touch #tP{order:0}#touch #tB{order:1}#touch #tG{order:2}
-#touch .pedal{border:0;color:#2b1a0e;font:400 17px var(--f-disp);box-shadow:inset 0 -8px 0 rgba(0,0,0,.25),0 4px 0 #1a120a;transition:transform .08s}
-#touch .pedal.gas{width:86px;height:122px;border-radius:14px 14px 22px 22px;background:repeating-linear-gradient(#ff8f3a 0 12px,#f07a22 12px 16px)}
-#touch .pedal.brk{width:64px;height:84px;border-radius:12px 12px 18px 18px;background:linear-gradient(#69727c,#353b42);color:#fff;font:600 12.5px var(--f-body)}
-#touch .pedal.on{transform:perspective(300px) rotateX(16deg) translateY(3px);box-shadow:inset 0 -4px 0 rgba(0,0,0,.25),0 1px 0 #1a120a}
-#touch .gcol #tP,#touch .side.r #tP{width:72px;height:72px;box-shadow:0 4px 0 #2b1a0e}#touch .side.r #tP b{font-size:18px}#touch .side.r #tP svg{width:32px;height:22px}
-#cSteer{position:absolute;left:max(18px,env(safe-area-inset-left,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:220px;height:72px;border-radius:99px;background:rgba(16,24,28,.45);border:2px solid rgba(255,255,255,.5);backdrop-filter:blur(6px);touch-action:none}
-#cSteer .ar{position:absolute;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.75);font-size:15px;pointer-events:none}#cSteer .ar.l{left:14px}#cSteer .ar.r{right:14px}
-#cKnob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:#f4efe4;box-shadow:0 3px 0 #2b1a0e;pointer-events:none;transition:transform .12s}
-#cSteer.on #cKnob{transition:none}
-#cZone{position:absolute;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));width:156px;height:150px;border-radius:28px;background:rgba(255,122,26,.3);border:2px solid rgba(255,255,255,.6);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none}
-#cZone b{font:400 24px var(--f-disp)}#cZone small{font:700 11px var(--f-body);opacity:.85}
-#cZone.on{background:rgba(255,122,26,.55)}#cZone.brk{background:rgba(70,80,92,.7)}#cZone.boost{background:rgba(201,240,122,.75);color:#2b1a0e}
+#cZone{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));width:132px;height:190px;box-sizing:border-box;padding:6px;border-radius:26px;background:rgba(12,18,16,.5);border:2px solid rgba(255,255,255,.5);backdrop-filter:blur(6px);display:flex;flex-direction:column;gap:5px;touch-action:none;user-select:none;-webkit-user-select:none;transition:background .12s}
+#cZone .zb{position:relative;flex:none;height:30%;border-radius:18px;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .12s,opacity .2s}
+#cZone .zboost{background:rgba(61,139,255,.18)}
+#cZone .zbrk{height:22%;background:rgba(255,90,74,.14);color:#ff6a5a}
+#cZone .can{width:22px;height:32px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.3))}
+#cZone .bk{width:30px;height:24px}
+#cZone .chev{display:flex;flex-direction:column;gap:2px}#cZone .chev i{width:12px;height:12px;border-left:3px solid #c9f07a;border-top:3px solid #c9f07a;transform:rotate(45deg);opacity:.85}
+#cZone.ready .chev i{animation:zChev 1s ease-in-out infinite}#cZone.ready .chev i:last-child{animation-delay:.15s}
+@keyframes zChev{0%,100%{transform:translateY(2px) rotate(45deg);opacity:.5}50%{transform:translateY(-2px) rotate(45deg);opacity:1}}
+#cZone:not(.ready) .zboost{opacity:.45}
+#cZone .zp{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+#cZone .pd{width:64%;height:100%;border-radius:12px 12px 18px 18px;background:repeating-linear-gradient(#ff8f3a 0 10px,#e8721c 10px 14px);box-shadow:inset 0 -6px 0 rgba(0,0,0,.25),0 3px 0 #1a120a;transition:transform .08s,filter .12s}
+#cZone.on .pd{transform:perspective(260px) rotateX(18deg) translateY(2px);filter:brightness(1.12)}
+#cZone.boost .zboost{background:rgba(201,240,122,.85)}#cZone.boost .pd{filter:brightness(1.3) saturate(1.2)}
+#cZone.brk .zbrk{background:rgba(255,90,74,.75);color:#fff}#cZone.brk .pd{filter:grayscale(.8) brightness(.8);transform:none}
+#cZone .zt{position:absolute;left:4px;right:4px;bottom:3px;text-align:center;font:700 10.5px/1.15 var(--f-body);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7);opacity:0;transition:opacity .4s;pointer-events:none}
+#touch.helptxt #cZone .zt{opacity:1}
+#touch.helptxt #cZone .zb svg,#touch.helptxt #cZone .chev{transform:translateY(-6px)}
 @media (pointer:coarse) and (orientation:landscape){
   #hClouds{left:50%;right:auto;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   .cockpit .speedo{right:calc(max(16px,env(safe-area-inset-right,0px)) + 250px)}
   .cockpit #hClouds{left:auto;transform:none;right:calc(max(16px,env(safe-area-inset-right,0px)) + 250px);bottom:calc(88px + env(safe-area-inset-bottom,0px))}
-  #cZone{width:140px;height:128px}
 }
-@media (pointer:coarse) and (orientation:landscape) and (max-height:420px){#touch .pedal.gas{width:78px;height:106px}#touch .pedal.brk{width:58px;height:76px}#touch .side.r #tP{width:62px;height:62px}}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:440px){#cZone{right:calc(max(14px,env(safe-area-inset-right,0px)) + 66px);height:min(178px,calc(100vh - 40px));width:124px}}
 @media (pointer:coarse) and (orientation:portrait){
-  #touch .gcol{display:flex;flex-direction:column;align-items:center;gap:10px;order:2}
-  #touch .pedal.gas{width:76px;height:108px}#touch .pedal.brk{width:58px;height:76px}#touch .side.r #tP{width:60px;height:60px}
-  #touch .side.r{flex-direction:row;gap:10px}
-  #hClouds,.cockpit #hClouds{bottom:calc(206px + env(safe-area-inset-bottom,0px))}
-  #cSteer{width:170px;height:66px}#cZone{width:136px;height:140px}
+  #cZone{width:124px;height:186px;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  #hClouds,.cockpit #hClouds{bottom:calc(212px + env(safe-area-inset-bottom,0px))}
 }
+/* ---- 드라이버 이름 (v3.0) ---- */
+#nameChip{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 12px;margin-left:10px;border-radius:99px;border:1px solid rgba(0,0,0,.18);background:rgba(255,255,255,.55);color:inherit;font:600 13px var(--f-body);cursor:pointer;vertical-align:middle;max-width:46vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#nameDlg{box-sizing:border-box;position:fixed;inset:0;z-index:45;display:grid;place-items:center;background:rgba(6,12,10,.55);backdrop-filter:blur(4px);padding:16px}
+.nbox{box-sizing:border-box;width:min(360px,calc(100vw - 32px));background:#10202a;color:#fff;border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:10px;box-shadow:0 12px 40px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18)}
+.nbox .k{font:700 12px var(--f-num);letter-spacing:.2em;color:#ff9a4a}.nbox h3{margin:0;font:400 28px var(--f-disp)}.nbox p{margin:0;font-size:14px;line-height:1.5;color:#c9d4cd}
+.nrow{display:flex;gap:8px}.nrow input{flex:1;min-width:0;height:52px;border-radius:14px;border:2px solid #3b5a4c;background:#0b1712;color:#fff;font:400 22px var(--f-disp);padding:0 14px}.nrow input:focus{outline:none;border-color:#ff7a1a}
+#nameDice{width:52px;height:52px;border-radius:14px;border:2px solid #3b5a4c;background:#18302a;color:#fff;display:grid;place-items:center;cursor:pointer}
+#nameOk{height:54px;border-radius:14px;border:0;background:#ff7a1a;color:#2b1a0e;font:400 22px var(--f-disp);cursor:pointer;box-shadow:0 4px 0 #8a3c08}
+.mm-top #mmRecSum{white-space:nowrap}
+@media (pointer:coarse) and (orientation:portrait){.mm-top{gap:8px}.mm-top .mm-logo{font-size:17px}#nameChip{margin-left:0;height:28px;padding:0 10px;font-size:12px;max-width:34vw}.mm-top #mmRecSum{font-size:12px;padding:5px 10px}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 #camToast{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%) scale(.9);background:rgba(16,24,28,.62);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:10px 22px;font-family:var(--f-disp);font-size:clamp(18px,5vmin,26px);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 #camToast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 @media (prefers-reduced-motion:reduce){.go{transition:none}}
@@ -449,7 +458,7 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 </div>
 
 <div id="mmenu">
-  <div class="mm-top"><span class="mm-logo">미니 RC 그랑프리</span><span id="mmCount">COURSE 01 / 10</span><span id="mmRecSum">완주 0 / 10</span></div>
+  <div class="mm-top"><span class="mm-logo">미니 RC 그랑프리</span><button id="nameChip" type="button" aria-label="드라이버 이름 바꾸기"><svg aria-hidden="true" viewBox="0 0 20 20" width="14" height="14"><circle cx="10" cy="6.5" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 17.5c.8-3.6 3.4-5.4 6.5-5.4s5.7 1.8 6.5 5.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span id="nameTxt">드라이버</span></button><span id="mmCount">COURSE 01 / 10</span><span id="mmRecSum">완주 0 / 10</span></div>
   <div id="mmStage">
     <div class="mm-floor" aria-hidden="true"></div>
     <div class="tt" id="ttPrev" aria-label="이전 코스"></div>
@@ -463,6 +472,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 </div>
 
 <div id="dskWarn" hidden role="alert"><b>화면이 작게 보이나요?</b><span>브라우저가 PC 화면(데스크톱 사이트)으로 열고 있어요. 크롬 오른쪽 위 ⋮ 메뉴에서 <b>데스크톱 사이트</b> 체크를 끄면 휴대폰 화면에 맞게 보여요.</span><button id="dskClose" type="button">닫기</button></div>
+<div id="nameDlg" hidden role="dialog" aria-modal="true" aria-labelledby="nameTitle">
+  <form class="nbox" id="nameForm">
+    <span class="k">DRIVER LICENSE</span>
+    <h3 id="nameTitle">드라이버 이름</h3>
+    <p>기록과 순위표에 이 이름으로 남아요. 추천 이름 그대로 시작해도 돼요.</p>
+    <div class="nrow"><label for="nameIn" class="sr">이름</label><input id="nameIn" maxlength="10" autocomplete="off" enterkeyhint="go"><button type="button" id="nameDice" aria-label="다른 이름 추천"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></button></div>
+    <button type="submit" class="go" id="nameOk">이 이름으로 시작</button>
+  </form>
+</div>
 <div id="intro" hidden aria-label="인트로: 하이라이트 영상">
   <div class="ci-bar t"><span class="ci-rec"><i></i>REPLAY CAM</span><span id="ciCourse"></span><span id="ciTc">00:00:00</span></div>
   <span id="ciTag" hidden>SLOW-MO</span>
@@ -490,14 +508,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v2.9 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v3.0 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v2.9</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.0</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v3.0</b><span>휴대폰 조작 확정 — 왼손 ◀ ▶, 오른손 가속 존(가운데 페달을 누르고 있으면 가속 · 위쪽 N₂O 부스터 칸을 누르거나 위로 밀면 방구 · 아래쪽 브레이크 칸을 누르거나 아래로 끌면 브레이크). 설명 글자는 출발 때만 6초 표시. 드라이버 이름: 처음 시작 때 추천 이름을 채워 묻고(그대로 시작 가능), 메뉴 위 이름표로 언제든 변경, 기록·순위표에 이름이 남아요.<em>2026.11.16</em></span></li>
         <li><b>v2.9</b><span>휴대폰 조작 새 단장 — B 페달(기본): 오른손 큰 가속 페달(위쪽을 누를수록 세게)·브레이크 페달·뿡!, 왼손 ◀ ▶. C 슬라이더: 왼손 슬라이더를 미는 만큼 꺾이고, 오른쪽 가속 존에 엄지를 올리면 가속·위로 튕기면 방구·아래로 끌면 브레이크. 일시정지 메뉴의 '조작 바꾸기'로 전환. 드리프트 버튼은 제거(조향만으로 미끄러짐).<em>2026.11.16</em></span></li>
         <li><b>v2.8</b><span>인트로를 드론 시네마 하이라이트로 교체 — 매번 무작위 코스에서 AI 차 4대가 실제로 달리고, 영화처럼 위아래가 검은 화면에 드론 스윕 → 슬로모 사이드(점프하면 더 느리게) → 방구 부스터 클로즈업 → 정면 돌파 → 로고 순으로 컷 편집해 보여줘요. 약 11초, 화면을 누르거나 건너뛰기로 바로 코스 고르기.<em>2026.11.16</em></span></li>
         <li><b>v2.7</b><span>코스 고르기와 차고에서 화면을 좌우로 밀어 넘기기 — 손가락을 따라 디오라마·자동차가 움직이고, 충분히 밀면 다음/이전으로 넘어가요. 첫 터치(또는 클릭·키)와 출발 버튼에서 전체화면으로 전환.<em>2026.11.16</em></span></li>
@@ -576,11 +595,14 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   <div id="touch">
     <div id="tZone"><span class="tip">화면을 누르고 있으면 전진</span></div>
     <div class="side l"><button id="tL" type="button" aria-label="왼쪽">◀</button><button id="tR" type="button" aria-label="오른쪽">▶</button></div>
-    <div class="side r"><button id="tB" class="pedal brk" type="button">브레이크</button><div class="gcol"><button id="tP" type="button" aria-label="방구 부스터"><svg aria-hidden="true" width="44" height="30" viewBox="0 0 32 22"><path d="M9 20 C4 20 2 16.5 4 13.5 C3 9 7.5 6.5 11 8.5 C12.5 4 19 3.5 21.5 7.5 C26 6.5 29.5 10 28 14 C31 16.5 29 20 25.5 20 Z" fill="#c9f07a" stroke="#2b1a0e" stroke-width="1.8"/></svg><b>뿡!</b></button><button id="tG" class="pedal gas" type="button">가속</button></div></div>
-    <div id="cSteer" class="cOnly" aria-label="조향 슬라이더"><span class="ar l">◀</span><span class="ar r">▶</span><i id="cKnob"></i></div>
-    <div id="cZone" class="cOnly" aria-label="가속 존"><small>↑ 튕기면 방구</small><b>가속</b><small>↓ 끌면 브레이크</small></div>
+    <div id="cZone" aria-label="가속 페달: 누르고 있으면 가속, 위로 밀거나 위쪽을 누르면 방구 부스터, 아래로 끌거나 아래쪽을 누르면 브레이크">
+      <div class="zb zboost"><svg class="can" aria-hidden="true" viewBox="0 0 26 38"><rect x="5" y="7" width="16" height="29" rx="6" fill="#3d8bff" stroke="#0b1a33" stroke-width="2"/><rect x="9.5" y="1.5" width="7" height="6.5" rx="1.6" fill="#d6dde6" stroke="#0b1a33" stroke-width="1.6"/><rect x="5" y="15" width="16" height="10" fill="#0b1a33" opacity=".35"/><text x="13" y="23.2" font-size="7" font-weight="700" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif">N₂O</text></svg><span class="chev" aria-hidden="true"><i></i><i></i></span><small class="zt">위로 밀면 방구</small></div>
+      <div class="zp" aria-hidden="true"><span class="pd"></span></div>
+      <div class="zb zbrk"><svg class="bk" aria-hidden="true" viewBox="0 0 36 28"><circle cx="18" cy="14" r="8.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M8 5 A13 13 0 0 0 8 23 M28 5 A13 13 0 0 1 28 23" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M18 9v6.4" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><circle cx="18" cy="19" r="1.6" fill="currentColor"/></svg><small class="zt">아래로 끌면 브레이크</small></div>
+    </div>
+
   </div>
-  <div id="pauseOv" hidden><div class="pbox"><span class="k">일시정지</span><h3 id="pName">코스</h3><button class="go" id="pResume" type="button">계속 달리기</button><button class="ghost" id="pRestart" type="button">처음부터 다시</button><button class="ghost" id="pCtl" type="button">조작 바꾸기</button><button class="ghost" id="pMenu" type="button">코스 목록으로</button></div></div>
+  <div id="pauseOv" hidden><div class="pbox"><span class="k">일시정지</span><h3 id="pName">코스</h3><button class="go" id="pResume" type="button">계속 달리기</button><button class="ghost" id="pRestart" type="button">처음부터 다시</button><button class="ghost" id="pMenu" type="button">코스 목록으로</button></div></div>
   <div id="replayUI" hidden>
     <div class="rp-top"><span class="dot"></span>REPLAY <em>베스트 하이라이트</em></div>
     <div id="rpTag"></div>
@@ -1394,6 +1416,8 @@ const trackCache={};function getTrack(id){return trackCache[id]||(trackCache[id]
 const HINT='왼손 W 가속 · S 브레이크 · Space 방구 · Shift 드리프트 / 오른손 ← → 조향. V는 차 안 시점, C는 시점 전환.';
 
 // ---- 기록 저장 (계정 저장소, 없으면 이 브라우저) ----
+const PLAYER={name:(()=>{try{return localStorage.getItem('rcgp.name')||'';}catch(_){return'';}})(),
+  setName(v){this.name=v;try{localStorage.setItem('rcgp.name',v);}catch(_){}if(REC.db)REC.db.collection('data/users/'+REC.uid).doc('profile').set({name:v}).catch(()=>{});}};
 const REC={data:{},db:null,uid:null,where:'local',
   load(){try{const s=localStorage.getItem('rcgp-records');if(s)this.data=JSON.parse(s)||{};}catch(_){}},
   saveLocal(){try{localStorage.setItem('rcgp-records',JSON.stringify(this.data));}catch(_){}},
@@ -1405,12 +1429,12 @@ const REC={data:{},db:null,uid:null,where:'local',
     try{if(!window.claude||!window.claude.use)return;const[db,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!user)return;const id=await user.id();if(!id)return;
       this.db=db;this.uid=id;this.where='account';
       const snap=await Promise.race([db.collection('data/users/'+id).get(),new Promise((_,rj)=>setTimeout(()=>rj('timeout'),10000))]);
-      for(const d of snap.docs){const v=d.data();if(v&&VI[d.id]!=null)this.data[d.id]=this.merge(this.data[d.id],v);}
+      for(const d of snap.docs){const v=d.data();if(d.id==='profile'&&v&&v.name&&!PLAYER.name){PLAYER.name=v.name;try{localStorage.setItem('rcgp.name',v.name);}catch(_){}if(window.showName)showName();}if(v&&VI[d.id]!=null)this.data[d.id]=this.merge(this.data[d.id],v);}
       this.saveLocal();onReady();}catch(_){if(!this.db)this.where='local';onReady();}},
   add(id,run){const r=this.data[id]||{best:null,bestLap:null,bestScore:0,bestGrade:null,plays:0,hist:[]};
     const isBest=r.best==null||run.t<r.best;
     r.plays=(r.plays||0)+1;if(isBest)r.best=run.t;if(r.bestLap==null||run.lap<r.bestLap)r.bestLap=run.lap;if(run.score>(r.bestScore||0)){r.bestScore=run.score;r.bestGrade=run.g;}
-    r.hist=[{t:run.t,g:run.g,p:run.p,d:Date.now()},...(r.hist||[])].slice(0,8);this.data[id]=r;this.saveLocal();
+    r.hist=[{t:run.t,g:run.g,p:run.p,d:Date.now(),n:PLAYER.name||''},...(r.hist||[])].slice(0,8);this.data[id]=r;this.saveLocal();
     if(this.db)this.db.collection('data/users/'+this.uid).doc(id).set(r).catch(()=>{});
     return{rec:r,isBest};}
 };
@@ -1447,12 +1471,12 @@ function startGame(vi,ci){
   const others=CARS.filter((_,i)=>i!==ci),pick=[others[(vi)%others.length],others[(vi+1)%others.length],others[(vi+2)%others.length]];
   const grid=[[pick[0],0.97],[pick[1],0.95],[CAR,0],[pick[2],0.92]];
   const cars=grid.map((d,k)=>makeCar(T,Math.round(N-2-(k>>1)*sp*1.4),k%2?-45:45,d[0].col,k!==2,d[1]));
-  grid.forEach((d,k)=>{cars[k].kind=d[0].kind;cars[k].name=k===2?('나 · '+CAR.name):d[0].name;});
+  grid.forEach((d,k)=>{cars[k].kind=d[0].kind;cars[k].name=k===2?(PLAYER.name||('나 · '+CAR.name)):d[0].name;});
   const pc=cars[2];Object.assign(pc,{power:CAR.power,top:CAR.top,gripM:CAR.grip,mass:CAR.mass,boostM:CAR.boost,offM:CAR.offM,susp:CAR.susp,kind:CAR.kind});
   G={V,vi,ci,T,cars,player:cars[2],parts:[],skids:[],t:0,state:'count',count:3.4,shake:0,order:[],rec:[],recAcc:0,ranks:[],finishShow:0};
   clearInterval(resTimer);
   $('#menu').hidden=true;$('#mmenu').hidden=true;$('#verBtn').hidden=true;$('#stage').hidden=false;$('#result').hidden=true;$('#replayUI').hidden=true;$('#hud').hidden=false;$('#touch').classList.remove('off');touch.g=0;$('#tZone').classList.remove('on');$('#view').innerHTML='';
-$('#hint').textContent=(matchMedia('(pointer:coarse)').matches?ctlHint():HINT)+(innerHeight>innerWidth?' 휴대폰을 가로로 돌리면 코스가 크게 보여요.':'');$('#hint').hidden=false;
+ctlHelp();$('#hint').textContent=(matchMedia('(pointer:coarse)').matches?ctlHint():HINT)+(innerHeight>innerWidth?' 휴대폰을 가로로 돌리면 코스가 크게 보여요.':'');$('#hint').hidden=false;
   REND=V.R();REND.init($('#view'),G);syncCamBtns();hudInit(G);$('#pauseOv').hidden=true;
   AU.init();last=performance.now();acc=0;cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
 }
@@ -1601,6 +1625,7 @@ function hud(){
   if(g.t>(g.hintT||6))$('#hint').hidden=true;
   const mh=REND.camMode==='overview';if(mh!==g.miniHid){g.miniHid=mh;$('#hMini').toggleAttribute('hidden',mh);}
   if(!mh)for(const[el,c]of g.miniDots){el.setAttribute('cx',c.x.toFixed(0));el.setAttribute('cy',c.y.toFixed(0));}
+  {const rd=p.gauge>=0.333&&p.boostT<=0;if(rd!==g.zReady){g.zReady=rd;$('#cZone').classList.toggle('ready',rd);}}
   $('#wheel').style.transform=`rotate(${(p.steer*110).toFixed(1)}deg)`;
 }
 function setPause(on){if(!G||G.state==='replay'||G.state==='done'||!$('#result').hidden)return;G.paused=on;$('#pauseOv').hidden=!on;if(on){AU.silence();$('#pName').textContent=`코스 ${G.vi+1} · ${G.V.name}`;$('#pResume').focus();}for(const k in keys)keys[k]=false;}
@@ -1628,30 +1653,21 @@ addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
 {const z=$('#tZone'),ids=new Set();const up=e=>{ids.delete(e.pointerId);touch.g=ids.size?1:0;z.classList.toggle('on',!!ids.size);};
   z.addEventListener('pointerdown',e=>{e.preventDefault();ids.add(e.pointerId);touch.g=1;z.classList.add('on','used');try{z.setPointerCapture(e.pointerId);}catch(_){}});
   z.addEventListener('pointerup',up);z.addEventListener('pointercancel',up);z.addEventListener('lostpointercapture',up);}
-// ---- 휴대폰 조작 방식: B 페달 / C 슬라이더 + 가속 존 ----
-let CTL='B';try{CTL=localStorage.getItem('rcgp.ctl')==='C'?'C':'B';}catch(_){}
-function ctlHint(){return CTL==='C'?'왼쪽 슬라이더를 미는 만큼 조향 · 오른쪽 네모에 엄지를 올리면 가속, 위로 튕기면 방구, 아래로 끌면 브레이크':'오른쪽 큰 페달 가속(위쪽을 누를수록 세게) · 옆 페달 브레이크 · ◀ ▶ 조향 · 뿡! 방구';}
-function applyCtl(){$('#touch').dataset.ctl=CTL;$('#pCtl').textContent=CTL==='C'?'조작 바꾸기 → B 페달':'조작 바꾸기 → C 슬라이더';for(const k of['g','b','p','l','r'])touch[k]=0;touch.sa=0;}
-function setCtl(m){CTL=m;try{localStorage.setItem('rcgp.ctl',m);}catch(_){}applyCtl();if(G){$('#hint').textContent=ctlHint();$('#hint').hidden=false;G.hintT=G.t+4;}}
-applyCtl();
-$('#pCtl').onclick=()=>{setCtl(CTL==='C'?'B':'C');setPause(false);camToast(CTL==='C'?'C · 슬라이더 + 가속 존':'B · 가속·브레이크 페달');};
-{const b=$('#tG');const set=e=>{const r=b.getBoundingClientRect();touch.g=clamp(1-(e.clientY-r.top)/r.height,0,1)*0.45+0.55;};
-  b.addEventListener('pointerdown',e=>{e.preventDefault();set(e);b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(_){}});
-  b.addEventListener('pointermove',e=>{if(b.classList.contains('on'))set(e);});
-  const off=()=>{touch.g=0;b.classList.remove('on');};b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);}
-{const el=$('#cSteer'),kn=$('#cKnob');let id=null;
-  const set=e=>{const r=el.getBoundingClientRect(),half=r.width/2-30,v=clamp((e.clientX-(r.left+r.width/2))/half,-1,1);touch.sa=Math.sign(v)*Math.pow(Math.abs(v),1.2);kn.style.transform=`translateX(${(v*half).toFixed(0)}px)`;};
-  el.addEventListener('pointerdown',e=>{e.preventDefault();id=e.pointerId;el.classList.add('on');try{el.setPointerCapture(id);}catch(_){}set(e);});
-  el.addEventListener('pointermove',e=>{if(e.pointerId===id)set(e);});
-  const off=e=>{if(e.pointerId!==id)return;id=null;touch.sa=0;el.classList.remove('on');kn.style.transform='';};el.addEventListener('pointerup',off);el.addEventListener('pointercancel',off);el.addEventListener('lostpointercapture',off);}
-{const z=$('#cZone');let id=null,y0=0,yMin=0,fired=false;
-  z.addEventListener('pointerdown',e=>{e.preventDefault();id=e.pointerId;y0=yMin=e.clientY;fired=false;touch.g=1;touch.b=0;z.classList.add('on');try{z.setPointerCapture(id);}catch(_){}});
+// ---- 휴대폰 조작: 왼손 ◀ ▶, 오른손 가속 존 (누르면 가속 · 위쪽/위로 밀기 = 방구 · 아래쪽/아래로 끌기 = 브레이크) ----
+function ctlHint(){return '왼손 ◀ ▶ 조향 · 오른쪽 페달을 누르고 있으면 가속 · 위로 밀면 방구 · 아래로 끌면 브레이크';}
+function ctlHelp(){const t=$('#touch');t.classList.add('helptxt');clearTimeout(ctlHelp.tm);ctlHelp.tm=setTimeout(()=>t.classList.remove('helptxt'),6000);}
+{const z=$('#cZone');let id=null,y0=0,fired=false;
+  const boost=()=>{touch.p=1;z.classList.add('boost');setTimeout(()=>{touch.p=0;z.classList.remove('boost');},140);};
+  const setBrk=on=>{touch.b=on?1:0;touch.g=on?0:1;z.classList.toggle('brk',on);};
+  z.addEventListener('pointerdown',e=>{e.preventDefault();id=e.pointerId;y0=e.clientY;fired=false;z.classList.add('on');try{z.setPointerCapture(id);}catch(_){}
+    const r=z.getBoundingClientRect(),f=(e.clientY-r.top)/r.height;setBrk(f>0.76);if(f<0.32){fired=true;boost();}});
   z.addEventListener('pointermove',e=>{if(e.pointerId!==id)return;const dy=e.clientY-y0;
-    if(!fired&&dy<-36){fired=true;touch.p=1;z.classList.add('boost');setTimeout(()=>{touch.p=0;z.classList.remove('boost');},120);y0=e.clientY;}
-    if(e.clientY>y0)fired=false;
-    const brk=e.clientY-y0>30;touch.b=brk?1:0;touch.g=brk?0:1;z.classList.toggle('brk',brk);});
-  const off=e=>{if(e.pointerId!==id)return;id=null;touch.g=0;touch.b=0;z.classList.remove('on','brk');};z.addEventListener('pointerup',off);z.addEventListener('pointercancel',off);z.addEventListener('lostpointercapture',off);}
-for(const[id,k]of[['tL','l'],['tR','r'],['tB','b'],['tP','p']]){const b=$('#'+id);
+    if(!fired&&dy<-30){fired=true;boost();y0=e.clientY;}
+    if(e.clientY>y0+10)fired=false;
+    const r=z.getBoundingClientRect(),f=(e.clientY-r.top)/r.height;setBrk(dy>26||f>0.76);});
+  const off=e=>{if(e.pointerId!==id)return;id=null;touch.g=0;touch.b=0;z.classList.remove('on','brk');};
+  z.addEventListener('pointerup',off);z.addEventListener('pointercancel',off);z.addEventListener('lostpointercapture',off);}
+for(const[id,k]of[['tL','l'],['tR','r']]){const b=$('#'+id);
   const on=e=>{e.preventDefault();touch[k]=1;b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(_){}},off=()=>{touch[k]=0;b.classList.remove('on');};
   b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);}
 function flashHint(t){$('#hint').textContent=t;$('#hint').hidden=false;G.hintT=G.t+2;}
@@ -1749,7 +1765,7 @@ addSwipe($('#mmStage'),{
   onEnd:d=>{const c=$('#ttCur');c.style.transition='';c.style.transform='';c.style.opacity='';if(d)ttGo(ttIdx+d);}
 });
 function setMobile(){document.body.classList.add('mobile');document.body.classList.toggle('fine',!matchMedia('(pointer:coarse)').matches);}
-addEventListener('keydown',e=>{if(G||GX.open||INTRO.open||!$('#verModal').hidden)return;if(e.code==='ArrowLeft'||e.code==='KeyA'){ttGo(ttIdx-1);}else if(e.code==='ArrowRight'||e.code==='KeyD'){ttGo(ttIdx+1);}else if(e.code==='Enter'||e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)$('#mmGo').click();}});
+addEventListener('keydown',e=>{if(G||GX.open||INTRO.open||!$('#nameDlg').hidden||!$('#verModal').hidden)return;if(e.code==='ArrowLeft'||e.code==='KeyA'){ttGo(ttIdx-1);}else if(e.code==='ArrowRight'||e.code==='KeyD'){ttGo(ttIdx+1);}else if(e.code==='Enter'||e.code==='Space'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)$('#mmGo').click();}});
 addEventListener('resize',setMobile);setMobile();ttRender();
 
 // ---- 차고 (자동차 선택) ----
@@ -1806,7 +1822,7 @@ const INTRO={open:false};
   const SHOTS=[['sweep','드론 스윕',2.6,1],['side','슬로모 사이드',2.4,0.45],['rear','방구 부스터 클로즈업',2.1,1],['front','정면 돌파',1.9,1],['title','',2.6,1]];
   let raf=0,done=false,si=-1,st=0,clock=0,lastTs=0,acc2=0;
   const finish=()=>{if(done)return;done=true;INTRO.open=false;el.classList.add('out');cancelAnimationFrame(raf);
-    $('#mmenu').hidden=false;$('#verBtn').hidden=false;
+    $('#mmenu').hidden=false;$('#verBtn').hidden=false;askNameIfNeeded();
     setTimeout(()=>{el.hidden=true;if(G&&G.intro){if(REND)REND.dispose();REND=null;G=null;$('#stage').hidden=true;$('#view').innerHTML='';$('#bang').classList.remove('pop');}},520);};
   try{
     const vi=Math.floor(Math.random()*VARIANTS.length),V=VARIANTS[vi],T=getTrack(V.id),N=T.p.length,sp=Math.max(2,Math.round(50/(T.L/N)));
@@ -1854,4 +1870,16 @@ function goFull(){const d=document.documentElement,f=d.requestFullscreen||d.webk
 {const first=()=>{goFull();removeEventListener('pointerdown',first,true);removeEventListener('keydown',first,true);};
  addEventListener('pointerdown',first,true);addEventListener('keydown',first,true);}
 {const g=$('#gGo').onclick;$('#gGo').onclick=()=>{goFull();g();};}
+
+// ---- 드라이버 이름: 인트로가 끝나면 처음 한 번 묻고(추천 이름 미리 채움), 메뉴 위 이름표를 눌러 언제든 변경 ----
+function randName(){const A=['번개','씽씽','부릉','뿡뿡','쌩쌩','질주','회오리','로켓','바람','불꽃','흙먼지','미끄럼'],B=['바퀴','레이서','드리프터','꼬마차','부스터','엔진','타이어','핸들','머플러','RC킹'];
+  return A[Math.random()*A.length|0]+B[Math.random()*B.length|0]+(10+Math.random()*90|0);}
+function showName(){$('#nameTxt').textContent=PLAYER.name||'드라이버';}
+function askName(){const d=$('#nameDlg'),i=$('#nameIn');i.value=PLAYER.name||randName();d.hidden=false;setTimeout(()=>{try{i.focus();i.select();}catch(_){}},60);}
+function askNameIfNeeded(){if(!PLAYER.name)askName();}
+$('#nameDice').onclick=()=>{$('#nameIn').value=randName();$('#nameIn').focus();};
+$('#nameForm').addEventListener('submit',e=>{e.preventDefault();const v=$('#nameIn').value.replace(/\s+/g,' ').trim().slice(0,10)||randName();PLAYER.setName(v);showName();$('#nameDlg').hidden=true;});
+$('#nameChip').onclick=askName;
+showName();
+if(!INTRO.open)askNameIfNeeded();
 </script>
