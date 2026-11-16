@@ -73,14 +73,15 @@ function Hxy(T,x,y,h){return groundAt(T,locate(T,x,y,h));}
 // 지형 메시용 높이: 겹치는 구간(다리)도 아래 길이 보이도록 모든 구간을 본다
 function terrainH(T,x,y){
   const P=T.p,N=P.length,rng=T.falloff+(T.canyon?T.canyon.from+T.canyon.ramp:0)+30;
-  let onMin=1e9,offMax=-1e9,exMin=1e9,any=false;
+  let onMin=1e9,offMax=-1e9,exMin=1e9,hNear=0,any=false;
   for(let i=0;i<N;i++){const a=P[i],b=P[(i+1)%N],dx=b.x-a.x,dy=b.y-a.y;
     let t=((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy);t=t<0?0:t>1?1:t;const px=a.x+dx*t,py=a.y+dy*t,d=Math.hypot(x-px,y-py),w=a.w+(b.w-a.w)*t,ex=d-w/2;
     if(ex>rng)continue;
-    const l={i,t,d,w,s:a.s+a.len*t},h=groundAt(T,l,true);any=true;exMin=Math.min(exMin,ex);
+    const l={i,t,d,w,s:a.s+a.len*t},h=groundAt(T,l,true);any=true;if(ex<exMin){exMin=ex;hNear=h;}
     if(ex<=0)onMin=Math.min(onMin,h);else offMax=Math.max(offMax,h);}
   if(!any)return{h:T.canyon?T.canyon.h:0,ex:1e9};
-  return{h:onMin<1e9?onMin:offMax,ex:exMin};
+  // 협곡: 길 밖은 '가장 가까운 길' 기준 높이(물리와 같은 기준)로 — 옆 구간의 벽이 길 위로 덮이지 않게
+  return{h:onMin<1e9?onMin:(T.canyon?hNear:offMax),ex:exMin};
 }
 
 function makeCar(T,idx,off,col,isAI,skill){
@@ -136,6 +137,11 @@ function stepCar(c,inp,dt,T,racing){
   const ox=c.x,oy=c.y;c.x+=c.vx*dt;c.y+=c.vy*dt;
   if(T.obstacles)collideObs(c,T);
   l=locate(T,c.x,c.y,c.hint);c.hint=l.i;
+  // 협곡 바위 벽: 벽을 타고 오르지 않고 아래에서 '퉁' 막히도록 길 쪽으로 밀어내고 바깥 방향 속도를 되튕긴다
+  if(T.canyon&&!(T.tun.length&&inTun(T,l.s))){const lim=T.canyon.from-10,exw=Math.abs(l.d)-l.w/2;
+    if(exw>lim){const a=T.p[l.i],sg=l.d<0?-1:1,nx=-a.ty*sg,ny=a.tx*sg,pen=exw-lim;c.x-=nx*pen;c.y-=ny*pen;
+      const vn=c.vx*nx+c.vy*ny;if(vn>0){c.vx-=1.3*vn*nx;c.vy-=1.3*vn*ny;c.vx*=0.9;c.vy*=0.9;c.bump=Math.max(c.bump,vn);c.spin+=(Math.random()-0.5)*vn*0.004;c.hitJ=Math.max(c.hitJ||0,vn*0.5);c.hitX=c.x+nx*12;c.hitY=c.y+ny*12;}
+      l=locate(T,c.x,c.y,c.hint);c.hint=l.i;}}
   let gz=groundAt(T,l);
   if(gz-c.z>10){c.x=ox;c.y=oy;c.bump=Math.max(c.bump,c.speed*0.6);c.vx*=-0.3;c.vy*=-0.3;l=locate(T,c.x,c.y,c.hint);c.hint=l.i;gz=groundAt(T,l);}
   c.gz=gz;

@@ -187,6 +187,7 @@ function make3D(opt){
       else if(cn.type==='rear'){cx=p.x-dx*95+nx*16;cy=p.y-dy*95+ny*16;up=30;fov=60;lz=14;}
       else if(cn.type==='front'){const a=lerp(260,130,e);cx=p.x+dx*a-nx*30;cy=p.y+dy*a-ny*30;up=22;fov=42;lz=9;}
       else{const th=this.ch+Math.PI*1.2+cn.t*0.18;cx=p.x+Math.cos(th)*430;cy=p.y+Math.sin(th)*430;up=300;fov=48;}
+      if(cn.type!=='sweep'&&cn.type!=='title')[cx,cy]=this.inWall(g,cx,cy,p.hint);
       const gz=Hxy(g.T,cx,cy,null),cz=Math.max(gz+12,p.z+up*(cn.type==='side'||cn.type==='front'?0.6:1),gz+up);
       const want=new THREE.Vector3(cx*S,cz*S,cy*S),look=new THREE.Vector3(p.x*S,(p.z+lz)*S,p.y*S);
       if(cn.cut){this.cp.copy(want);this.lt.copy(look);this.cam.fov=fov;cn.cut=false;}else{this.cp.lerp(want,Math.min(1,dt*7));this.lt.lerp(look,Math.min(1,dt*9));this.cam.fov=lerp(this.cam.fov,fov,0.08);}
@@ -197,11 +198,13 @@ function make3D(opt){
     }else{
       const CM={drone:{back:150,up:125,ahead:110,lz:0,fov:52,turn:3},chase:{back:100,up:46,ahead:40,lz:12,fov:60,turn:6}}[mode];
       let tx=Math.cos(p.h),ty=Math.sin(p.h);if(p.speed>80&&p.vF>0){tx=tx*0.6+p.vx/p.speed*0.4;ty=ty*0.6+p.vy/p.speed*0.4;}
+      if(g.T.canyon&&p.loc){const a=g.T.p[p.loc.i],ex=Math.abs(p.loc.d)-p.loc.w/2;if(ex>0){let ta=Math.atan2(a.ty,a.tx);if(Math.cos(ta-Math.atan2(ty,tx))<0)ta+=Math.PI;const w=clamp(ex/(g.T.canyon.from-10),0,1)*0.7;const hh=Math.atan2(ty,tx)+wrapA(ta-Math.atan2(ty,tx))*w;tx=Math.cos(hh);ty=Math.sin(hh);}}
       if(this.ch==null)this.ch=p.h;this.ch+=wrapA(Math.atan2(ty,tx)-this.ch)*Math.min(1,dt*CM.turn);
       const dx=Math.cos(this.ch),dy=Math.sin(this.ch);
-      const cx=p.x-dx*CM.back,cy=p.y-dy*CM.back,gz=Hxy(g.T,cx,cy,null);const cz=Math.max(p.z,gz)+CM.up;
+      let cx=p.x-dx*CM.back,cy=p.y-dy*CM.back;[cx,cy]=this.inWall(g,cx,cy,p.hint);const gz=Hxy(g.T,cx,cy,null);const cz=Math.max(p.z,gz)+CM.up;
       this.cp.lerp(new THREE.Vector3(cx*S,cz*S,cy*S),k);const mg=(Hxy(g.T,this.cp.x/S,this.cp.z/S,null)+14)*S;if(this.cp.y<mg)this.cp.y=mg;
-      this.lt.lerp(new THREE.Vector3((p.x+dx*CM.ahead)*S,(p.z+CM.lz)*S,(p.y+dy*CM.ahead)*S),Math.min(1,k*2));
+      let ax=p.x+dx*CM.ahead,ay=p.y+dy*CM.ahead;[ax,ay]=this.inWall(g,ax,ay,p.hint,g.T.canyon?g.T.canyon.from-12:0);
+      this.lt.lerp(new THREE.Vector3(ax*S,(p.z+CM.lz)*S,ay*S),Math.min(1,k*2));
       this.cam.fov=lerp(this.cam.fov,CM.fov+p.speed*0.018,0.05);
     }
     if(mode!=='cockpit'){const sh=g.shake*0.004;this.cam.position.set(this.cp.x+(Math.random()-0.5)*sh,this.cp.y+(Math.random()-0.5)*sh,this.cp.z);this.cam.lookAt(this.lt);this.cam.updateProjectionMatrix();}
@@ -212,6 +215,9 @@ function make3D(opt){
     r.render(this.sc,this.cam);
     this.drawMirrors(ck,W,H);
   },
+  // 협곡에서는 카메라가 바위 벽 속으로 들어가지 않도록 길 쪽으로 당긴다
+  inWall(g,x,y,hint,lim0){const T=g.T,cy=T.canyon;if(!cy)return[x,y];const l=locate(T,x,y,hint);if(T.tun.length&&inTun(T,l.s))return[x,y];const lim=lim0==null?8:lim0,ex=Math.abs(l.d)-l.w/2;
+    if(ex<=lim)return[x,y];const a=T.p[l.i],sg=l.d<0?-1:1;return[x+a.ty*sg*(ex-lim),y-a.tx*sg*(ex-lim)];},
   // 차 안 시점 사이드미러: 장면을 좌우 반전해 뒤쪽을 작은 화면에 그린다
   mirrorRects(W,H){
     const co=matchMedia('(pointer:coarse)').matches;

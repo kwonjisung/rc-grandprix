@@ -508,14 +508,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v3.0 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v3.1 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.0</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.1</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v3.1</b><span>붉은 협곡 벽 정리 — 길이 굽어 붙은 곳에서 화면의 바위 벽과 실제 충돌 벽이 어긋나 차가 바위 속으로 들어가 보이던 문제 수정. 벽에 부딪히면 타고 오르거나 튀어 오르지 않고 아래에서 '퉁' 막히며 되튕겨요(불꽃·충돌음). 카메라도 바위 속으로 들어가지 않고 길 위에 머물러요.<em>2026.11.16</em></span></li>
         <li><b>v3.0</b><span>휴대폰 조작 확정 — 왼손 ◀ ▶, 오른손 가속 존(가운데 페달을 누르고 있으면 가속 · 위쪽 N₂O 부스터 칸을 누르거나 위로 밀면 방구 · 아래쪽 브레이크 칸을 누르거나 아래로 끌면 브레이크). 설명 글자는 출발 때만 6초 표시. 드라이버 이름: 처음 시작 때 추천 이름을 채워 묻고(그대로 시작 가능), 메뉴 위 이름표로 언제든 변경, 기록·순위표에 이름이 남아요.<em>2026.11.16</em></span></li>
         <li><b>v2.9</b><span>휴대폰 조작 새 단장 — B 페달(기본): 오른손 큰 가속 페달(위쪽을 누를수록 세게)·브레이크 페달·뿡!, 왼손 ◀ ▶. C 슬라이더: 왼손 슬라이더를 미는 만큼 꺾이고, 오른쪽 가속 존에 엄지를 올리면 가속·위로 튕기면 방구·아래로 끌면 브레이크. 일시정지 메뉴의 '조작 바꾸기'로 전환. 드리프트 버튼은 제거(조향만으로 미끄러짐).<em>2026.11.16</em></span></li>
         <li><b>v2.8</b><span>인트로를 드론 시네마 하이라이트로 교체 — 매번 무작위 코스에서 AI 차 4대가 실제로 달리고, 영화처럼 위아래가 검은 화면에 드론 스윕 → 슬로모 사이드(점프하면 더 느리게) → 방구 부스터 클로즈업 → 정면 돌파 → 로고 순으로 컷 편집해 보여줘요. 약 11초, 화면을 누르거나 건너뛰기로 바로 코스 고르기.<em>2026.11.16</em></span></li>
@@ -695,14 +696,15 @@ function Hxy(T,x,y,h){return groundAt(T,locate(T,x,y,h));}
 // 지형 메시용 높이: 겹치는 구간(다리)도 아래 길이 보이도록 모든 구간을 본다
 function terrainH(T,x,y){
   const P=T.p,N=P.length,rng=T.falloff+(T.canyon?T.canyon.from+T.canyon.ramp:0)+30;
-  let onMin=1e9,offMax=-1e9,exMin=1e9,any=false;
+  let onMin=1e9,offMax=-1e9,exMin=1e9,hNear=0,any=false;
   for(let i=0;i<N;i++){const a=P[i],b=P[(i+1)%N],dx=b.x-a.x,dy=b.y-a.y;
     let t=((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy);t=t<0?0:t>1?1:t;const px=a.x+dx*t,py=a.y+dy*t,d=Math.hypot(x-px,y-py),w=a.w+(b.w-a.w)*t,ex=d-w/2;
     if(ex>rng)continue;
-    const l={i,t,d,w,s:a.s+a.len*t},h=groundAt(T,l,true);any=true;exMin=Math.min(exMin,ex);
+    const l={i,t,d,w,s:a.s+a.len*t},h=groundAt(T,l,true);any=true;if(ex<exMin){exMin=ex;hNear=h;}
     if(ex<=0)onMin=Math.min(onMin,h);else offMax=Math.max(offMax,h);}
   if(!any)return{h:T.canyon?T.canyon.h:0,ex:1e9};
-  return{h:onMin<1e9?onMin:offMax,ex:exMin};
+  // 협곡: 길 밖은 '가장 가까운 길' 기준 높이(물리와 같은 기준)로 — 옆 구간의 벽이 길 위로 덮이지 않게
+  return{h:onMin<1e9?onMin:(T.canyon?hNear:offMax),ex:exMin};
 }
 
 function makeCar(T,idx,off,col,isAI,skill){
@@ -758,6 +760,11 @@ function stepCar(c,inp,dt,T,racing){
   const ox=c.x,oy=c.y;c.x+=c.vx*dt;c.y+=c.vy*dt;
   if(T.obstacles)collideObs(c,T);
   l=locate(T,c.x,c.y,c.hint);c.hint=l.i;
+  // 협곡 바위 벽: 벽을 타고 오르지 않고 아래에서 '퉁' 막히도록 길 쪽으로 밀어내고 바깥 방향 속도를 되튕긴다
+  if(T.canyon&&!(T.tun.length&&inTun(T,l.s))){const lim=T.canyon.from-10,exw=Math.abs(l.d)-l.w/2;
+    if(exw>lim){const a=T.p[l.i],sg=l.d<0?-1:1,nx=-a.ty*sg,ny=a.tx*sg,pen=exw-lim;c.x-=nx*pen;c.y-=ny*pen;
+      const vn=c.vx*nx+c.vy*ny;if(vn>0){c.vx-=1.3*vn*nx;c.vy-=1.3*vn*ny;c.vx*=0.9;c.vy*=0.9;c.bump=Math.max(c.bump,vn);c.spin+=(Math.random()-0.5)*vn*0.004;c.hitJ=Math.max(c.hitJ||0,vn*0.5);c.hitX=c.x+nx*12;c.hitY=c.y+ny*12;}
+      l=locate(T,c.x,c.y,c.hint);c.hint=l.i;}}
   let gz=groundAt(T,l);
   if(gz-c.z>10){c.x=ox;c.y=oy;c.bump=Math.max(c.bump,c.speed*0.6);c.vx*=-0.3;c.vy*=-0.3;l=locate(T,c.x,c.y,c.hint);c.hint=l.i;gz=groundAt(T,l);}
   c.gz=gz;
@@ -1077,6 +1084,7 @@ function make3D(opt){
       else if(cn.type==='rear'){cx=p.x-dx*95+nx*16;cy=p.y-dy*95+ny*16;up=30;fov=60;lz=14;}
       else if(cn.type==='front'){const a=lerp(260,130,e);cx=p.x+dx*a-nx*30;cy=p.y+dy*a-ny*30;up=22;fov=42;lz=9;}
       else{const th=this.ch+Math.PI*1.2+cn.t*0.18;cx=p.x+Math.cos(th)*430;cy=p.y+Math.sin(th)*430;up=300;fov=48;}
+      if(cn.type!=='sweep'&&cn.type!=='title')[cx,cy]=this.inWall(g,cx,cy,p.hint);
       const gz=Hxy(g.T,cx,cy,null),cz=Math.max(gz+12,p.z+up*(cn.type==='side'||cn.type==='front'?0.6:1),gz+up);
       const want=new THREE.Vector3(cx*S,cz*S,cy*S),look=new THREE.Vector3(p.x*S,(p.z+lz)*S,p.y*S);
       if(cn.cut){this.cp.copy(want);this.lt.copy(look);this.cam.fov=fov;cn.cut=false;}else{this.cp.lerp(want,Math.min(1,dt*7));this.lt.lerp(look,Math.min(1,dt*9));this.cam.fov=lerp(this.cam.fov,fov,0.08);}
@@ -1087,11 +1095,13 @@ function make3D(opt){
     }else{
       const CM={drone:{back:150,up:125,ahead:110,lz:0,fov:52,turn:3},chase:{back:100,up:46,ahead:40,lz:12,fov:60,turn:6}}[mode];
       let tx=Math.cos(p.h),ty=Math.sin(p.h);if(p.speed>80&&p.vF>0){tx=tx*0.6+p.vx/p.speed*0.4;ty=ty*0.6+p.vy/p.speed*0.4;}
+      if(g.T.canyon&&p.loc){const a=g.T.p[p.loc.i],ex=Math.abs(p.loc.d)-p.loc.w/2;if(ex>0){let ta=Math.atan2(a.ty,a.tx);if(Math.cos(ta-Math.atan2(ty,tx))<0)ta+=Math.PI;const w=clamp(ex/(g.T.canyon.from-10),0,1)*0.7;const hh=Math.atan2(ty,tx)+wrapA(ta-Math.atan2(ty,tx))*w;tx=Math.cos(hh);ty=Math.sin(hh);}}
       if(this.ch==null)this.ch=p.h;this.ch+=wrapA(Math.atan2(ty,tx)-this.ch)*Math.min(1,dt*CM.turn);
       const dx=Math.cos(this.ch),dy=Math.sin(this.ch);
-      const cx=p.x-dx*CM.back,cy=p.y-dy*CM.back,gz=Hxy(g.T,cx,cy,null);const cz=Math.max(p.z,gz)+CM.up;
+      let cx=p.x-dx*CM.back,cy=p.y-dy*CM.back;[cx,cy]=this.inWall(g,cx,cy,p.hint);const gz=Hxy(g.T,cx,cy,null);const cz=Math.max(p.z,gz)+CM.up;
       this.cp.lerp(new THREE.Vector3(cx*S,cz*S,cy*S),k);const mg=(Hxy(g.T,this.cp.x/S,this.cp.z/S,null)+14)*S;if(this.cp.y<mg)this.cp.y=mg;
-      this.lt.lerp(new THREE.Vector3((p.x+dx*CM.ahead)*S,(p.z+CM.lz)*S,(p.y+dy*CM.ahead)*S),Math.min(1,k*2));
+      let ax=p.x+dx*CM.ahead,ay=p.y+dy*CM.ahead;[ax,ay]=this.inWall(g,ax,ay,p.hint,g.T.canyon?g.T.canyon.from-12:0);
+      this.lt.lerp(new THREE.Vector3(ax*S,(p.z+CM.lz)*S,ay*S),Math.min(1,k*2));
       this.cam.fov=lerp(this.cam.fov,CM.fov+p.speed*0.018,0.05);
     }
     if(mode!=='cockpit'){const sh=g.shake*0.004;this.cam.position.set(this.cp.x+(Math.random()-0.5)*sh,this.cp.y+(Math.random()-0.5)*sh,this.cp.z);this.cam.lookAt(this.lt);this.cam.updateProjectionMatrix();}
@@ -1102,6 +1112,9 @@ function make3D(opt){
     r.render(this.sc,this.cam);
     this.drawMirrors(ck,W,H);
   },
+  // 협곡에서는 카메라가 바위 벽 속으로 들어가지 않도록 길 쪽으로 당긴다
+  inWall(g,x,y,hint,lim0){const T=g.T,cy=T.canyon;if(!cy)return[x,y];const l=locate(T,x,y,hint);if(T.tun.length&&inTun(T,l.s))return[x,y];const lim=lim0==null?8:lim0,ex=Math.abs(l.d)-l.w/2;
+    if(ex<=lim)return[x,y];const a=T.p[l.i],sg=l.d<0?-1:1;return[x+a.ty*sg*(ex-lim),y-a.tx*sg*(ex-lim)];},
   // 차 안 시점 사이드미러: 장면을 좌우 반전해 뒤쪽을 작은 화면에 그린다
   mirrorRects(W,H){
     const co=matchMedia('(pointer:coarse)').matches;
