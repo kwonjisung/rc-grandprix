@@ -178,6 +178,18 @@ function make3D(opt){
       this.cp.lerp(new THREE.Vector3(tx*S,(Math.max(gz,p.z)+hgt+Math.sin(rp.t*2.3)*3)*S,ty*S),rp.cut?1:Math.min(1,dt*2.5));
       this.lt.lerp(new THREE.Vector3(p.x*S,(p.z+10)*S,p.y*S),rp.cut?1:Math.min(1,dt*6));rp.cut=false;
       this.cam.fov=lerp(this.cam.fov,air?54:50,0.05);
+    }else if(mode==='cine'){
+      const cn=g.cine,u=clamp(cn.t/cn.dur,0,1),e=u*u*(3-2*u);
+      if(this.ch==null||cn.cut)this.ch=p.h;this.ch+=wrapA(p.h-this.ch)*Math.min(1,dt*4);
+      const dx=Math.cos(this.ch),dy=Math.sin(this.ch),nx=-dy,ny=dx;let cx,cy,up,fov,lz=10;
+      if(cn.type==='sweep'){const th=this.ch+Math.PI*0.55+u*1.5,R=lerp(560,230,e);cx=p.x+Math.cos(th)*R;cy=p.y+Math.sin(th)*R;up=lerp(430,130,e);fov=50;}
+      else if(cn.type==='side'){const a=lerp(-110,90,u);cx=p.x+nx*175+dx*a;cy=p.y+ny*175+dy*a;up=30;fov=40;lz=8;}
+      else if(cn.type==='rear'){cx=p.x-dx*95+nx*16;cy=p.y-dy*95+ny*16;up=30;fov=60;lz=14;}
+      else if(cn.type==='front'){const a=lerp(260,130,e);cx=p.x+dx*a-nx*30;cy=p.y+dy*a-ny*30;up=22;fov=42;lz=9;}
+      else{const th=this.ch+Math.PI*1.2+cn.t*0.18;cx=p.x+Math.cos(th)*430;cy=p.y+Math.sin(th)*430;up=300;fov=48;}
+      const gz=Hxy(g.T,cx,cy,null),cz=Math.max(gz+12,p.z+up*(cn.type==='side'||cn.type==='front'?0.6:1),gz+up);
+      const want=new THREE.Vector3(cx*S,cz*S,cy*S),look=new THREE.Vector3(p.x*S,(p.z+lz)*S,p.y*S);
+      if(cn.cut){this.cp.copy(want);this.lt.copy(look);this.cam.fov=fov;cn.cut=false;}else{this.cp.lerp(want,Math.min(1,dt*7));this.lt.lerp(look,Math.min(1,dt*9));this.cam.fov=lerp(this.cam.fov,fov,0.08);}
     }else if(mode==='stand'){
       const[sx,sy,sz]=this.opt.stand,base=Hxy(g.T,sx,sy,null);this.cp.set(sx*S,(base+sz+18)*S,sy*S);
       this.lt.lerp(new THREE.Vector3(p.x*S,(p.z+8)*S,p.y*S),Math.min(1,dt*6));

@@ -106,24 +106,48 @@ addEventListener('keydown',e=>{if(e.code==='Escape'&&!$('#verModal').hidden)$('#
 REC.init(()=>{renderCards();ttRender();});
 if(document.fonts)['700 40px "Chakra Petch"','italic 700 40px "Chakra Petch"','700 40px "Bodoni Moda"'].forEach(f=>document.fonts.load(f).catch(()=>{}));
 
-// ---- 인트로: 탁자 위 코스 디오라마를 틸트시프트로 훑고, 고른 코스에서 멈춘 뒤 코스 고르기로 ----
+// ---- 인트로 A: 드론 시네마 하이라이트 — 무작위 코스에서 AI 4대를 실제로 달리게 하고, 리플레이 카메라로 컷을 나눠 보여준 뒤 코스 고르기로 ----
 const INTRO={open:false};
 (function(){
   const el=$('#intro');if(!el)return;
   if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  const n=VARIANTS.length,sel=ttIdx,order=[];for(let k=1;k<=n;k++)order.push((sel+k)%n);
-  $('#inStrip').innerHTML=order.map(i=>`<div class="in-item"><div class="in-tile">${tileHTML(VARIANTS[i].id)}</div><small>COURSE ${String(i+1).padStart(2,'0')}</small><b>${VARIANTS[i].name}</b></div>`).join('');
-  $('#inSub').textContent=`${n}개 코스가 기다려요 · 화면을 눌러 시작`;
+  const SHOTS=[['sweep','드론 스윕',2.6,1],['side','슬로모 사이드',2.4,0.45],['rear','방구 부스터 클로즈업',2.1,1],['front','정면 돌파',1.9,1],['title','',2.6,1]];
+  let raf=0,done=false,si=-1,st=0,clock=0,lastTs=0,acc2=0;
+  const finish=()=>{if(done)return;done=true;INTRO.open=false;el.classList.add('out');cancelAnimationFrame(raf);
+    $('#mmenu').hidden=false;$('#verBtn').hidden=false;
+    setTimeout(()=>{el.hidden=true;if(G&&G.intro){if(REND)REND.dispose();REND=null;G=null;$('#stage').hidden=true;$('#view').innerHTML='';$('#bang').classList.remove('pop');}},520);};
+  try{
+    const vi=Math.floor(Math.random()*VARIANTS.length),V=VARIANTS[vi],T=getTrack(V.id),N=T.p.length,sp=Math.max(2,Math.round(50/(T.L/N)));
+    const grid=[0,1,2,3].map(k=>CARS[(vi+k)%CARS.length]);
+    const cars=grid.map((d,k)=>{const c=makeCar(T,Math.round(N-2-(k>>1)*sp*1.4),k%2?-45:45,d.col,true,[0.97,0.95,0.96,0.93][k]);Object.assign(c,{kind:d.kind,name:d.name,power:d.power,top:d.top,gripM:d.grip,mass:d.mass});return c;});
+    G={intro:true,V,vi,ci:0,T,cars,player:cars[0],parts:[],skids:[],t:0,state:'race',count:0,shake:0,order:[],rec:[],recAcc:0,ranks:[],finishShow:0,cine:null};
+    for(let i=0;i<Math.round(1.6/STEP);i++)update(STEP);
+    $('#menu').hidden=true;$('#mmenu').hidden=true;$('#verBtn').hidden=true;$('#stage').hidden=false;$('#hud').hidden=true;$('#touch').classList.add('off');$('#replayUI').hidden=true;$('#result').hidden=true;$('#hint').hidden=true;$('#count').textContent='';$('#pauseOv').hidden=true;
+    $('#cockpitFrame').toggleAttribute('hidden',true);$('#wheelWrap').hidden=true;$('#stage').classList.remove('cockpit');$('#view').innerHTML='';
+    REND=V.R();REND.init($('#view'),G);REND.setMode('cine');
+    $('#ciCourse').textContent=`COURSE ${String(vi+1).padStart(2,'0')} · ${V.name}`;
+  }catch(err){console.warn('intro',err);G=null;REND=null;$('#stage').hidden=true;$('#mmenu').hidden=false;$('#verBtn').hidden=false;return;}
   INTRO.open=true;el.hidden=false;
-  let anim=null,tEnd=0,done=false;
-  const finish=()=>{if(done)return;done=true;clearTimeout(tEnd);el.classList.add('out');INTRO.open=false;setTimeout(()=>{el.hidden=true;if(anim)anim.cancel();},520);};
-  requestAnimationFrame(()=>{
-    const st=$('#inStrip'),items=st.children,W=innerWidth,c=it=>it.offsetLeft+it.offsetWidth/2;
-    const x0=W*0.15-c(items[0])+W*0.3,x1=W/2-c(items[items.length-1]);
-    const dur=Math.min(6500,Math.max(4000,(x0-x1)/W*900));
-    anim=st.animate([{transform:`translate(${x0}px,-50%)`},{transform:`translate(${x1}px,-50%)`}],{duration:dur,easing:'cubic-bezier(.45,0,.4,1)',fill:'forwards'});
-    anim.onfinish=()=>{el.classList.add('end');tEnd=setTimeout(finish,1600);};
-  });
+  const rank=()=>G.cars.slice().sort((a,b)=>progressOf(b,G.T)-progressOf(a,G.T));
+  const nextShot=()=>{si++;st=0;if(si>=SHOTS.length){finish();return;}
+    const[type,label,dur]=SHOTS[si],R=rank();
+    const focus=type==='sweep'?R[0]:type==='side'?R[1]:type==='rear'?R[2]:type==='front'?R[0]:R[1];
+    G.player=focus;G.cine={type,t:0,dur,cut:true};
+    if(type==='rear'){focus.gauge=1;focus.boostT=0;fireBoost(focus);}
+    $('#ciShot').textContent=type==='title'?'':`SHOT ${si+1} · ${label}`;
+    el.classList.remove('cut');void el.offsetWidth;if(si>0&&type!=='title')el.classList.add('cut');
+    el.classList.toggle('end',type==='title');};
+  nextShot();
+  const tick=ts=>{if(done||!G||!G.intro)return;const real=Math.min(0.25,lastTs?(ts-lastTs)/1000:0.016),dt=Math.min(0.05,real);lastTs=ts;
+    const sh=SHOTS[si],air=G.player.air,scale=sh[0]==='title'?1:air?0.3:sh[3];
+    const tag=scale<1?`SLOW-MO ${scale}×`:'';$('#ciTag').hidden=!tag;if(tag)$('#ciTag').textContent=tag;
+    acc2+=dt*scale;while(acc2>=STEP){update(STEP);acc2-=STEP;}
+    st+=real;clock+=real*scale;G.cine.t=st;
+    const f=Math.floor((clock%1)*30);$('#ciTc').textContent=`00:${String(Math.floor(clock/60)).padStart(2,'0')}:${String(Math.floor(clock%60)).padStart(2,'0')}:${String(f).padStart(2,'0')}`;
+    REND.draw(G,dt*Math.max(scale,0.5));
+    if(st>=sh[2])nextShot();
+    raf=requestAnimationFrame(tick);};
+  raf=requestAnimationFrame(tick);
   el.addEventListener('click',finish);
   addEventListener('keydown',e=>{if(!INTRO.open)return;e.preventDefault();e.stopImmediatePropagation();finish();},true);
 })();
