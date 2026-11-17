@@ -37,6 +37,15 @@ function paintHarbor(c,x0,x1,y0,y1,T){
   const cn=T.canal;if(cn){c.fillStyle='#24384a';c.fillRect(cn[0]-30,y0,cn[1]-cn[0]+60,280-y0);c.fillStyle='#2a6f9a';c.fillRect(cn[0]-14,y0,cn[1]-cn[0]+28,266-y0);c.fillStyle='#7a828c';c.fillRect(cn[0]-30,266,cn[1]-cn[0]+60,14);}
   c.fillStyle='#7a828c';c.fillRect(x0,T.shore-30,x1-x0,30);c.fillStyle='#f2c230';for(let x=Math.floor(x0/120)*120;x<x1;x+=120)c.fillRect(x+40,T.shore-24,18,18);
 }
+function paintCity(c,x0,x1,y0,y1){
+  c.fillStyle='#8e9096';c.fillRect(x0,y0,x1-x0,y1-y0);gridLines(c,x0,x1,y0,y1,40,'rgba(40,42,48,.18)',2);
+  // 도심 차도(코스 밖) + 차선 + 횡단보도
+  c.fillStyle='#3d3f45';for(const y of[-1000,1150])c.fillRect(x0,y-60,x1-x0,120);for(const x of[-950,3000])c.fillRect(x-60,y0,120,y1-y0);
+  c.strokeStyle='rgba(242,194,48,.8)';c.lineWidth=5;c.setLineDash([50,40]);c.beginPath();for(const y of[-1000,1150]){c.moveTo(x0,y);c.lineTo(x1,y);}for(const x of[-950,3000]){c.moveTo(x,y0);c.lineTo(x,y1);}c.stroke();c.setLineDash([]);
+  c.fillStyle='rgba(255,255,255,.85)';for(const [cx,cy] of[[-950,-1000],[3000,-1000],[-950,1150],[3000,1150]])for(let k=-3;k<=3;k++){c.fillRect(cx+90,cy+k*16-5,60,9);c.fillRect(cx+k*16-5,cy+90,9,60);}
+  // 계단실이 있는 안뜰
+  c.fillStyle='#6f7e66';c.beginPath();c.arc(1300,-340,190,0,TAU);c.fill();c.fillStyle='#5f6e58';for(let k=0;k<8;k++){c.beginPath();c.arc(1300+Math.cos(k*0.8)*140,-340+Math.sin(k*0.8)*140,22,0,TAU);c.fill();}
+}
 const BOOKS=['#c0392b','#2e6da4','#e2b33c','#3c8d5a','#7d4ea3'];
 const THUMB=(bg,road,edge,pat)=>({bg,road,edge,pat});
 const VARIANTS=[
@@ -68,6 +77,10 @@ const VARIANTS=[
   R:opt3({sky:'#1b2742',fogFar:560,hemiSky:0x9fb2e0,hemiGround:0x2a2a32,sun:0xffc988,hemiI:0.8,sunI:0.7,paint:paintHarbor,sea:0x1f4a6e,road:'#33373e',road2:'#2f333a',rampCol:'#c9a227',edge2:'dock',trees:'port',treeCount:40,lamps:true,gate:0xf2c230,
    tunnel:{wall:0xb8432f,roof:0x3a3f47,portal:0x2e6da4,ribs:true},
    roadFn:(i,P,T)=>{const a=P[i];if(i<2)return i%2?'#222':'#f4f4f4';if(a.z<-4)return null;if(a.z-a.zb>2)return i%2?'#c9a227':'#b8921f';for(const r of T.steel)if(a.x>r[0]&&a.x<r[1]&&a.y>r[2]&&a.y<r[3])return i%2?'#7d8590':'#6f7781';return i%6<3?'#33373e':'#2f333a';}})},
+ {id:'parking',name:'옥상 주차빌딩',view:'나선 램프 · 옥상 점프',desc:'해 질 녘 도심 주차빌딩. 나선 램프를 한 바퀴 돌아 옥상까지 오르고, 옥상 사이 틈을 뛰어넘은 뒤 1층 기둥 사이 터널로 내려와요. 칠한 주차장 바닥은 미끄러워요.',tags:['아스팔트·칠한 바닥','나선 램프','2랩'],dust:'#8e8f94',puff:'#d7d9de',th:THUMB('#8d9097','#3a3c41','#f2c230','grid'),
+  R:opt3({sky:'#f0a884',fogFar:620,hemiSky:0xffd9c4,hemiGround:0x3a3a48,sun:0xffb98a,hemiI:0.7,sunI:0.8,paint:paintCity,road:'#3a3c41',road2:'#36383d',rampCol:'#c9a227',edge2:'parking',trees:'tower',treeCount:30,treeGap:120,propsOut:true,flatGround:true,lamps:true,gate:0x2e6da4,garage:[1300,-340,170],
+   tunnel:{wall:0xa9a49b,roof:0x8a857c,portal:0xc9c4ba,ribs:true},
+   roadFn:(i,P,T)=>{const a=P[i];if(i<2)return i%2?'#222':'#f4f4f4';if(a.z-a.zb>2)return i%2?'#c9a227':'#b8921f';if(a.z-a.zb<-2)return '#55585e';if(a.zb>3)return i%9===0?'#e8e6de':(i%2?'#4f7f6c':'#4a7866');return i%6<3?'#3a3c41':'#36383d';}})},
 ];
 const VI=Object.fromEntries(VARIANTS.map((v,i)=>[v.id,i]));
 const trackCache={};function getTrack(id){return trackCache[id]||(trackCache[id]=buildTrack(COURSES[id]));}

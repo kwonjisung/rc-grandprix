@@ -19,7 +19,7 @@ function make3D(opt){
     const pos=geo.attributes.position,cols=[],cx=(bx0+bx1)/2,cy=(by0+by1)/2,cA=new THREE.Color(),gA=new THREE.Color(...opt.grass),eA=new THREE.Color(...opt.edge),rA=opt.rock?new THREE.Color(...opt.rock):null;
     for(let k=0;k<pos.count;k++){
       const wx=pos.getX(k)/S+cx,wy=pos.getZ(k)/S+cy;pos.setX(k,wx*S);pos.setZ(k,wy*S);
-      const th=terrainH(T,wx,wy),ex=th.ex;let h=th.h;
+      const th=terrainH(T,wx,wy),ex=th.ex;let h=opt.flatGround?0:th.h;
       if(ex<0)h-=6;else if(ex<20)h-=6*(1-ex/20);
       const far=ex-T.falloff-60;if(far>0&&opt.hills)h+=(Math.sin(wx*0.004)*Math.cos(wy*0.005)*45+Math.sin(wx*0.011+wy*0.007)*14+30)*Math.min(1,far/260)*opt.hills;
       pos.setY(k,h*S);
@@ -54,6 +54,7 @@ function make3D(opt){
     else if(ed==='plastic'){ribbon(a=>a.w/2-8,a=>a.w/2,1.7,stripe('#e8433c','#ffffff'));ribbon(a=>-a.w/2,a=>-a.w/2+8,1.7,stripe('#e8433c','#ffffff'));
       for(const sd of[1,-1])wall(sd,sd>0?'#b9542f':'#d26a3e',a=>a.z+1.5,()=>-2,i=>{const a=P[i],b=P[(i+1)%N];return(a.z<2&&b.z<2)||under[i];});
       ribbon(a=>-a.w/2,a=>a.w/2,-7,i=>under[i]?'#a9472a':null,true);}
+    else if(ed==='parking'){const st=i=>P[i].zb>3&&!P[i].tun?null:((i>>1)%2?'#f2c230':'#2a2b2e');ribbon(a=>a.w/2,a=>a.w/2+12,1.6,st,true);ribbon(a=>-a.w/2-12,a=>-a.w/2,1.6,st,true);}
     else if(ed==='dock'){ribbon(a=>a.w/2,a=>a.w/2+12,1.6,stripe('#f2c230','#30343b'));ribbon(a=>-a.w/2-12,a=>-a.w/2,1.6,stripe('#f2c230','#30343b'));}
     else if(ed==='tape'){ribbon(a=>a.w/2-6,a=>a.w/2+6,1.8,()=>'#ecdca9');ribbon(a=>-a.w/2-6,a=>-a.w/2+6,1.8,()=>'#ecdca9');}
     else{ribbon(a=>a.w/2,a=>a.w/2+20,1.2,()=>opt.berm);ribbon(a=>-a.w/2-20,a=>-a.w/2,1.2,()=>opt.berm);}
@@ -81,10 +82,33 @@ function make3D(opt){
       for(const sd of[1,-1])for(let q=0;q<3;q++){const o=sd*(l0.w/2+6),pp=T.p.find(z=>z.s>=bb.s0+q*30)||l0;addMesh(new THREE.CylinderGeometry(3*S,3*S,22*S,8),lam(q%2?0x111111:0xf2c230),(pp.x+pp.nx*o)*S,(pp.z+11)*S,(pp.y+pp.ny*o)*S);}}
     // 가로등 (밤 항구)
     if(opt.lamps){const pm2=lam(0x3a3f47),hm=new THREE.MeshBasicMaterial({color:0xffd27a}),gm=new THREE.MeshBasicMaterial({color:0xffc260,transparent:true,opacity:0.18,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-5,polygonOffsetUnits:-5});
-      for(let i=3;i<N;i+=10){const a=P[i];if(a.tun||a.z<-4)continue;const sd=(i/10|0)%2?1:-1,o=sd*(a.w/2+30),x=a.x+a.nx*o,y=a.y+a.ny*o,z=zAt(a,o);
+      for(let i=3;i<N;i+=10){const a=P[i];if(a.tun||a.z<-4||(opt.garage&&a.zb>3))continue;const sd=(i/10|0)%2?1:-1,o=sd*(a.w/2+30),x=a.x+a.nx*o,y=a.y+a.ny*o,z=zAt(a,o);
         addMesh(new THREE.CylinderGeometry(2.2*S,3*S,80*S,8),pm2,x*S,(z+40)*S,y*S);const arm=addMesh(new THREE.BoxGeometry(3*S,3*S,26*S),pm2,(x-a.nx*sd*12)*S,(z+80)*S,(y-a.ny*sd*12)*S,false);arm.rotation.y=-Math.atan2(a.ny,a.nx)+Math.PI/2;
         addMesh(new THREE.BoxGeometry(10*S,4*S,10*S),hm,(x-a.nx*sd*24)*S,(z+78)*S,(y-a.ny*sd*24)*S,false);
         const pool=new THREE.Mesh(new THREE.CircleGeometry(58*S,20),gm);pool.rotation.x=-Math.PI/2;pool.position.set((x-a.nx*sd*30)*S,(a.z+2.4)*S,(y-a.ny*sd*30)*S);sc.add(pool);}}
+    // 주차빌딩: 층마다 창이 뚫린 외벽, 난간, 다리 구간 바닥판과 기둥, 가운데 계단실과 네온 간판
+    if(opt.garage){const fac=[],fcol=[],cl=new THREE.Color(),RO=20,el=a=>a.zb>3&&!a.tun,lr=(()=>{let q=11;return()=>(q=(q*48271)%2147483647)/2147483647;})();
+      const quad=(A,B,z0a,z1a,z0b,z1b,col)=>{cl.set(col);const q=[[A[0],z1a,A[1]],[B[0],z1b,B[1]],[A[0],z0a,A[1]],[B[0],z0b,B[1]]];for(const t of[q[0],q[2],q[1],q[1],q[2],q[3]]){fac.push(t[0]*S,t[1]*S,t[2]*S);fcol.push(cl.r,cl.g,cl.b);}};
+      for(let i=0;i<N;i++){const a=P[i],b=P[(i+1)%N];if(!el(a)&&!el(b))continue;
+        for(const sd of[1,-1]){const o=a.w/2+RO,A=[a.x+a.nx*o*sd,a.y+a.ny*o*sd],B=[b.x+b.nx*o*sd,b.y+b.ny*o*sd];
+          quad(A,B,a.z,a.z+15,b.z,b.z+15,'#c9c4ba');quad(A,B,a.z+15,a.z+18,b.z+15,b.z+18,'#e9e4da');
+          const lit=lr()<0.3;
+          if(under[i])quad(A,B,a.z-14,a.z,b.z-14,b.z,'#9e998f');
+          else for(let f=0;f<a.z-2;f+=34){const top=Math.min(a.z,f+34),z0=f,z1=f+10,z2=Math.min(top,f+30);quad(A,B,z0,z1,z0,z1,'#a9a49b');if(z2>z1)quad(A,B,z1,z2,z1,z2,lit&&f>0?'#ffd27a':((i>>2)%2?'#2b3540':'#34404c'));if(top>z2)quad(A,B,z2,top,z2,top,'#a9a49b');}}}
+      const fg=new THREE.BufferGeometry();fg.setAttribute('position',new THREE.Float32BufferAttribute(fac,3));fg.setAttribute('color',new THREE.Float32BufferAttribute(fcol,3));fg.computeVertexNormals();
+      const fm=new THREE.Mesh(fg,new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide}));fm.castShadow=true;fm.receiveShadow=true;sc.add(fm);
+      // 난간과 길 사이 바닥(평평하게) + 다리 아래 바닥판
+      ribbon(a=>a.w/2,a=>a.w/2+RO,1.5,i=>el(P[i])?'#8d8f94':null,true);ribbon(a=>-a.w/2-RO,a=>-a.w/2,1.5,i=>el(P[i])?'#8d8f94':null,true);
+      ribbon(a=>-a.w/2-RO,a=>a.w/2+RO,-14,i=>under[i]?'#8a857c':null,true);
+      const pm=lam(0xb3aea4);for(let i=0;i<N;i+=5){const a=P[i];if(!under[i])continue;for(const sd of[1,-1]){const o=sd*(a.w/2+8);addMesh(new THREE.BoxGeometry(14*S,(a.z-14)*S,14*S),pm,(a.x+a.nx*o)*S,(a.z-14)/2*S,(a.y+a.ny*o)*S);}}
+      // 가운데 계단실 + 물탱크 + 네온 P 간판
+      const [gx,gy,gh]=opt.garage;addMesh(new THREE.BoxGeometry(150*S,gh*S,150*S),lam(0xb9b4aa),gx*S,gh/2*S,gy*S);addMesh(new THREE.BoxGeometry(160*S,8*S,160*S),lam(0xe2ddd2),gx*S,(gh+4)*S,gy*S);
+      for(let k=0;k<4;k++)addMesh(new THREE.BoxGeometry(152*S,18*S,152*S),lam(k%2?0x2b3540:0xffd27a),gx*S,(30+k*40)*S,gy*S,false);
+      for(const dx of[-35,35]){addMesh(new THREE.CylinderGeometry(22*S,22*S,40*S,16),lam(0x6f8fa8),(gx+dx)*S,(gh+28)*S,gy*S);addMesh(new THREE.CylinderGeometry(23*S,23*S,4*S,16),lam(0x4f6b80),(gx+dx)*S,(gh+49)*S,gy*S);}
+      const cv=document.createElement('canvas');cv.width=256;cv.height=128;const x2=cv.getContext('2d');x2.fillStyle='#0f1a3a';x2.fillRect(0,0,256,128);x2.strokeStyle='#5fd0ff';x2.lineWidth=8;x2.strokeRect(8,8,240,112);
+      x2.fillStyle='#5fd0ff';x2.font='900 92px sans-serif';x2.textAlign='center';x2.textBaseline='middle';x2.fillText('P',70,68);x2.fillStyle='#ff5fa8';x2.font='800 40px sans-serif';x2.fillText('주차',172,50);x2.fillStyle='#ffe066';x2.font='700 26px sans-serif';x2.fillText('24H',172,94);
+      const sm=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv),side:THREE.DoubleSide});for(const r of[0,Math.PI/2]){const sg=new THREE.Mesh(new THREE.PlaneGeometry(130*S,65*S),sm);sg.position.set(gx*S,(gh+95)*S,gy*S);sg.rotation.y=r;sc.add(sg);}
+      for(const sd of[-1,1])addMesh(new THREE.BoxGeometry(4*S,40*S,4*S),lam(0x30343b),(gx+sd*40)*S,(gh+60)*S,gy*S);}
     // 빙판
     if(T.ice){const im=new THREE.MeshLambertMaterial({color:0xbfe6ff,transparent:true,opacity:0.6,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4});for(const c of T.ice){const l=locate(T,c[0],c[1],null),z=trackZ(T,l);const d=new THREE.Mesh(new THREE.CircleGeometry(c[2]*0.8*S,28),im);d.rotation.x=-Math.PI/2;d.position.set(c[0]*S,(z+2.2)*S,c[1]*S);sc.add(d);}}
     // 소품
@@ -102,9 +126,16 @@ function make3D(opt){
             const ro=new THREE.Mesh(new THREE.BoxGeometry(2,70,2),lam(0x222222));ro.position.set(150,135,0);g.add(ro);const hk=new THREE.Mesh(new THREE.BoxGeometry(14,8,14),lam(0x222222));hk.position.set(150,98,0);g.add(hk);return g;}
           const cols=1+(rand()*2|0),h=1+(rand()*3|0);for(let cI=0;cI<cols;cI++)for(let k=0;k<h-(cI&&rand()<0.5?1:0);k++){const cb=new THREE.Mesh(new THREE.BoxGeometry(120,44,46),lam(CC[(rand()*CC.length)|0]));cb.position.set(0,22+k*45,cI*48);cb.castShadow=true;g.add(cb);
             for(let r=-2;r<=2;r++){const rib=new THREE.Mesh(new THREE.BoxGeometry(3,40,47),lam(0x000000));rib.material.transparent=true;rib.material.opacity=0.18;rib.position.set(r*22,22+k*45,cI*48);g.add(rib);}}return g;},
+        tower:()=>{const g=new THREE.Group();if(!this._winTex){this._winTex=[0,1,2].map(v=>{const c=document.createElement('canvas');c.width=64;c.height=128;const x=c.getContext('2d');x.fillStyle=['#5d6470','#7a7268','#4c5560'][v];x.fillRect(0,0,64,128);
+              for(let r=0;r<8;r++)for(let q=0;q<4;q++){x.fillStyle=rand()<0.35?'#ffd27a':(rand()<0.5?'#22303c':'#2c3a48');x.fillRect(4+q*15,6+r*15,10,9);}const t=new THREE.CanvasTexture(c);return t;});}
+          const w=80+rand()*90,d=80+rand()*90,h=140+rand()*320,m=new THREE.MeshLambertMaterial({map:this._winTex[(rand()*3)|0]});const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);b.position.y=h/2;b.castShadow=true;g.add(b);
+          const tp=new THREE.Mesh(new THREE.BoxGeometry(w+6,6,d+6),lam(0x3a3d44));tp.position.y=h+3;g.add(tp);
+          if(rand()<0.35){const nc=[0xff5fa8,0x5fd0ff,0xffe066][(rand()*3)|0],sg=new THREE.Mesh(new THREE.BoxGeometry(w*0.7,22,3),new THREE.MeshBasicMaterial({color:nc}));sg.position.set(0,h+26,d/2);g.add(sg);}
+          else if(rand()<0.5){const wt=new THREE.Mesh(new THREE.CylinderGeometry(16,16,30,12),lam(0x6f8fa8));wt.position.set(w*0.2,h+21,0);g.add(wt);}
+          return g;},
         piles:()=>{const g=new THREE.Group(),p=new THREE.Mesh(new THREE.ConeGeometry(60+rand()*30,50+rand()*20,9),lam(rand()<0.5?0xb89a6a:0x9a8a74));p.position.y=28;p.castShadow=true;g.add(p);return g;}}[tt];
       const cnt=opt.treeCount||70;
-      for(let k=0,tries=0;k<cnt&&tries<1500;tries++){const x=lerp(bx0+200,bx1-200,rand()),y=lerp(by0+200,by1-200,rand());if(opt.sea&&y>T.shore-60)continue;if(T.canal&&x>T.canal[0]-90&&x<T.canal[1]+90&&Math.abs(y)<340)continue;const th=terrainH(T,x,y);if(th.ex<T.falloff+40+(T.canyon?T.canyon.from+T.canyon.ramp:0))continue;
+      for(let k=0,tries=0;k<cnt&&tries<1500;tries++){const x=lerp(bx0+200,bx1-200,rand()),y=lerp(by0+200,by1-200,rand());if(opt.sea&&y>T.shore-60)continue;if(T.canal&&x>T.canal[0]-90&&x<T.canal[1]+90&&Math.abs(y)<340)continue;if(opt.propsOut&&x>T.b.x0-60&&x<T.b.x1+60&&y>T.b.y0-60&&y<T.b.y1+60)continue;const th=terrainH(T,x,y);if(th.ex<T.falloff+40+(opt.treeGap||0)+(T.canyon?T.canyon.from+T.canyon.ramp:0))continue;
         const gT=mk();gT.scale.setScalar(S*(0.8+rand()*0.7));gT.rotation.y=rand()*TAU;gT.position.set(x*S,th.h*S,y*S);sc.add(gT);k++;}}
     if(opt.tires){const tg=new THREE.TorusGeometry(9*S,4*S,6,12),tm=lam(0x1f1f22),tm2=lam(0xeeeeee);
       for(let i=0;i<N;i+=7){const a=P[i];if(a.tun)continue;for(const sd of[1,-1]){if((i/7+(sd>0?0:1))%2)continue;const o=sd*(a.w/2+34);const x=a.x+a.nx*o,y=a.y+a.ny*o;const z=zAt(a,o);for(let k=0;k<2;k++){const t=new THREE.Mesh(tg,k?tm2:tm);t.rotation.x=Math.PI/2;t.position.set(x*S,(z+4+k*8)*S,y*S);t.castShadow=true;sc.add(t);}}}}

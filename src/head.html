@@ -117,6 +117,10 @@ h1 em{font-style:normal;color:var(--orange)}
 .where{grid-column:1/-1;margin:0;font-size:11.5px;color:var(--muted)}
 .rbox .btns{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
 .rbox .btns button{flex:1;min-width:130px}
+/* v3.3 결과 버튼은 카드 아래쪽에 고정 — 휴대폰에서 스크롤하지 않아도 보이게 */
+.rbox .btns{position:sticky;bottom:-20px;z-index:2;margin:0 -20px -20px;padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--line);box-shadow:0 -12px 18px -10px rgba(0,0,0,.45)}
+@media (max-height:700px),(max-width:640px){.rbox{padding:14px 16px 20px;gap:10px 18px}.rbox .btns{margin:0 -16px -20px;padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px))}.rbox .btns button{min-width:96px;padding-block:10px}.rbox .rows{gap:2px 12px}}
+@media (max-width:480px){.rbox .btns button{min-width:0;white-space:nowrap;font-size:14px}.rbox .btns button:first-child{flex-basis:100%}}
 .ghost{appearance:none;background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:7px;font:500 14px var(--f-body);padding:10px;cursor:pointer}
 #replayUI{position:absolute;inset:0;pointer-events:none;color:#fff;font-family:var(--f-body)}
 #replayUI::before,#replayUI::after{content:"";position:absolute;left:0;right:0;height:9vh;background:#000}
@@ -197,7 +201,7 @@ body.fine .mm-keys{display:flex}
 #gStats{display:flex;flex-direction:column;gap:5px}
 .gs{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:8px;font-size:12px;color:#9db9a9}
 .gs i{height:8px;border-radius:4px;background:#0a1d16;overflow:hidden}.gs u{display:block;height:100%;background:var(--orange);text-decoration:none;transition:width .3s}
-#gPick{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+#gPick{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
 .gchip{appearance:none;border:2px solid transparent;border-radius:12px;background:#0a1d16;color:#eef4ec;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:4px;font:500 11px var(--f-body);cursor:pointer;min-height:44px}
 .gchip i{width:26px;height:12px;border-radius:4px;background:var(--c);box-shadow:inset 0 -4px 0 var(--d)}
 .gchip.on{border-color:var(--orange)}
@@ -315,13 +319,17 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 @media (orientation:portrait){
   .gx-main{grid-template-rows:minmax(120px,1fr) auto;gap:8px}
   .gx-side{align-self:end;max-height:100%;padding:12px 14px;gap:6px}
-  #gPick{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .gchip{min-height:40px;flex-direction:row;justify-content:center;gap:6px;padding:4px 2px}
+  #gPick{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .gchip{min-height:40px;flex-direction:row;justify-content:center;gap:5px;padding:4px 2px}
+  .gchip i{flex:none;width:20px}
   #gName{font-size:clamp(24px,7.4vmin,34px)}#gDesc{font-size:12.5px;line-height:1.45}
   .gs{font-size:12px;grid-template-columns:76px 1fr}.gs i{height:8px}
   #gGo{margin-top:6px;height:52px;font-size:22px}
 }
 @media (orientation:portrait) and (max-height:600px){#gDesc{display:none}}
+/* v3.3 차 7대: 낮은 가로 화면은 칩을 색 견본만, 넓은 화면은 글자를 촘촘히 */
+@media (orientation:landscape){.gchip span{letter-spacing:-.06em}#gPick .gchip{padding-inline:0}}
+@media (orientation:landscape) and (max-height:440px){#gPick .gchip{min-height:30px;padding:6px 0}#gPick .gchip span{display:none}#gPick .gchip i{width:70%;height:14px}}
 /* ---- 휴대폰 세로 리플레이: 태그를 라벨 아래로 (v2.4) ---- */
 @media (max-width:640px){#rpTag{top:calc(9vh + 40px);font-size:24px}}
 /* ---- 휴대폰 세로: 버튼이 겹치지 않게 재배치 ---- */
@@ -419,9 +427,9 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 #touch.helptxt #cZone .zt{opacity:1}
 #touch.helptxt #cZone .zb svg,#touch.helptxt #cZone .chev{transform:translateY(-6px)}
 @media (pointer:coarse) and (orientation:landscape){
-  #hClouds{left:50%;right:auto;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+  #hClouds{left:50%;right:auto;transform:translateX(-50%);bottom:calc(126px + env(safe-area-inset-bottom,0px))}
   .cockpit .speedo{right:calc(max(16px,env(safe-area-inset-right,0px)) + 250px)}
-  .cockpit #hClouds{left:auto;transform:none;right:calc(max(16px,env(safe-area-inset-right,0px)) + 250px);bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+  .cockpit #hClouds{left:auto;transform:none;right:calc(max(16px,env(safe-area-inset-right,0px)) + 250px);bottom:calc(124px + env(safe-area-inset-bottom,0px))}
 }
 @media (pointer:coarse) and (orientation:landscape) and (max-height:440px){#cZone{right:calc(max(14px,env(safe-area-inset-right,0px)) + 66px);height:min(166px,calc(100vh - 40px));width:180px}}
 @media (pointer:coarse) and (orientation:portrait){
@@ -512,14 +520,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v3.2 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v3.3 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.2</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.3</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v3.3</b><span>새 코스 12 옥상 주차빌딩 — 해 질 녘 도심에서 나선 램프를 한 바퀴 돌아 옥상까지 오르고, 옥상 사이 틈을 뛰어넘은 뒤 1층 기둥 사이 터널로 내려와요(칠한 주차장 바닥은 미끄럽고, 높은 층은 콘크리트 난간에 막혀요). 일곱 번째 차 스팅어(오픈휠 포뮬러 — 접지력 최고·가벼움, 길 밖에서는 크게 느려짐). 장난감 8자 트랙 다리 옆에서 차가 계속 튀어 오르며 갇히던 문제 수정(옆면은 벽처럼 막히고, 다리에서 떨어지면 바로 코스 복귀, 길 밖에서 5초 넘게 못 나아가면 자동 복귀). 벽에 스치기만 해도 멈춰 버리던 마찰 완화, AI가 빙판 앞에서 미리 속도를 줄이고 벽에 박히면 후진해 빠져나옴. 휴대폰 결과 화면 버튼을 아래에 고정, 휴대폰 가로 화면에서 '방구 부스터!' 글자와 구름 게이지가 겹치던 문제 수정.<em>2026.11.17</em></span></li>
         <li><b>v3.2</b><span>홈 화면 아이콘 추가 — 체커 무늬 바탕에 주황 엠블럼과 RC카. 휴대폰 '홈 화면에 추가' 시 이 아이콘과 'RC 그랑프리' 이름으로 저장되고, 홈 화면에서 열면 전체화면으로 실행돼요. 브라우저 탭 아이콘도 같은 그림으로 교체.<em>2026.11.16</em></span></li>
         <li><b>v3.1</b><span>붉은 협곡 벽 정리 — 길이 굽어 붙은 곳에서 화면의 바위 벽과 실제 충돌 벽이 어긋나 차가 바위 속으로 들어가 보이던 문제 수정. 벽에 부딪히면 타고 오르거나 튀어 오르지 않고 아래에서 '퉁' 막히며 되튕겨요(불꽃·충돌음). 카메라도 바위 속으로 들어가지 않고 길 위에 머물러요. 휴대폰 브레이크 칸을 가속 페달 왼쪽으로 옮김(누르거나 왼쪽으로 밀면 브레이크).<em>2026.11.16</em></span></li>
         <li><b>v3.0</b><span>휴대폰 조작 확정 — 왼손 ◀ ▶, 오른손 가속 존(가운데 페달을 누르고 있으면 가속 · 위쪽 N₂O 부스터 칸을 누르거나 위로 밀면 방구 · 아래쪽 브레이크 칸을 누르거나 아래로 끌면 브레이크). 설명 글자는 출발 때만 6초 표시. 드라이버 이름: 처음 시작 때 추천 이름을 채워 묻고(그대로 시작 가능), 메뉴 위 이름표로 언제든 변경, 기록·순위표에 이름이 남아요.<em>2026.11.16</em></span></li>

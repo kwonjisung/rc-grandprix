@@ -89,12 +89,12 @@ function makeCar(T,idx,off,col,isAI,skill){
   const c={x:a.x+a.nx*off,y:a.y+a.ny*off,z:0,h:Math.atan2(a.ty,a.tx),vx:0,vy:0,vz:0,yaw:0,steer:0,air:false,airT:0,hint:idx,col,isAI,
     power:isAI?560*skill:610,top:isAI?520*skill:560,boostT:0,gauge:1,lane:off*0.4,lap:0,maxLap:0,s:a.s,prevS:a.s,lapStart:0,laps:[],done:false,finishT:0,
     pitch:0,pitchV:0,roll:0,rollV:0,gp:0,gr:0,slope:0,dist:0,land:0,stuck:0,slow:0,speed:0,vL:0,vF:0,drift:false,off:false,gz:0,flash:0,bump:0,
-    resp:0,boosts:0,driftT:0,maxAir:0,spin:0,hits:0,hitJ:0,hitX:0,hitY:0};
+    resp:0,pS:a.s,pT:0,boosts:0,driftT:0,maxAir:0,spin:0,hits:0,hitJ:0,hitX:0,hitY:0};
   const l=locate(T,c.x,c.y,idx);c.z=groundAt(T,l);c.gz=c.z;c.s=l.s;c.prevS=l.s;c.loc=l;c.surf=T.surface(c.x,c.y,l);return c;
 }
 function respawn(c,T){
   const l=locate(T,c.x,c.y,c.hint),a=T.p[l.i];
-  c.x=a.x;c.y=a.y;c.h=Math.atan2(a.ty,a.tx);c.vx=c.vy=c.vz=0;c.yaw=0;c.spin=0;c.air=false;c.z=a.zb+bumpAt(T,a.s);c.gz=c.z;c.stuck=0;c.slow=0;c.flash=1.2;c.s=a.s;c.prevS=a.s;c.hint=l.i;c.resp++;
+  c.x=a.x;c.y=a.y;c.h=Math.atan2(a.ty,a.tx);c.vx=c.vy=c.vz=0;c.yaw=0;c.spin=0;c.air=false;c.z=a.zb+bumpAt(T,a.s);c.gz=c.z;c.stuck=0;c.slow=0;c.pT=0;c.pS=a.s;c.flash=1.2;c.s=a.s;c.prevS=a.s;c.hint=l.i;c.resp++;
 }
 function collideObs(c,T){
   for(const o of T.obstacles){const nx=clamp(c.x,o.x,o.x+o.w),ny=clamp(c.y,o.y,o.y+o.h);let dx=c.x-nx,dy=c.y-ny;const d=Math.hypot(dx,dy),r=20;
@@ -138,11 +138,18 @@ function stepCar(c,inp,dt,T,racing){
   if(T.obstacles)collideObs(c,T);
   l=locate(T,c.x,c.y,c.hint);c.hint=l.i;
   // 협곡 바위 벽: 벽을 타고 오르지 않고 아래에서 '퉁' 막히도록 길 쪽으로 밀어내고 바깥 방향 속도를 되튕긴다
-  if(T.canyon&&!(T.tun.length&&inTun(T,l.s))){const lim=T.canyon.from-10,exw=Math.abs(l.d)-l.w/2;
+  // 주차빌딩 높은 층: 길 가장자리 콘크리트 난간에 막힌다(협곡 벽과 같은 방식)
+  const railHere=T.rail&&T.p[l.i].zb>T.rail.minZ;
+  if((T.canyon||railHere)&&!(T.tun.length&&inTun(T,l.s))){const lim=railHere?T.rail.off:T.canyon.from-10,exw=Math.abs(l.d)-l.w/2;
     if(exw>lim){const a=T.p[l.i],sg=l.d<0?-1:1,nx=-a.ty*sg,ny=a.tx*sg,pen=exw-lim;c.x-=nx*pen;c.y-=ny*pen;
-      const vn=c.vx*nx+c.vy*ny;if(vn>0){c.vx-=1.3*vn*nx;c.vy-=1.3*vn*ny;c.vx*=0.9;c.vy*=0.9;c.bump=Math.max(c.bump,vn);c.spin+=(Math.random()-0.5)*vn*0.004;c.hitJ=Math.max(c.hitJ||0,vn*0.5);c.hitX=c.x+nx*12;c.hitY=c.y+ny*12;}
+      const vn=c.vx*nx+c.vy*ny;if(vn>0){c.vx-=1.3*vn*nx;c.vy-=1.3*vn*ny;const fr=vn>60?0.9:0.996;c.vx*=fr;c.vy*=fr;c.bump=Math.max(c.bump,vn);c.spin+=(Math.random()-0.5)*vn*0.004;c.hitJ=Math.max(c.hitJ||0,vn*0.5);c.hitX=c.x+nx*12;c.hitY=c.y+ny*12;}
       l=locate(T,c.x,c.y,c.hint);c.hint=l.i;}}
   let gz=groundAt(T,l);
+  // 길 밖의 가파른 옆면(장난감 다리 경사로 등): 타고 올라 튀어 오르지 않고 벽처럼 막힌다
+  {const exn=Math.abs(l.d)-l.w/2,mv=Math.hypot(c.x-ox,c.y-oy);
+    if(!c.air&&exn>0&&gz-c.z>Math.max(2.5,mv*2)&&gz-c.z<=10){const a=T.p[l.i],sg=l.d<0?-1:1,nx=-a.ty*sg,ny=a.tx*sg;c.x=ox;c.y=oy;
+      const vn=c.vx*nx+c.vy*ny;if(vn<0){c.vx-=1.3*vn*nx;c.vy-=1.3*vn*ny;c.vx*=0.9;c.vy*=0.9;c.bump=Math.max(c.bump,-vn);c.hitJ=Math.max(c.hitJ||0,-vn*0.5);c.hitX=c.x-nx*12;c.hitY=c.y-ny*12;}
+      l=locate(T,c.x,c.y,c.hint);c.hint=l.i;gz=groundAt(T,l);}}
   if(gz-c.z>10){c.x=ox;c.y=oy;c.bump=Math.max(c.bump,c.speed*0.6);c.vx*=-0.3;c.vy*=-0.3;l=locate(T,c.x,c.y,c.hint);c.hint=l.i;gz=groundAt(T,l);}
   c.gz=gz;
   if(c.air){
@@ -164,19 +171,29 @@ function stepCar(c,inp,dt,T,racing){
   c.dist+=c.speed*dt;
   c.prevS=c.s;c.s=l.s;c.loc=l;
   const ex=Math.abs(l.d)-l.w/2;c.off=ex>0;
-  if(ex>l.w*1.5||(!c.air&&tz-c.z>40&&ex>0)||c.z<-200)c.stuck+=dt;else c.stuck=0;
+  if(ex>l.w*1.5||(ex>0&&tz-gz>40&&c.z<tz-30)||c.z<-200)c.stuck+=dt;else c.stuck=0;
   if(c.isAI&&racing&&c.speed<25)c.slow+=dt;else c.slow=0;
-  if(c.stuck>0.8||c.slow>2.5)respawn(c,T);
+  // 앞으로 나아가지 못하는 시간: 길 밖에서 5초(AI는 어디서든 6초) 넘게 제자리면 코스로 복귀
+  if(racing&&!c.done){let pd=((c.s-c.pS)%T.L+T.L)%T.L;if(pd>T.L/2)pd-=T.L;if(pd>80){c.pS=c.s;c.pT=0;}else{c.pT+=dt;if(pd<-200)c.pS=c.s;}}else c.pT=0;
+  if(c.stuck>0.8||c.slow>2.5||(c.off&&c.pT>5)||(c.isAI&&c.pT>6))respawn(c,T);
   c.flash=Math.max(0,c.flash-dt);
 }
 function aiInput(c,T,t){
   const N=T.p.length,sp=c.speed,look=5+Math.floor(sp/55);
   const a=T.p[(c.hint+look)%N],b=T.p[(c.hint+look+14)%N];
-  const lane=c.lane*Math.cos(t*0.35+c.lane);
+  // 높은 다리 위(옆이 낭떠러지)에서는 가운데로 붙어 조심히 달린다
+  const hp=T.p[c.hint],high=T.falloff<70&&Math.max(hp.zb,a.zb)>25;
+  const lane=high?c.lane*0.6:c.lane*Math.cos(t*0.35+c.lane);
   const want=Math.atan2(a.y+a.ny*lane-c.y,a.x+a.nx*lane-c.x),diff=wrapA(want-c.h);
   const turn=Math.abs(wrapA(Math.atan2(b.ty,b.tx)-Math.atan2(a.ty,a.tx)));
-  const slip=c.surf?c.surf.grip<3:false,lim=slip?0.5:0.6;
-  return{steer:clamp(diff*2.6,-1,1),gas:!(turn>0.45&&sp>c.top*lim)&&(Math.abs(diff)<1.2||sp<130),brake:(turn>0.75&&sp>c.top*(lim+0.08))||(Math.abs(diff)>1.4&&sp>150),hand:false};
+  // 앞길이 빙판처럼 미끄러우면 들어가기 전에 미리 속도를 줄인다
+  const sa=T.surface(a.x,a.y,{d:0,w:a.w}),sb=T.surface(b.x,b.y,{d:0,w:b.w}),icy=Math.min(sa.grip,sb.grip)<1.6;
+  const slip=c.surf?c.surf.grip<3:false;let lim=slip?0.5:0.6;if(icy)lim=Math.min(lim,0.36);if(high)lim-=0.08;
+  const icyFast=icy&&sp>c.top*0.5&&turn>0.2;
+  // 벽에 코를 박고 멈췄으면 잠깐 후진하며 머리를 돌린다
+  if(c.revUntil>t)return{steer:diff>0?-1:1,gas:false,brake:true,hand:false};
+  if(sp<30&&Math.abs(diff)>0.7&&t>1){c.stall=(c.stall||0)+1;if(c.stall>40){c.stall=0;c.revUntil=t+0.9;}}else c.stall=0;
+  return{steer:clamp(diff*(high?3.2:2.6),-1,1),gas:!(turn>0.45&&sp>c.top*lim)&&!icyFast&&(Math.abs(diff)<1.2||sp<130),brake:(turn>0.75&&sp>c.top*(lim+0.08))||(Math.abs(diff)>1.4&&sp>150)||(icyFast&&sp>c.top*0.6),hand:false};
 }
 // 차 충돌: 회전한 직사각형(OBB) 두 개를 분리축으로 검사하고, 접촉점 기준 충격량으로 밀고 돌린다
 const CAR_HX=27,CAR_HY=14.5,CAR_I=(4*CAR_HX*CAR_HX+4*CAR_HY*CAR_HY)/12,CAR_E=0.45,CAR_MU=0.35;
@@ -229,7 +246,7 @@ const SF={
   redDirt:{grip:4.6,drag:0.4,name:'붉은 흙길'},gravel:{grip:3,drag:1.5,name:'자갈밭'},
   stone:{grip:6.5,drag:0.35,name:'돌길'},lawn:{grip:4,drag:1.4,name:'잔디밭'},
   site:{grip:3.8,drag:0.5,name:'공사장 자갈'},mud:{grip:2.2,drag:2.4,name:'진흙'},
-  steel:{grip:2.3,drag:0.22,name:'젖은 철판'},dock:{grip:4.4,drag:1.3,name:'부두 콘크리트'},canal:{grip:1.6,drag:3.8,name:'운하 물'},
+  steel:{grip:2.3,drag:0.22,name:'젖은 철판'},epoxy:{grip:4.4,drag:0.28,name:'칠한 주차장 바닥'},dock:{grip:4.4,drag:1.3,name:'부두 콘크리트'},canal:{grip:1.6,drag:3.8,name:'운하 물'},
 };
 const ICE=[[700,0,190],[1080,425,150],[300,860,170],[900,1300,160]];
 const COURSES={
@@ -270,5 +287,12 @@ const COURSES={
     bumps:[{s:0.09,prof:[[0,0],[90,34],[96,-30],[176,-30],[270,0]]},{s:0.64,prof:[[0,0],[10,8],[20,0],[60,0],[70,8],[80,0]]},{s:0.86,prof:[[0,0],[60,26],[66,0]]}],
     surface:(x,y,l)=>{if(x>700&&x<810&&y>-260&&y<260)return SF.canal;if(!onTrack(l))return y>1290?SF.sea:SF.dock;
       for(const r of COURSES.harbor.steel)if(x>r[0]&&x<r[1]&&y>r[2]&&y<r[3])return SF.steel;return SF.asphalt;}},
+  parking:{ctrl:(()=>{const W=165,o=[[-300,0,0,W],[300,0,0,W],[850,0,0,W]];
+      // 나선 램프: 중심(1300,-340) 반지름 340을 한 바퀴 돌며 옥상(높이 130)까지 오른다
+      for(let k=0;k<=16;k++){const f=k/16,t=Math.PI/2-f*TAU;o.push([1300+340*Math.cos(t),-340+340*Math.sin(t),130*f,W]);}
+      o.push([1800,0,130,W],[2280,0,130,W],[2560,150,128,W],[2600,470,118,W],[2350,760,90,W],[1850,820,48,W],[1350,830,12,W],[850,830,0,W],[300,820,0,W],[-200,780,0,W],[-520,520,0,W],[-560,200,0,W]);return o;})(),
+    falloff:12,laps:2,rail:{minZ:3,off:-4},tunnels:[[0.79,0.87]],
+    bumps:[{s:0.452,prof:[[0,0],[50,16],[56,-50],[120,-50],[152,0]]},{s:0.53,prof:[[0,0],[20,5],[40,0]]},{s:0.81,prof:[[0,0],[20,5],[40,0]]},{s:0.84,prof:[[0,0],[20,5],[40,0]]}],
+    surface:(x,y,l)=>{if(!onTrack(l))return SF.walk;if(Math.hypot(x-1300,y+340)<520||(x>1300&&y<620&&x<2800))return SF.epoxy;return SF.asphalt;}},
 };
 //#ENDCORE
