@@ -80,7 +80,11 @@ const VARIANTS=[
  {id:'parking',name:'옥상 주차빌딩',view:'나선 램프 · 옥상 점프',desc:'해 질 녘 도심 주차빌딩. 나선 램프를 한 바퀴 돌아 옥상까지 오르고, 옥상 사이 틈을 뛰어넘은 뒤 1층 기둥 사이 터널로 내려와요. 칠한 주차장 바닥은 미끄러워요.',tags:['아스팔트·칠한 바닥','나선 램프','2랩'],dust:'#8e8f94',puff:'#d7d9de',th:THUMB('#8d9097','#3a3c41','#f2c230','grid'),
   R:opt3({sky:'#f0a884',fogFar:620,hemiSky:0xffd9c4,hemiGround:0x3a3a48,sun:0xffb98a,hemiI:0.7,sunI:0.8,paint:paintCity,road:'#3a3c41',road2:'#36383d',rampCol:'#c9a227',edge2:'parking',trees:'tower',treeCount:30,treeGap:120,propsOut:true,flatGround:true,lamps:true,gate:0x2e6da4,garage:[1300,-340,170],
    tunnel:{wall:0xa9a49b,roof:0x8a857c,portal:0xc9c4ba,ribs:true},
-   roadFn:(i,P,T)=>{const a=P[i];if(i<2)return i%2?'#222':'#f4f4f4';if(a.z-a.zb>2)return i%2?'#c9a227':'#b8921f';if(a.z-a.zb<-2)return '#55585e';if(a.zb>3)return i%9===0?'#e8e6de':(i%2?'#4f7f6c':'#4a7866');return i%6<3?'#3a3c41':'#36383d';}})},
+   roadFn:(i,P,T)=>{const a=P[i];if(i<2)return i%2?'#222':'#f4f4f4';if(a.z-a.zb>2)return i%2?'#c9a227':'#b8921f';if(a.z-a.zb<-2)return '#55585e';if(a.zb>3)return i%9===0?'#e8e6de':(i%2?'#4f7f6c':'#4a7866');return i%6<3?'#3a3c41':'#36383d';}})}, {id:'mine',name:'폐광 갱도',view:'갱도 터널 · 나무 다리',desc:'안개 낀 산속 폐광. 버팀목 갱도 터널 두 곳을 지나고, 난간 없는 나무 트레슬 다리로 깊은 골짜기를 건너요. 광차 레일 위는 아주 미끄럽고, 갱도 출구 내리막에서 크게 뛰어요.',tags:['석탄 흙길·레일','터널 2곳·나무 다리','2랩'],dust:'#5a524b',puff:'#c9c2b8',th:THUMB('#6f675c','#3e3833','#d9a441'),
+  R:opt3({sky:'#a9b2b7',fogFar:520,hemiSky:0xe4eaee,hemiGround:0x4a4038,sun:0xfff0dc,hemiI:0.7,sunI:0.6,grass:[0.44,0.46,0.35],edge:[0.26,0.23,0.21],road:'#4a4440',road2:'#45403c',rampCol:'#6b5a48',berm:'#2f2a27',edge2:'mine',trees:'pine',treeCount:70,hills:0.9,gate:0xd9a441,
+   mine:{river:[[40,170],[960,1520]],headframe:[380,-640],cart:0.725},
+   tunnel:{wall:0x4f453c,roof:0x3a3129,portal:0x7a5a38,ribs:true},
+   roadFn:(i,P,T)=>{const a=P[i],f=a.s/T.L;if(i<2)return i%2?'#222':'#f4f4f4';if(f>T.gorge.s0&&f<T.gorge.s1)return i%3===0?'#5c4128':(i%2?'#8a6a45':'#7d5f3d');if(Math.abs(f-T.rails[0])*T.L<26)return '#5d5a57';if(a.z-a.zb>2)return i%2?'#6b5a48':'#64543f';return i%6<3?'#4a4440':'#45403c';}})},
 ];
 const VI=Object.fromEntries(VARIANTS.map((v,i)=>[v.id,i]));
 const trackCache={};function getTrack(id){return trackCache[id]||(trackCache[id]=buildTrack(COURSES[id]));}
@@ -283,7 +287,8 @@ function hud(){
   const now=performance.now();
   if(now-(g.hudLast||0)>150){g.hudLast=now;
     const order=[...g.cars].sort((a,b)=>progressOf(b,T)-progressOf(a,T)),lead=order[0],rank=order.indexOf(p)+1;
-    const gapS=(a,b)=>{if(a.done&&b.done)return b.finishT-a.finishT;return Math.max(0,(progressOf(a,T)-progressOf(b,T))/Math.max(220,(a.speed+b.speed)/2));};
+    // 시간 차: 둘 다 결승 → 결승 시각 차 / 앞차만 결승 → 결승 뒤 흐른 시간 + 뒤차의 남은 거리 ÷ 속도
+    const fin=(T.laps+1)*T.L,gapS=(a,b)=>{if(a.done&&b.done)return b.finishT-a.finishT;if(a.done)return Math.max(0,g.t-a.finishT)+Math.max(0,fin-(b.lap*T.L+b.s))/Math.max(220,b.speed);return Math.max(0,(progressOf(a,T)-progressOf(b,T))/Math.max(220,(a.speed+b.speed)/2));};
     order.forEach((c,i)=>{const el=document.getElementById('tr'+g.cars.indexOf(c));el.style.top=(i*23)+'px';el.querySelector('b').textContent=i+1;el.querySelector('em').textContent=c.done?'완주':i===0?'선두':'+'+Math.min(99,gapS(lead,c)).toFixed(2);});
     $('#hPos').textContent='P'+rank;
     $('#hDots').innerHTML=order.map(c=>`<i${c===p?' class="me"':''} style="background:${c.col.body}"></i>`).join('');$('#hDots').setAttribute('aria-label','현재 순서 '+order.map((c,i)=>(i+1)+'위 '+c.name).join(', '));

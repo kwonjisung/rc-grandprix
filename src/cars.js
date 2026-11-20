@@ -79,6 +79,8 @@ function wheel(sp,style){
   const lip=new THREE.Mesh(new THREE.TorusGeometry(R*.63,0.32,8,36),rimMat);face.add(lip);
   const hub=new THREE.Mesh(new THREE.CylinderGeometry(R*.14,R*.14,1,16),rimMat);hub.rotation.x=Math.PI/2;face.add(hub);
   const nut=new THREE.Mesh(new THREE.CylinderGeometry(R*.07,R*.07,1.3,6),M.paint(style.caliper,{envMap:null}));nut.rotation.x=Math.PI/2;face.add(nut);
+  // 몬스터 트럭: 큰 블록 트레드(좌우 엇갈림)
+  if(style.tread){const tm=M.rubber(),n=style.tread;for(let i=0;i<n;i++){const a=i/n*Math.PI*2;for(const sz of[1,-1]){const b=new THREE.Mesh(new THREE.BoxGeometry(2.4,1.3,tw*0.42),tm);const aa=a+(sz>0?0:Math.PI/n);b.position.set(Math.sin(aa)*(R-0.05),Math.cos(aa)*(R-0.05),sz*tw*0.24);b.rotation.z=-aa;g.add(b);}}}
   g.userData.face=face;return g;
 }
 function box(w,h,d,mat,x,y,z,parent,rz){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);if(rz)m.rotation.z=rz;m.castShadow=true;parent.add(m);return m;}
@@ -87,7 +89,7 @@ function wingFoil(chord,span,mat){const s=new THREE.Shape();s.moveTo(0,0);s.quad
   const g=new THREE.ExtrudeGeometry(s,{depth:span,bevelEnabled:false,curveSegments:12});g.translate(-chord,0,-span/2);const m=new THREE.Mesh(g,mat);m.castShadow=true;return m;}
 function cyl(r,h,mat,x,y,z,parent,axis){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,20),mat);if(axis==='x')m.rotation.z=Math.PI/2;if(axis==='z')m.rotation.x=Math.PI/2;m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;}
 
-// ---- 시안 7종 ----
+// ---- 시안 8종 ----
 const DESIGNS=[
  {k:'A',name:'미드나잇 GT',cls:'번개 · 기본형',desc:'긴 보닛과 패스트백 지붕, 큰 리어 윙을 단 GT 레이서. 짙은 남색 바탕에 주황 핀스트라이프 두 줄만 넣어 절제했어요.',
   sw:[['#1b2a44','미드나잇 네이비'],['#ff6a1a','시그널 오렌지'],['#1a1b1e','카본'],['#4b4f56','건메탈 휠']],parts:['패스트백 지붕','리어 윙 + 엔드플레이트','카본 스플리터','디퓨저 핀 4개','6스포크 휠'],
@@ -199,6 +201,36 @@ const DESIGNS=[
        tube([x-3.4,S.R-1.6,bz],[x,S.R-1.2,hz],0.38,cb);tube([x+3.4,S.R-1.6,bz],[x,S.R-1.2,hz],0.38,cb);tube([x,S.R-1,hz*0.92],[x+(x>0?-2:2),S.R+4.4,bz],0.32,mat.chrome);}
      // 노즈 아래 카메라 날개 + 리어 레인 라이트
      for(const s of[1,-1])box(1.6,0.5,1.2,cb,20,9.6,s*3.2,g0);box(0.6,1.4,1.4,M.glow(0xff2a2a),-22.4,9.8,0,g0);}}},
+ {k:'H',name:'미니 몬스터 트럭',cls:'빅풋 · 몬스터 트럭',desc:'커다란 블록 타이어 위로 높이 띄운 픽업 차체, 드러난 솔리드 액슬과 코일오버 쇽 8개, 짐칸 롤바와 지붕 LED 바. 건메탈 바탕에 시그널 옐로 사선 데칼.',
+  sw:[['#3a3f46','건메탈'],['#ffc21a','시그널 옐로'],['#16171a','블랙 프레임'],['#c9ccd1','폴리시드 휠']],parts:['솔리드 액슬 + 코일오버 8개','짐칸 롤바 + 라이트 포드','지붕 LED 바','앞 범퍼 LED','배기 스택 2개','블록 트레드 타이어'],
+  sp:{W:15,R:10.4,tw:9.4,yb:13,eye:22.5,track:13.6,noArch:true,axles:[-14,14.4],top:[[-21,13],[-21.6,19.4],[-20.8,20.6],[-7,20.6],[-6.2,22],[-5.6,29],[-4.4,30.2],[2.6,30.2],[4,29.2],[8.6,23.2],[10,22.6],[18.4,22],[21.4,20.8],[22,17.2],[21.4,13]],
+   win:[[-4.6,22.4],[-4.2,28.4],[2.4,28.6],[6.8,23]],ws:[[3.6,29.6],[8.8,23.4]],rw:[[-5.4,28.6],[-5.9,23.4]],
+   body:0x3a3f46,wheel:{rim:0xc9ccd1,caliper:0xffc21a,spokes:5,tread:16},
+   paint(p,S){p.band(0,1,'#3a3f46');p.band(0,.2,'#16171a');p.band(.2,.235,'#ffc21a',.02,.98);
+     for(let i=0;i<4;i++)p.poly([[.05+i*.075,.24],[.09+i*.075,.24],[.15+i*.075,.62],[.11+i*.075,.62]],'#ffc21a');
+     windowPaint(p,S.win,'#16171a');panelLines(p,[-5.8,7.6],21.8,13.6);roundel(p,.5,.42,.13,'#ffc21a','#16171a','88','#16171a');
+     p.text('BIGFOOT',.78,.5,.15,'#ffc21a','"Chakra Petch",sans-serif','center',true);p.text('PUFF 4X4 · RC',.78,.3,.065,'#c9ccd1');p.text('MONSTER',.22,.78,.06,'#8f949b');},
+   paintTop(p){p.band(0,1,'#3a3f46');p.poly([[0.02,.12],[.33,.12],[.33,.88],[0.02,.88]],'#1a1c1f');for(let k=0;k<5;k++)p.poly([[.04+k*.058,.14],[.06+k*.058,.14],[.06+k*.058,.86],[.04+k*.058,.86]],'#2a2c30');
+     p.poly([[.62,.42],[1,.42],[1,.47],[.62,.47]],'#ffc21a');p.poly([[.62,.53],[1,.53],[1,.58],[.62,.58]],'#ffc21a');},
+   extras(g,S,mat,g0){const tube=(a,b,r,m)=>{const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),L=A.distanceTo(B),t=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,10),m);t.position.copy(A).add(B).multiplyScalar(.5);t.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize());t.castShadow=true;g0.add(t);return t;};
+     const bk=mat.black,ch=mat.chrome,yl=M.paint(0xffc21a,{envMap:null}),R=S.R,tk=S.track;
+     // 프레임 레일 + 솔리드 액슬 + 디퍼렌셜
+     for(const z of[-4.6,4.6])box(42,2,1.6,bk,0,12.2,z,g0);
+     for(const x of S.axles){cyl(1.15,2*tk-5,bk,x,R,0,g0,'z');const df=new THREE.Mesh(new THREE.SphereGeometry(2.6,14,10),M.metal(0x6d7177));df.position.set(x,R,0.8);df.castShadow=true;g0.add(df);
+       // 링크 2개 + 코일오버(바퀴마다 둘)
+       for(const z of[-1,1]){tube([x,R,z*6],[x*0.35,12.2,z*4.6],0.5,bk);
+         for(const dx of[-2.4,2.4]){const a=[x+dx,R+0.6,z*(tk-6.4)],b=[x+dx*1.5,19.4,z*6.6];tube(a,b,0.42,ch);const m=[(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2];
+           const sp=tube([m[0]-(b[0]-a[0])*0.22,m[1]-(b[1]-a[1])*0.22,m[2]-(b[2]-a[2])*0.22],[m[0]+(b[0]-a[0])*0.22,m[1]+(b[1]-a[1])*0.22,m[2]+(b[2]-a[2])*0.22],0.95,yl);}}}
+     // 펜더 플레어
+     for(const x of S.axles)for(const z of[-1,1]){box(17,1,4.6,bk,x,21.9,z*(S.W/2+2.1),g0);box(1.6,3,4.6,bk,x-8.2,20.6,z*(S.W/2+2.1),g0);box(1.6,3,4.6,bk,x+8.2,20.6,z*(S.W/2+2.1),g0);}
+     // 짐칸 롤바 + 라이트 포드
+     const yr=18.3,yt=25.4;for(const z of[-1,1]){tube([-8.4,yr,z*6],[-9.4,yt,z*5.2],0.6,bk);tube([-19.6,yr,z*6],[-9.4,yt,z*5.2],0.55,bk);}tube([-9.4,yt,-5.2],[-9.4,yt,5.2],0.6,bk);
+     for(const z of[-3,3]){cyl(1.3,1,ch,-8.6,yt+1.2,z,g0,'x');cyl(1.05,1.1,mat.glowW,-8.2,yt+1.2,z,g0,'x');}
+     // 지붕 LED 바 + 앞 범퍼 + 범퍼 LED + 배기 스택
+     box(1.8,1.6,S.W-3,bk,2.4,25.9,0,g0);box(0.5,1,S.W-4,mat.glowW,3.4,25.9,0,g0);
+     box(2.2,2.6,S.W+3,bk,22.8,14.6,0,g0);box(0.5,1.1,S.W-1,mat.glowW,24,14.6,0,g0);for(const z of[-1,1])tube([22.8,13.4,z*5],[20.6,12.2,z*4.6],0.5,bk);
+     box(2,2.2,S.W+2,bk,-22.4,14.2,0,g0);
+     for(const z of[-5.4,5.4]){cyl(0.75,10,ch,-6.6,22.8,z,g0);cyl(0.9,0.8,bk,-6.6,27.9,z,g0);}}}},
 ];
 function ctxRect(p,u,v,w,h,col){p.ctx.fillStyle=col;p.ctx.fillRect(u*p.cw,(1-v-h)*p.ch,w*p.cw,h*p.ch);}
 
@@ -229,7 +261,7 @@ function buildCar(D){
   for(const x of S.axles)for(const s of[1,-1]){const piv=new THREE.Group();piv.position.set(x,S.R,s*(S.track||(S.W/2-S.tw/2+1.6)));inner.add(piv);
     const flip=new THREE.Group();if(s<0)flip.rotation.y=Math.PI;piv.add(flip);const wh=wheel(S,S.wheel);wh.position.set(0,0,0);wh.userData.sgn=s<0?-1:1;flip.add(wh);wheels.push(wh);if(x>0)fronts.push(piv);}
   root.traverse(o=>{if(o.isMesh)o.castShadow=true;});
-  return{g:root,body:g,wheels,fronts,cab:new THREE.Group()};
+  return{g:root,body:g,wheels,fronts,cab:new THREE.Group(),eye:S.eye||14.5};
 }
 
 const KIND={std:'A',low:'B',wide:'C',rocket:'D'};

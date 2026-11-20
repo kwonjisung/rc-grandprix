@@ -36,7 +36,7 @@ function make3D(opt){
     // 다리(입체교차) 아래 구간 표시: 다른 길이 아래를 지나는 곳
     const under=P.map((a,i)=>{if(a.z<25)return false;for(let j=0;j<N;j+=2){const b=P[j];const ds=Math.min(Math.abs(a.s-b.s),T.L-Math.abs(a.s-b.s));if(ds<a.w*2)continue;if(b.z<a.z-25&&Math.hypot(a.x-b.x,a.y-b.y)<(a.w+b.w)/2+10)return true;}return false;});
     // 리본(트랙/연석)
-    const zAt=(a,off)=>{const ex=Math.abs(off)-a.w/2;if(ex<=0)return a.z;const f=clamp(1-ex/T.falloff,0,1);return a.z*sstep(f);};
+    const zAt=(a,off)=>{const ex=Math.abs(off)-a.w/2;if(ex<=0)return a.z;const f=clamp(1-ex/foAt(T,a.s),0,1);return a.z*sstep(f);};
     const ribbon=(o0,o1,lift,colFn,flat)=>{const v=[],c=[],col=new THREE.Color();
       for(let i=0;i<N;i++){const a=P[i],b=P[(i+1)%N],q=[];
         for(const[pnt,o]of[[a,o0(a)],[a,o1(a)],[b,o0(b)],[b,o1(b)]])q.push([(pnt.x+pnt.nx*o)*S,((flat?pnt.z:zAt(pnt,o))+lift)*S,(pnt.y+pnt.ny*o)*S]);
@@ -55,6 +55,11 @@ function make3D(opt){
       for(const sd of[1,-1])wall(sd,sd>0?'#b9542f':'#d26a3e',a=>a.z+1.5,()=>-2,i=>{const a=P[i],b=P[(i+1)%N];return(a.z<2&&b.z<2)||under[i];});
       ribbon(a=>-a.w/2,a=>a.w/2,-7,i=>under[i]?'#a9472a':null,true);}
     else if(ed==='parking'){const st=i=>P[i].zb>3&&!P[i].tun?null:((i>>1)%2?'#f2c230':'#2a2b2e');ribbon(a=>a.w/2,a=>a.w/2+12,1.6,st,true);ribbon(a=>-a.w/2-12,a=>-a.w/2,1.6,st,true);}
+    else if(ed==='mine'){const gz=i=>{const f=P[i].s/T.L;return T.gorge&&f>T.gorge.s0-0.004&&f<T.gorge.s1+0.004;};
+      // 땅 위는 석탄 흙 둔덕, 나무 다리 위는 낮은 나무 턱(난간은 없음)
+      ribbon(a=>a.w/2,a=>a.w/2+18,1.2,i=>gz(i)?null:opt.berm);ribbon(a=>-a.w/2-18,a=>-a.w/2,1.2,i=>gz(i)?null:opt.berm);
+      ribbon(a=>a.w/2,a=>a.w/2+7,3.2,i=>gz(i)?'#4a3420':null,true);ribbon(a=>-a.w/2-7,a=>-a.w/2,3.2,i=>gz(i)?'#4a3420':null,true);
+      ribbon(a=>-a.w/2-7,a=>a.w/2+7,-6,i=>gz(i)?'#3a2a1a':null,true);}
     else if(ed==='dock'){ribbon(a=>a.w/2,a=>a.w/2+12,1.6,stripe('#f2c230','#30343b'));ribbon(a=>-a.w/2-12,a=>-a.w/2,1.6,stripe('#f2c230','#30343b'));}
     else if(ed==='tape'){ribbon(a=>a.w/2-6,a=>a.w/2+6,1.8,()=>'#ecdca9');ribbon(a=>-a.w/2-6,a=>-a.w/2+6,1.8,()=>'#ecdca9');}
     else{ribbon(a=>a.w/2,a=>a.w/2+20,1.2,()=>opt.berm);ribbon(a=>-a.w/2-20,a=>-a.w/2,1.2,()=>opt.berm);}
@@ -109,6 +114,38 @@ function make3D(opt){
       x2.fillStyle='#5fd0ff';x2.font='900 92px sans-serif';x2.textAlign='center';x2.textBaseline='middle';x2.fillText('P',70,68);x2.fillStyle='#ff5fa8';x2.font='800 40px sans-serif';x2.fillText('주차',172,50);x2.fillStyle='#ffe066';x2.font='700 26px sans-serif';x2.fillText('24H',172,94);
       const sm=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv),side:THREE.DoubleSide});for(const r of[0,Math.PI/2]){const sg=new THREE.Mesh(new THREE.PlaneGeometry(130*S,65*S),sm);sg.position.set(gx*S,(gh+95)*S,gy*S);sg.rotation.y=r;sc.add(sg);}
       for(const sd of[-1,1])addMesh(new THREE.BoxGeometry(4*S,40*S,4*S),lam(0x30343b),(gx+sd*40)*S,(gh+60)*S,gy*S);}
+    // 폐광: 트레슬 다리 버팀목, 골짜기 개울, 광차 레일 건널목, 권양탑, 갱도 랜턴
+    if(opt.mine){const rand0=(()=>{let q=13;return()=>(q=(q*16807)%2147483647)/2147483647;})(),mo=opt.mine,wd=lam(0x5a3d24),wd2=lam(0x6b4a2e),stl=lam(0x6d7177),G=T.gorge;
+      const inG=a=>{const f=a.s/T.L;return f>G.s0-0.01&&f<G.s1+0.01&&a.zb>6;};
+      const beam=(x0,y0,z0,x1,y1,z1,t,m)=>{const A=new THREE.Vector3(x0*S,z0*S,y0*S),B=new THREE.Vector3(x1*S,z1*S,y1*S),L=A.distanceTo(B),b=new THREE.Mesh(new THREE.BoxGeometry(t*S,L,t*S),m);b.position.copy(A).add(B).multiplyScalar(.5);b.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize());b.castShadow=true;sc.add(b);return b;};
+      for(let i=0;i<N;i+=5){const a=P[i];if(!inG(a))continue;const z=a.z-6,o=a.w/2-8,L1=[a.x+a.nx*o,a.y+a.ny*o],R1=[a.x-a.nx*o,a.y-a.ny*o],O1=[a.x+a.nx*(o+26),a.y+a.ny*(o+26)],O2=[a.x-a.nx*(o+26),a.y-a.ny*(o+26)];
+        // 기둥 둘 + 바깥으로 벌어진 버팀 다리 + 가로대 + X자 가새
+        beam(L1[0],L1[1],-10,L1[0],L1[1],z,7,wd);beam(R1[0],R1[1],-10,R1[0],R1[1],z,7,wd);beam(O1[0],O1[1],-10,L1[0],L1[1],z*0.9,5,wd2);beam(O2[0],O2[1],-10,R1[0],R1[1],z*0.9,5,wd2);
+        beam(L1[0],L1[1],z-2,R1[0],R1[1],z-2,7,wd2);for(const f of[0.5])beam(L1[0],L1[1],z*f,R1[0],R1[1],z*f,5,wd2);
+        beam(L1[0],L1[1],z*0.08,R1[0],R1[1],z*0.5,4,wd2);beam(R1[0],R1[1],z*0.08,L1[0],L1[1],z*0.5,4,wd2);beam(L1[0],L1[1],z*0.5,R1[0],R1[1],z*0.95,4,wd2);beam(R1[0],R1[1],z*0.5,L1[0],L1[1],z*0.95,4,wd2);}
+      // 골짜기 바닥 개울과 바위
+      if(mo.river){const[[x0,x1],[y0,y1]]=mo.river,rw=new THREE.Mesh(new THREE.PlaneGeometry((x1-x0)*S,(y1-y0)*S),new THREE.MeshLambertMaterial({color:0x4f7d8c,transparent:true,opacity:0.85}));rw.rotation.x=-Math.PI/2;rw.position.set((x0+x1)/2*S,-2*S,(y0+y1)/2*S);sc.add(rw);
+        const rk=lam(0x6f6a64);for(let k=0;k<26;k++){const y=lerp(y0,y1,rand0()),sd=rand0()<0.5?x0-10:x1+10;addMesh(new THREE.DodecahedronGeometry((8+rand0()*14)*S,0),rk,(sd+(rand0()-0.5)*30)*S,0,y*S);}}
+      // 광차 레일 건널목 + 광차
+      if(mo.cart!=null){const a=P[Math.round(mo.cart*N)%N],ang=-Math.atan2(a.ny,a.nx),rl=a.w+300;
+        for(const q of[-11,11]){const r=addMesh(new THREE.BoxGeometry(rl*S,3*S,3*S),stl,(a.x+a.tx*q)*S,(a.z+2.6)*S,(a.y+a.ty*q)*S);r.rotation.y=ang;}
+        for(let k=-rl/2;k<=rl/2;k+=16){const x=a.x+a.nx*k,y=a.y+a.ny*k,ex=Math.abs(k)-a.w/2;if(ex<0)continue;const t=addMesh(new THREE.BoxGeometry(5*S,2*S,34*S),wd,x*S,(a.z*sstep(clamp(1-ex/foAt(T,a.s),0,1))+1)*S,y*S);t.rotation.y=ang+Math.PI/2;}
+        const cx=a.x+a.nx*(a.w/2+90),cy=a.y+a.ny*(a.w/2+90),cz=a.z*sstep(clamp(1-90/foAt(T,a.s),0,1)),cg=new THREE.Group();cg.position.set(cx*S,cz*S,cy*S);cg.rotation.y=ang;cg.scale.setScalar(S);sc.add(cg);
+        const bx=(w,h,d,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),lam(c));m.position.set(x,y,z);m.castShadow=true;cg.add(m);return m;};
+        bx(40,18,26,0x7a4a2a,0,16,0);bx(42,3,28,0x3a3d42,0,25,0);bx(36,6,22,0x1c1a19,0,27,0);for(const x of[-12,12])for(const z of[-11,11]){const w=new THREE.Mesh(new THREE.CylinderGeometry(5,5,3,12),lam(0x2a2c30));w.rotation.x=Math.PI/2;w.position.set(x,6,z);cg.add(w);}}
+      // 권양탑(광산 탑): 철골 A자 탑 + 큰 바퀴
+      if(mo.headframe){const[hx,hy]=mo.headframe,hz=Hxy(T,hx,hy,null),hg=new THREE.Group();hg.position.set(hx*S,hz*S,hy*S);hg.scale.setScalar(S);sc.add(hg);const fm=lam(0x8a3a24);
+        const lg=(x0,z0,y0,x1,z1,y1,t)=>{const A=new THREE.Vector3(x0,y0,z0),B=new THREE.Vector3(x1,y1,z1),L=A.distanceTo(B),b=new THREE.Mesh(new THREE.BoxGeometry(t,L,t),fm);b.position.copy(A).add(B).multiplyScalar(.5);b.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize());b.castShadow=true;hg.add(b);};
+        for(const z of[-30,30]){lg(-40,z,0,-12,z*0.4,190,6);lg(40,z,0,12,z*0.4,190,6);for(let h=40;h<180;h+=45)lg(-40+h*0.147,z*(1-h/316),h,40-h*0.147,z*(1-h/316),h,4);}
+        lg(-60,0,0,-8,0,170,7);const wh=new THREE.Mesh(new THREE.TorusGeometry(26,3,8,24),lam(0x2a2c30));wh.position.set(0,196,0);hg.add(wh);for(let k=0;k<6;k++){const sp=new THREE.Mesh(new THREE.BoxGeometry(2,50,2),lam(0x2a2c30));sp.position.set(0,196,0);sp.rotation.z=k*Math.PI/6;hg.add(sp);}
+        const sh=new THREE.Mesh(new THREE.BoxGeometry(110,46,80),lam(0x6b5a48));sh.position.set(-90,23,0);sh.castShadow=true;hg.add(sh);const rf=new THREE.Mesh(new THREE.BoxGeometry(118,6,88),lam(0x3a3129));rf.position.set(-90,49,0);hg.add(rf);}
+      // 랜턴: 나무 기둥에 매단 따뜻한 등 + 바닥 불빛
+      const lm=new THREE.MeshBasicMaterial({color:0xffc46a}),gm=new THREE.MeshBasicMaterial({color:0xffb04a,transparent:true,opacity:0.2,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-5,polygonOffsetUnits:-5});
+      for(let i=6;i<N;i+=11){const a=P[i];const sd=(i/11|0)%2?1:-1,o=sd*(a.w/2+(inG(a)?-4:26)),x=a.x+a.nx*o,y=a.y+a.ny*o,z=a.tun||inG(a)?a.z:zAt(a,o);
+        if(a.tun){addMesh(new THREE.BoxGeometry(6*S,6*S,6*S),lm,x*S,(a.z+70)*S,y*S,false);continue;}
+        addMesh(new THREE.BoxGeometry(5*S,62*S,5*S),wd,x*S,(z+31)*S,y*S);const arm=addMesh(new THREE.BoxGeometry(22*S,4*S,4*S),wd,(x-a.nx*sd*9)*S,(z+60)*S,(y-a.ny*sd*9)*S,false);arm.rotation.y=-Math.atan2(a.ny,a.nx);
+        addMesh(new THREE.BoxGeometry(7*S,10*S,7*S),lm,(x-a.nx*sd*18)*S,(z+52)*S,(y-a.ny*sd*18)*S,false);
+        const pool=new THREE.Mesh(new THREE.CircleGeometry(46*S,18),gm);pool.rotation.x=-Math.PI/2;pool.position.set((x-a.nx*sd*24)*S,(a.z+2.4)*S,(y-a.ny*sd*24)*S);sc.add(pool);}}
     // 빙판
     if(T.ice){const im=new THREE.MeshLambertMaterial({color:0xbfe6ff,transparent:true,opacity:0.6,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4});for(const c of T.ice){const l=locate(T,c[0],c[1],null),z=trackZ(T,l);const d=new THREE.Mesh(new THREE.CircleGeometry(c[2]*0.8*S,28),im);d.rotation.x=-Math.PI/2;d.position.set(c[0]*S,(z+2.2)*S,c[1]*S);sc.add(d);}}
     // 소품
@@ -190,7 +227,7 @@ function make3D(opt){
     if(this._ov!==ov){this._ov=ov;this._ovInit=0;const c2=this.dl.shadow.camera,e=ov?80:35;c2.left=c2.bottom=-e;c2.right=c2.top=e;c2.far=ov?400:200;c2.updateProjectionMatrix();this.sc.fog.near=ov?400:70;this.sc.fog.far=ov?1400:this.opt.fogFar;}
     this.mark.visible=ov;if(ov){this.mark.position.set(p.x*S,(p.z+75+Math.sin(performance.now()/180)*6)*S,p.y*S);}
     if(mode==='cockpit'){
-      const pm=this.meshes[this.pi];this.sc.updateMatrixWorld(true);const v=new THREE.Vector3(2,14.5,0);pm.body.localToWorld(v);this.cam.position.copy(v);
+      const pm=this.meshes[this.pi];this.sc.updateMatrixWorld(true);const v=new THREE.Vector3(2,pm.eye||14.5,0);pm.body.localToWorld(v);this.cam.position.copy(v);
       if(!this._qy)this._qy=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),-Math.PI/2);const q=new THREE.Quaternion();pm.body.getWorldQuaternion(q);this.cam.quaternion.copy(q).multiply(this._qy);
       if(g.shake)this.cam.rotateZ((Math.random()-0.5)*g.shake*0.002);
       const asp=this.cam.aspect||1,base=asp>=1?72:Math.min(92,2*Math.atan(Math.tan(39/57.3)/asp)*57.3);this.cam.fov=lerp(this.cam.fov,base+Math.min(p.speed,700)*0.003+(p.boostT>0?2.5:0),0.06);this.cam.updateProjectionMatrix();
@@ -232,8 +269,10 @@ function make3D(opt){
       if(g.T.canyon&&p.loc){const a=g.T.p[p.loc.i],ex=Math.abs(p.loc.d)-p.loc.w/2;if(ex>0){let ta=Math.atan2(a.ty,a.tx);if(Math.cos(ta-Math.atan2(ty,tx))<0)ta+=Math.PI;const w=clamp(ex/(g.T.canyon.from-10),0,1)*0.7;const hh=Math.atan2(ty,tx)+wrapA(ta-Math.atan2(ty,tx))*w;tx=Math.cos(hh);ty=Math.sin(hh);}}
       if(this.ch==null)this.ch=p.h;this.ch+=wrapA(Math.atan2(ty,tx)-this.ch)*Math.min(1,dt*CM.turn);
       const dx=Math.cos(this.ch),dy=Math.sin(this.ch);
-      let cx=p.x-dx*CM.back,cy=p.y-dy*CM.back;[cx,cy]=this.inWall(g,cx,cy,p.hint);const gz=Hxy(g.T,cx,cy,null);const cz=Math.max(p.z,gz)+CM.up;
-      this.cp.lerp(new THREE.Vector3(cx*S,cz*S,cy*S),k);const mg=(Hxy(g.T,this.cp.x/S,this.cp.z/S,null)+14)*S;if(this.cp.y<mg)this.cp.y=mg;
+      let cx=p.x-dx*CM.back,cy=p.y-dy*CM.back;[cx,cy]=this.inWall(g,cx,cy,p.hint);const T=g.T,cg=(x,y)=>groundAt(T,locate(T,x,y,null),true),gz=cg(cx,cy);let cz=Math.max(p.z,gz)+CM.up;
+      // 터널 근처: 카메라를 지붕 아래로 내려 터널 벽·지붕이 차를 가리지 않게
+      if(T.tun.length){const lc=locate(T,cx,cy,p.hint),inT=inTun(T,lc.s)||(p.loc&&inTun(T,p.loc.s));if(inT)cz=Math.min(cz,trackZ(T,lc)+62);}
+      this.cp.lerp(new THREE.Vector3(cx*S,cz*S,cy*S),k);const mg=(cg(this.cp.x/S,this.cp.z/S)+14)*S;if(this.cp.y<mg)this.cp.y=mg;
       let ax=p.x+dx*CM.ahead,ay=p.y+dy*CM.ahead;[ax,ay]=this.inWall(g,ax,ay,p.hint,g.T.canyon?g.T.canyon.from-12:0);
       this.lt.lerp(new THREE.Vector3(ax*S,(p.z+CM.lz)*S,ay*S),Math.min(1,k*2));
       this.cam.fov=lerp(this.cam.fov,CM.fov+p.speed*0.018,0.05);
@@ -247,7 +286,10 @@ function make3D(opt){
     this.drawMirrors(ck,W,H);
   },
   // 협곡에서는 카메라가 바위 벽 속으로 들어가지 않도록 길 쪽으로 당긴다
-  inWall(g,x,y,hint,lim0){const T=g.T,cy=T.canyon;if(!cy)return[x,y];const l=locate(T,x,y,hint);if(T.tun.length&&inTun(T,l.s))return[x,y];const lim=lim0==null?8:lim0,ex=Math.abs(l.d)-l.w/2;
+  // 터널 구간에서는 카메라가 터널 벽(소파·바위 등) 속에 들어가지 않도록 터널 안쪽으로 당긴다
+  inWall(g,x,y,hint,lim0){const T=g.T,cy=T.canyon;if(!cy&&!T.tun.length)return[x,y];const l=locate(T,x,y,hint);
+    if(T.tun.length&&inTun(T,l.s)){const ex=Math.abs(l.d)-l.w/2,lim=-14;if(ex<=lim)return[x,y];const a=T.p[l.i],sg=l.d<0?-1:1;return[x+a.ty*sg*(ex-lim),y-a.tx*sg*(ex-lim)];}
+    if(!cy)return[x,y];const lim=lim0==null?8:lim0,ex=Math.abs(l.d)-l.w/2;
     if(ex<=lim)return[x,y];const a=T.p[l.i],sg=l.d<0?-1:1;return[x+a.ty*sg*(ex-lim),y-a.tx*sg*(ex-lim)];},
   // 차 안 시점 사이드미러: 장면을 좌우 반전해 뒤쪽을 작은 화면에 그린다
   mirrorRects(W,H){

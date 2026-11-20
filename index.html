@@ -202,7 +202,7 @@ body.fine .mm-keys{display:flex}
 #gStats{display:flex;flex-direction:column;gap:5px}
 .gs{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:8px;font-size:12px;color:#9db9a9}
 .gs i{height:8px;border-radius:4px;background:#0a1d16;overflow:hidden}.gs u{display:block;height:100%;background:var(--orange);text-decoration:none;transition:width .3s}
-#gPick{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+#gPick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px} /* v3.4 차 8대: 4열 × 2줄 */
 .gchip{appearance:none;border:2px solid transparent;border-radius:12px;background:#0a1d16;color:#eef4ec;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:4px;font:500 11px var(--f-body);cursor:pointer;min-height:44px}
 .gchip i{width:26px;height:12px;border-radius:4px;background:var(--c);box-shadow:inset 0 -4px 0 var(--d)}
 .gchip.on{border-color:var(--orange)}
@@ -330,7 +330,7 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 @media (orientation:portrait) and (max-height:600px){#gDesc{display:none}}
 /* v3.3 차 7대: 낮은 가로 화면은 칩을 색 견본만, 넓은 화면은 글자를 촘촘히 */
 @media (orientation:landscape){.gchip span{letter-spacing:-.06em}#gPick .gchip{padding-inline:0}}
-@media (orientation:landscape) and (max-height:440px){#gPick .gchip{min-height:30px;padding:6px 0}#gPick .gchip span{display:none}#gPick .gchip i{width:70%;height:14px}}
+@media (orientation:landscape) and (max-height:440px){#gPick{grid-template-columns:repeat(8,minmax(0,1fr))}#gPick .gchip{min-height:30px;padding:6px 0}#gPick .gchip span{display:none}#gPick .gchip i{width:70%;height:14px}}
 /* ---- 휴대폰 세로 리플레이: 태그를 라벨 아래로 (v2.4) ---- */
 @media (max-width:640px){#rpTag{top:calc(9vh + 40px);font-size:24px}}
 /* ---- 휴대폰 세로: 버튼이 겹치지 않게 재배치 ---- */
@@ -370,7 +370,9 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 @media (pointer:coarse) and (orientation:landscape){.cockpit #hint{top:calc(80px + env(safe-area-inset-top,0px))}#hMini{width:84px;height:84px;padding:4px;border-radius:14px}}
 @media (pointer:coarse) and (orientation:portrait){
   #hMini{right:auto;top:auto;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(182px + env(safe-area-inset-bottom,0px));width:96px;height:96px;padding:5px;border-radius:14px}
-  #hint{top:calc(290px + env(safe-area-inset-top,0px))}
+  /* v3.4 출발 안내는 순위표 바로 아래 작게, 카운트다운 숫자는 조금 아래로 — 서로 겹치지 않게 */
+  #hint{top:calc(192px + env(safe-area-inset-top,0px));font-size:12px;line-height:1.4;padding:5px 10px;max-width:calc(100vw - 28px)}
+  #count{padding-top:18vh;box-sizing:border-box}
   #tZone .tip{bottom:calc(300px + env(safe-area-inset-bottom,0px))}
 }
 /* ---- 휴대폰 세로 코스 고르기: 위쪽 빈 공간 정리 (v2.5.1) ---- */
@@ -521,14 +523,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v3.3 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v3.4 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.3</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.4</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v3.4</b><span>새 코스 13 폐광 갱도 — 안개 낀 산속 폐광에서 버팀목 갱도 터널 두 곳을 지나고, 난간 없는 나무 트레슬 다리로 깊은 골짜기를 건너요(떨어지면 바로 코스 복귀). 광차 레일 건널목은 아주 미끄럽고, 갱도 출구 내리막에서 크게 뛰어요. 여덟 번째 차 빅풋(미니 몬스터 트럭 — 가장 무겁고 점프 착지·험로 주행 최고, 대신 가속·접지력이 낮음), 차고 칩을 4열 × 2줄로. 선두가 결승한 뒤 순위표와 앞차·뒤차 칸이 모두 +99.00으로 굳던 문제 수정(남은 거리로 시간 차 계산). 터널 입구 모서리·옆벽에 차가 끼어 멈추던 문제 수정(벽을 따라 미끄러지며 입구 쪽으로 흘러가요), 터널 근처에서 카메라가 터널 벽 속에 묻히지 않게. AI가 산악 서킷·눈길의 높은 커브와 협곡 벽에서 덜 떨어지고 덜 끼이도록 개선. 휴대폰 세로 화면에서 출발 안내가 카운트다운 숫자를 가리지 않게.<em>2026.11.20</em></span></li>
         <li><b>v3.3</b><span>새 코스 12 옥상 주차빌딩 — 해 질 녘 도심에서 나선 램프를 한 바퀴 돌아 옥상까지 오르고, 옥상 사이 틈을 뛰어넘은 뒤 1층 기둥 사이 터널로 내려와요(칠한 주차장 바닥은 미끄럽고, 높은 층은 콘크리트 난간에 막혀요). 일곱 번째 차 스팅어(오픈휠 포뮬러 — 접지력 최고·가벼움, 길 밖에서는 크게 느려짐). 장난감 8자 트랙 다리 옆에서 차가 계속 튀어 오르며 갇히던 문제 수정(옆면은 벽처럼 막히고, 다리에서 떨어지면 바로 코스 복귀, 길 밖에서 5초 넘게 못 나아가면 자동 복귀). 벽에 스치기만 해도 멈춰 버리던 마찰 완화, AI가 빙판 앞에서 미리 속도를 줄이고 벽에 박히면 후진해 빠져나옴. 휴대폰 결과 화면 버튼을 아래에 고정, 휴대폰 가로 화면에서 '방구 부스터!' 글자와 구름 게이지가 겹치던 문제 수정.<em>2026.11.17</em></span></li>
         <li><b>v3.2</b><span>홈 화면 아이콘 추가 — 체커 무늬 바탕에 주황 엠블럼과 RC카. 휴대폰 '홈 화면에 추가' 시 이 아이콘과 'RC 그랑프리' 이름으로 저장되고, 홈 화면에서 열면 전체화면으로 실행돼요. 브라우저 탭 아이콘도 같은 그림으로 교체.<em>2026.11.16</em></span></li>
         <li><b>v3.1</b><span>붉은 협곡 벽 정리 — 길이 굽어 붙은 곳에서 화면의 바위 벽과 실제 충돌 벽이 어긋나 차가 바위 속으로 들어가 보이던 문제 수정. 벽에 부딪히면 타고 오르거나 튀어 오르지 않고 아래에서 '퉁' 막히며 되튕겨요(불꽃·충돌음). 카메라도 바위 속으로 들어가지 않고 길 위에 머물러요. 휴대폰 브레이크 칸을 가속 페달 왼쪽으로 옮김(누르거나 왼쪽으로 밀면 브레이크).<em>2026.11.16</em></span></li>
@@ -685,6 +688,9 @@ function bumpAt(T,s){
     for(let k=1;k<pr.length;k++){if(u<=pr[k][0]){const u0=pr[k-1][0],h0=pr[k-1][1],u1=pr[k][0],h1=pr[k][1];h+=h0+(h1-h0)*(u-u0)/((u1-u0)||1);break;}}}
   return h;
 }
+// 구간별 비탈 폭: 협곡 다리(gorge) 구간은 좁게(아래가 낭떠러지), 그 앞뒤로 부드럽게 이어진다
+function foAt(T,s){const g=T.gorge;if(!g)return T.falloff;const L=T.L,a=g.s0*L,b=g.s1*L,bl=g.blend||90;let w=0;
+  if(s>a-bl&&s<b+bl)w=s<a?sstep((s-a+bl)/bl):s>b?sstep(1-(s-b)/bl):1;return lerp(T.falloff,g.fo,w);}
 function inTun(T,s){for(const t of T.tun)if(s>=t.s0&&s<=t.s1)return true;return false;}
 function locate(T,x,y,hint){
   const P=T.p,N=P.length;let best=1e18,bi=0,bt=0;
@@ -702,7 +708,7 @@ function trackZ(T,l){const P=T.p,a=P[l.i],b=P[(l.i+1)%P.length];return a.zb+(b.z
 function groundAt(T,l,noTun){
   const zt=trackZ(T,l),ex=Math.abs(l.d)-l.w/2;if(ex<=0)return zt;
   if(!noTun&&T.tun.length&&ex>2&&inTun(T,l.s))return zt+90;
-  const f=clamp(1-ex/T.falloff,0,1);let h=zt*sstep(f);
+  const f=clamp(1-ex/foAt(T,l.s),0,1);let h=zt*sstep(f);
   const cy=T.canyon;if(cy&&ex>cy.from)h=Math.max(h,cy.h*sstep(clamp((ex-cy.from)/cy.ramp,0,1)));
   return h;
 }
@@ -781,6 +787,16 @@ function stepCar(c,inp,dt,T,racing){
     if(exw>lim){const a=T.p[l.i],sg=l.d<0?-1:1,nx=-a.ty*sg,ny=a.tx*sg,pen=exw-lim;c.x-=nx*pen;c.y-=ny*pen;
       const vn=c.vx*nx+c.vy*ny;if(vn>0){c.vx-=1.3*vn*nx;c.vy-=1.3*vn*ny;const fr=vn>60?0.9:0.996;c.vx*=fr;c.vy*=fr;c.bump=Math.max(c.bump,vn);c.spin+=(Math.random()-0.5)*vn*0.004;c.hitJ=Math.max(c.hitJ||0,vn*0.5);c.hitX=c.x+nx*12;c.hitY=c.y+ny*12;}
       l=locate(T,c.x,c.y,c.hint);c.hint=l.i;}}
+  // 터널 벽: 옆면에 닿으면 길 쪽으로 밀어내며 벽을 따라 미끄러지고, 길 밖에서 입구 모서리에 부딪히면 되튕기며 입구 쪽으로 흘려보낸다
+  if(T.tun.length&&inTun(T,l.s)){const exw=Math.abs(l.d)-l.w/2;
+    if(exw>0){const a=T.p[l.i],sg=l.d<0?-1:1,nx=-a.ty*sg,ny=a.tx*sg,lo=locate(T,ox,oy,c.hint);
+      if(inTun(T,lo.s)||Math.abs(lo.d)-lo.w/2<=0){c.x-=nx*exw;c.y-=ny*exw;
+        const vn=c.vx*nx+c.vy*ny;if(vn>0){c.vx-=1.3*vn*nx;c.vy-=1.3*vn*ny;const fr=vn>60?0.92:0.996;c.vx*=fr;c.vy*=fr;c.bump=Math.max(c.bump,vn);c.hitJ=Math.max(c.hitJ||0,vn*0.5);c.hitX=c.x+nx*12;c.hitY=c.y+ny*12;}}
+      else{let ds=l.s-lo.s;if(ds>T.L/2)ds-=T.L;if(ds<-T.L/2)ds+=T.L;const sd=ds>=0?1:-1,mx=a.tx*sd,my=a.ty*sd;c.x=ox;c.y=oy;
+        const vm=c.vx*mx+c.vy*my;if(vm>0){c.vx-=1.25*vm*mx;c.vy-=1.25*vm*my;c.bump=Math.max(c.bump,vm);c.hitJ=Math.max(c.hitJ||0,vm*0.5);c.hitX=c.x+mx*14;c.hitY=c.y+my*14;}
+        // 입구 쪽(길 가운데)으로 옆걸음 — 멈춰 서서 조향이 안 되는 일이 없게
+        c.x-=nx*2.5;c.y-=ny*2.5;}
+      l=locate(T,c.x,c.y,c.hint);c.hint=l.i;}}
   let gz=groundAt(T,l);
   // 길 밖의 가파른 옆면(장난감 다리 경사로 등): 타고 올라 튀어 오르지 않고 벽처럼 막힌다
   {const exn=Math.abs(l.d)-l.w/2,mv=Math.hypot(c.x-ox,c.y-oy);
@@ -819,18 +835,24 @@ function aiInput(c,T,t){
   const N=T.p.length,sp=c.speed,look=5+Math.floor(sp/55);
   const a=T.p[(c.hint+look)%N],b=T.p[(c.hint+look+14)%N];
   // 높은 다리 위(옆이 낭떠러지)에서는 가운데로 붙어 조심히 달린다
-  const hp=T.p[c.hint],high=T.falloff<70&&Math.max(hp.zb,a.zb)>25;
-  const lane=high?c.lane*0.6:c.lane*Math.cos(t*0.35+c.lane);
+  const hp=T.p[c.hint],high=foAt(T,hp.s)<70&&Math.max(hp.zb,a.zb)>25;
+  // 높은 언덕길(옆이 비탈): 멀리 앞 커브와 점프를 미리 보고 안쪽 줄로 속도를 줄인다
+  const far=T.p[(c.hint+look+34)%N],hill=!high&&Math.max(hp.z,a.z,far.z)>40,turnFar=Math.abs(wrapA(Math.atan2(far.ty,far.tx)-Math.atan2(hp.ty,hp.tx)));
+  // 앞에 터널 입구가 있으면 가운데 줄로 붙는다(입구 모서리에 걸리지 않게)
+  let tunAhead=false;if(T.tun.length&&!hp.tun)for(let k=4;k<=40;k+=4)if(T.p[(c.hint+k)%N].tun){tunAhead=true;break;}
+  const lane=high||tunAhead?c.lane*(tunAhead?0.15:0.6):hill?c.lane*0.5:c.lane*Math.cos(t*0.35+c.lane);
   const want=Math.atan2(a.y+a.ny*lane-c.y,a.x+a.nx*lane-c.x),diff=wrapA(want-c.h);
   const turn=Math.abs(wrapA(Math.atan2(b.ty,b.tx)-Math.atan2(a.ty,a.tx)));
   // 앞길이 빙판처럼 미끄러우면 들어가기 전에 미리 속도를 줄인다
   const sa=T.surface(a.x,a.y,{d:0,w:a.w}),sb=T.surface(b.x,b.y,{d:0,w:b.w}),icy=Math.min(sa.grip,sb.grip)<1.6;
   const slip=c.surf?c.surf.grip<3:false;let lim=slip?0.5:0.6;if(icy)lim=Math.min(lim,0.36);if(high)lim-=0.08;
   const icyFast=icy&&sp>c.top*0.5&&turn>0.2;
+  // 비탈 위 큰 커브 앞(점프 직후 포함): 들어가기 전에 미리 감속
+  const sk=slip||icy?0.8:1,hillFast=(hill||high)&&turnFar>0.9&&sp>c.top*(turnFar>1.4?0.55:0.68)*sk;
   // 벽에 코를 박고 멈췄으면 잠깐 후진하며 머리를 돌린다
   if(c.revUntil>t)return{steer:diff>0?-1:1,gas:false,brake:true,hand:false};
-  if(sp<30&&Math.abs(diff)>0.7&&t>1){c.stall=(c.stall||0)+1;if(c.stall>40){c.stall=0;c.revUntil=t+0.9;}}else c.stall=0;
-  return{steer:clamp(diff*(high?3.2:2.6),-1,1),gas:!(turn>0.45&&sp>c.top*lim)&&!icyFast&&(Math.abs(diff)<1.2||sp<130),brake:(turn>0.75&&sp>c.top*(lim+0.08))||(Math.abs(diff)>1.4&&sp>150)||(icyFast&&sp>c.top*0.6),hand:false};
+  if(Math.abs(c.vF||sp)<35&&Math.abs(diff)>0.7&&t>1){c.stall=(c.stall||0)+1;if(c.stall>40){c.stall=0;c.revUntil=t+0.9;}}else c.stall=0;
+  return{steer:clamp(diff*(high?3.2:2.6),-1,1),gas:!(turn>0.45&&sp>c.top*lim)&&!icyFast&&!hillFast&&(Math.abs(diff)<1.2||sp<130),brake:(turn>0.75&&sp>c.top*(lim+0.08))||(Math.abs(diff)>1.4&&sp>150)||(icyFast&&sp>c.top*0.6)||(hillFast&&turnFar>1.4&&sp>c.top*0.68*sk),hand:false};
 }
 // 차 충돌: 회전한 직사각형(OBB) 두 개를 분리축으로 검사하고, 접촉점 기준 충격량으로 밀고 돌린다
 const CAR_HX=27,CAR_HY=14.5,CAR_I=(4*CAR_HX*CAR_HX+4*CAR_HY*CAR_HY)/12,CAR_E=0.45,CAR_MU=0.35;
@@ -883,6 +905,7 @@ const SF={
   redDirt:{grip:4.6,drag:0.4,name:'붉은 흙길'},gravel:{grip:3,drag:1.5,name:'자갈밭'},
   stone:{grip:6.5,drag:0.35,name:'돌길'},lawn:{grip:4,drag:1.4,name:'잔디밭'},
   site:{grip:3.8,drag:0.5,name:'공사장 자갈'},mud:{grip:2.2,drag:2.4,name:'진흙'},
+  coal:{grip:4.1,drag:0.44,name:'석탄 흙길'},scree:{grip:2.8,drag:1.7,name:'돌 부스러기'},plank:{grip:5.2,drag:0.32,name:'나무 다리'},rail:{grip:1.5,drag:0.2,name:'광차 레일'},
   steel:{grip:2.3,drag:0.22,name:'젖은 철판'},epoxy:{grip:4.4,drag:0.28,name:'칠한 주차장 바닥'},dock:{grip:4.4,drag:1.3,name:'부두 콘크리트'},canal:{grip:1.6,drag:3.8,name:'운하 물'},
 };
 const ICE=[[700,0,190],[1080,425,150],[300,860,170],[900,1300,160]];
@@ -931,6 +954,10 @@ const COURSES={
     falloff:12,laps:2,rail:{minZ:3,off:-4},tunnels:[[0.79,0.87]],
     bumps:[{s:0.452,prof:[[0,0],[50,16],[56,-50],[120,-50],[152,0]]},{s:0.53,prof:[[0,0],[20,5],[40,0]]},{s:0.81,prof:[[0,0],[20,5],[40,0]]},{s:0.84,prof:[[0,0],[20,5],[40,0]]}],
     surface:(x,y,l)=>{if(!onTrack(l))return SF.walk;if(Math.hypot(x-1300,y+340)<520||(x>1300&&y<620&&x<2800))return SF.epoxy;return SF.asphalt;}},
+  mine:{ctrl:[[0,-250,0,165],[600,-250,0,165],[1080,-130,4,160],[1380,170,16,160],[1450,560,30,158],[1270,880,40,155],[900,990,54,155],[520,1100,78,150],[100,1190,92,148],[-320,1160,92,150],[-660,980,66,155],[-770,680,38,160],[-560,480,24,160],[-270,590,16,162],[-20,470,12,160],[-70,210,22,160],[-370,110,30,158],[-640,-20,28,160],[-570,-230,24,165],[-290,-290,0,165]],
+    falloff:150,laps:2,gorge:{s0:0.43,s1:0.535,fo:12,blend:110},tunnels:[[0.25,0.33],[0.815,0.882]],rails:[0.725],
+    bumps:[{s:0.72,prof:[[0,0],[5,4],[10,0],[26,0],[31,4],[36,0]]},{s:0.925,prof:[[0,0],[46,18],[52,-4],[110,-4],[150,0]]},{s:0.1,prof:[[0,0],[60,22],[70,0]]}],
+    surface(x,y,l){const f=l.s/this.L;if(onTrack(l)){for(const r of this.rails)if(Math.abs(f-r)*this.L<26)return SF.rail;if(f>this.gorge.s0&&f<this.gorge.s1)return SF.plank;return SF.coal;}return SF.scree;}},
 };
 //#ENDCORE
 // ---- 3D 렌더러 ----
@@ -971,7 +998,7 @@ function make3D(opt){
     // 다리(입체교차) 아래 구간 표시: 다른 길이 아래를 지나는 곳
     const under=P.map((a,i)=>{if(a.z<25)return false;for(let j=0;j<N;j+=2){const b=P[j];const ds=Math.min(Math.abs(a.s-b.s),T.L-Math.abs(a.s-b.s));if(ds<a.w*2)continue;if(b.z<a.z-25&&Math.hypot(a.x-b.x,a.y-b.y)<(a.w+b.w)/2+10)return true;}return false;});
     // 리본(트랙/연석)
-    const zAt=(a,off)=>{const ex=Math.abs(off)-a.w/2;if(ex<=0)return a.z;const f=clamp(1-ex/T.falloff,0,1);return a.z*sstep(f);};
+    const zAt=(a,off)=>{const ex=Math.abs(off)-a.w/2;if(ex<=0)return a.z;const f=clamp(1-ex/foAt(T,a.s),0,1);return a.z*sstep(f);};
     const ribbon=(o0,o1,lift,colFn,flat)=>{const v=[],c=[],col=new THREE.Color();
       for(let i=0;i<N;i++){const a=P[i],b=P[(i+1)%N],q=[];
         for(const[pnt,o]of[[a,o0(a)],[a,o1(a)],[b,o0(b)],[b,o1(b)]])q.push([(pnt.x+pnt.nx*o)*S,((flat?pnt.z:zAt(pnt,o))+lift)*S,(pnt.y+pnt.ny*o)*S]);
@@ -990,6 +1017,11 @@ function make3D(opt){
       for(const sd of[1,-1])wall(sd,sd>0?'#b9542f':'#d26a3e',a=>a.z+1.5,()=>-2,i=>{const a=P[i],b=P[(i+1)%N];return(a.z<2&&b.z<2)||under[i];});
       ribbon(a=>-a.w/2,a=>a.w/2,-7,i=>under[i]?'#a9472a':null,true);}
     else if(ed==='parking'){const st=i=>P[i].zb>3&&!P[i].tun?null:((i>>1)%2?'#f2c230':'#2a2b2e');ribbon(a=>a.w/2,a=>a.w/2+12,1.6,st,true);ribbon(a=>-a.w/2-12,a=>-a.w/2,1.6,st,true);}
+    else if(ed==='mine'){const gz=i=>{const f=P[i].s/T.L;return T.gorge&&f>T.gorge.s0-0.004&&f<T.gorge.s1+0.004;};
+      // 땅 위는 석탄 흙 둔덕, 나무 다리 위는 낮은 나무 턱(난간은 없음)
+      ribbon(a=>a.w/2,a=>a.w/2+18,1.2,i=>gz(i)?null:opt.berm);ribbon(a=>-a.w/2-18,a=>-a.w/2,1.2,i=>gz(i)?null:opt.berm);
+      ribbon(a=>a.w/2,a=>a.w/2+7,3.2,i=>gz(i)?'#4a3420':null,true);ribbon(a=>-a.w/2-7,a=>-a.w/2,3.2,i=>gz(i)?'#4a3420':null,true);
+      ribbon(a=>-a.w/2-7,a=>a.w/2+7,-6,i=>gz(i)?'#3a2a1a':null,true);}
     else if(ed==='dock'){ribbon(a=>a.w/2,a=>a.w/2+12,1.6,stripe('#f2c230','#30343b'));ribbon(a=>-a.w/2-12,a=>-a.w/2,1.6,stripe('#f2c230','#30343b'));}
     else if(ed==='tape'){ribbon(a=>a.w/2-6,a=>a.w/2+6,1.8,()=>'#ecdca9');ribbon(a=>-a.w/2-6,a=>-a.w/2+6,1.8,()=>'#ecdca9');}
     else{ribbon(a=>a.w/2,a=>a.w/2+20,1.2,()=>opt.berm);ribbon(a=>-a.w/2-20,a=>-a.w/2,1.2,()=>opt.berm);}
@@ -1044,6 +1076,38 @@ function make3D(opt){
       x2.fillStyle='#5fd0ff';x2.font='900 92px sans-serif';x2.textAlign='center';x2.textBaseline='middle';x2.fillText('P',70,68);x2.fillStyle='#ff5fa8';x2.font='800 40px sans-serif';x2.fillText('주차',172,50);x2.fillStyle='#ffe066';x2.font='700 26px sans-serif';x2.fillText('24H',172,94);
       const sm=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv),side:THREE.DoubleSide});for(const r of[0,Math.PI/2]){const sg=new THREE.Mesh(new THREE.PlaneGeometry(130*S,65*S),sm);sg.position.set(gx*S,(gh+95)*S,gy*S);sg.rotation.y=r;sc.add(sg);}
       for(const sd of[-1,1])addMesh(new THREE.BoxGeometry(4*S,40*S,4*S),lam(0x30343b),(gx+sd*40)*S,(gh+60)*S,gy*S);}
+    // 폐광: 트레슬 다리 버팀목, 골짜기 개울, 광차 레일 건널목, 권양탑, 갱도 랜턴
+    if(opt.mine){const rand0=(()=>{let q=13;return()=>(q=(q*16807)%2147483647)/2147483647;})(),mo=opt.mine,wd=lam(0x5a3d24),wd2=lam(0x6b4a2e),stl=lam(0x6d7177),G=T.gorge;
+      const inG=a=>{const f=a.s/T.L;return f>G.s0-0.01&&f<G.s1+0.01&&a.zb>6;};
+      const beam=(x0,y0,z0,x1,y1,z1,t,m)=>{const A=new THREE.Vector3(x0*S,z0*S,y0*S),B=new THREE.Vector3(x1*S,z1*S,y1*S),L=A.distanceTo(B),b=new THREE.Mesh(new THREE.BoxGeometry(t*S,L,t*S),m);b.position.copy(A).add(B).multiplyScalar(.5);b.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize());b.castShadow=true;sc.add(b);return b;};
+      for(let i=0;i<N;i+=5){const a=P[i];if(!inG(a))continue;const z=a.z-6,o=a.w/2-8,L1=[a.x+a.nx*o,a.y+a.ny*o],R1=[a.x-a.nx*o,a.y-a.ny*o],O1=[a.x+a.nx*(o+26),a.y+a.ny*(o+26)],O2=[a.x-a.nx*(o+26),a.y-a.ny*(o+26)];
+        // 기둥 둘 + 바깥으로 벌어진 버팀 다리 + 가로대 + X자 가새
+        beam(L1[0],L1[1],-10,L1[0],L1[1],z,7,wd);beam(R1[0],R1[1],-10,R1[0],R1[1],z,7,wd);beam(O1[0],O1[1],-10,L1[0],L1[1],z*0.9,5,wd2);beam(O2[0],O2[1],-10,R1[0],R1[1],z*0.9,5,wd2);
+        beam(L1[0],L1[1],z-2,R1[0],R1[1],z-2,7,wd2);for(const f of[0.5])beam(L1[0],L1[1],z*f,R1[0],R1[1],z*f,5,wd2);
+        beam(L1[0],L1[1],z*0.08,R1[0],R1[1],z*0.5,4,wd2);beam(R1[0],R1[1],z*0.08,L1[0],L1[1],z*0.5,4,wd2);beam(L1[0],L1[1],z*0.5,R1[0],R1[1],z*0.95,4,wd2);beam(R1[0],R1[1],z*0.5,L1[0],L1[1],z*0.95,4,wd2);}
+      // 골짜기 바닥 개울과 바위
+      if(mo.river){const[[x0,x1],[y0,y1]]=mo.river,rw=new THREE.Mesh(new THREE.PlaneGeometry((x1-x0)*S,(y1-y0)*S),new THREE.MeshLambertMaterial({color:0x4f7d8c,transparent:true,opacity:0.85}));rw.rotation.x=-Math.PI/2;rw.position.set((x0+x1)/2*S,-2*S,(y0+y1)/2*S);sc.add(rw);
+        const rk=lam(0x6f6a64);for(let k=0;k<26;k++){const y=lerp(y0,y1,rand0()),sd=rand0()<0.5?x0-10:x1+10;addMesh(new THREE.DodecahedronGeometry((8+rand0()*14)*S,0),rk,(sd+(rand0()-0.5)*30)*S,0,y*S);}}
+      // 광차 레일 건널목 + 광차
+      if(mo.cart!=null){const a=P[Math.round(mo.cart*N)%N],ang=-Math.atan2(a.ny,a.nx),rl=a.w+300;
+        for(const q of[-11,11]){const r=addMesh(new THREE.BoxGeometry(rl*S,3*S,3*S),stl,(a.x+a.tx*q)*S,(a.z+2.6)*S,(a.y+a.ty*q)*S);r.rotation.y=ang;}
+        for(let k=-rl/2;k<=rl/2;k+=16){const x=a.x+a.nx*k,y=a.y+a.ny*k,ex=Math.abs(k)-a.w/2;if(ex<0)continue;const t=addMesh(new THREE.BoxGeometry(5*S,2*S,34*S),wd,x*S,(a.z*sstep(clamp(1-ex/foAt(T,a.s),0,1))+1)*S,y*S);t.rotation.y=ang+Math.PI/2;}
+        const cx=a.x+a.nx*(a.w/2+90),cy=a.y+a.ny*(a.w/2+90),cz=a.z*sstep(clamp(1-90/foAt(T,a.s),0,1)),cg=new THREE.Group();cg.position.set(cx*S,cz*S,cy*S);cg.rotation.y=ang;cg.scale.setScalar(S);sc.add(cg);
+        const bx=(w,h,d,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),lam(c));m.position.set(x,y,z);m.castShadow=true;cg.add(m);return m;};
+        bx(40,18,26,0x7a4a2a,0,16,0);bx(42,3,28,0x3a3d42,0,25,0);bx(36,6,22,0x1c1a19,0,27,0);for(const x of[-12,12])for(const z of[-11,11]){const w=new THREE.Mesh(new THREE.CylinderGeometry(5,5,3,12),lam(0x2a2c30));w.rotation.x=Math.PI/2;w.position.set(x,6,z);cg.add(w);}}
+      // 권양탑(광산 탑): 철골 A자 탑 + 큰 바퀴
+      if(mo.headframe){const[hx,hy]=mo.headframe,hz=Hxy(T,hx,hy,null),hg=new THREE.Group();hg.position.set(hx*S,hz*S,hy*S);hg.scale.setScalar(S);sc.add(hg);const fm=lam(0x8a3a24);
+        const lg=(x0,z0,y0,x1,z1,y1,t)=>{const A=new THREE.Vector3(x0,y0,z0),B=new THREE.Vector3(x1,y1,z1),L=A.distanceTo(B),b=new THREE.Mesh(new THREE.BoxGeometry(t,L,t),fm);b.position.copy(A).add(B).multiplyScalar(.5);b.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize());b.castShadow=true;hg.add(b);};
+        for(const z of[-30,30]){lg(-40,z,0,-12,z*0.4,190,6);lg(40,z,0,12,z*0.4,190,6);for(let h=40;h<180;h+=45)lg(-40+h*0.147,z*(1-h/316),h,40-h*0.147,z*(1-h/316),h,4);}
+        lg(-60,0,0,-8,0,170,7);const wh=new THREE.Mesh(new THREE.TorusGeometry(26,3,8,24),lam(0x2a2c30));wh.position.set(0,196,0);hg.add(wh);for(let k=0;k<6;k++){const sp=new THREE.Mesh(new THREE.BoxGeometry(2,50,2),lam(0x2a2c30));sp.position.set(0,196,0);sp.rotation.z=k*Math.PI/6;hg.add(sp);}
+        const sh=new THREE.Mesh(new THREE.BoxGeometry(110,46,80),lam(0x6b5a48));sh.position.set(-90,23,0);sh.castShadow=true;hg.add(sh);const rf=new THREE.Mesh(new THREE.BoxGeometry(118,6,88),lam(0x3a3129));rf.position.set(-90,49,0);hg.add(rf);}
+      // 랜턴: 나무 기둥에 매단 따뜻한 등 + 바닥 불빛
+      const lm=new THREE.MeshBasicMaterial({color:0xffc46a}),gm=new THREE.MeshBasicMaterial({color:0xffb04a,transparent:true,opacity:0.2,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-5,polygonOffsetUnits:-5});
+      for(let i=6;i<N;i+=11){const a=P[i];const sd=(i/11|0)%2?1:-1,o=sd*(a.w/2+(inG(a)?-4:26)),x=a.x+a.nx*o,y=a.y+a.ny*o,z=a.tun||inG(a)?a.z:zAt(a,o);
+        if(a.tun){addMesh(new THREE.BoxGeometry(6*S,6*S,6*S),lm,x*S,(a.z+70)*S,y*S,false);continue;}
+        addMesh(new THREE.BoxGeometry(5*S,62*S,5*S),wd,x*S,(z+31)*S,y*S);const arm=addMesh(new THREE.BoxGeometry(22*S,4*S,4*S),wd,(x-a.nx*sd*9)*S,(z+60)*S,(y-a.ny*sd*9)*S,false);arm.rotation.y=-Math.atan2(a.ny,a.nx);
+        addMesh(new THREE.BoxGeometry(7*S,10*S,7*S),lm,(x-a.nx*sd*18)*S,(z+52)*S,(y-a.ny*sd*18)*S,false);
+        const pool=new THREE.Mesh(new THREE.CircleGeometry(46*S,18),gm);pool.rotation.x=-Math.PI/2;pool.position.set((x-a.nx*sd*24)*S,(a.z+2.4)*S,(y-a.ny*sd*24)*S);sc.add(pool);}}
     // 빙판
     if(T.ice){const im=new THREE.MeshLambertMaterial({color:0xbfe6ff,transparent:true,opacity:0.6,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4});for(const c of T.ice){const l=locate(T,c[0],c[1],null),z=trackZ(T,l);const d=new THREE.Mesh(new THREE.CircleGeometry(c[2]*0.8*S,28),im);d.rotation.x=-Math.PI/2;d.position.set(c[0]*S,(z+2.2)*S,c[1]*S);sc.add(d);}}
     // 소품
@@ -1125,7 +1189,7 @@ function make3D(opt){
     if(this._ov!==ov){this._ov=ov;this._ovInit=0;const c2=this.dl.shadow.camera,e=ov?80:35;c2.left=c2.bottom=-e;c2.right=c2.top=e;c2.far=ov?400:200;c2.updateProjectionMatrix();this.sc.fog.near=ov?400:70;this.sc.fog.far=ov?1400:this.opt.fogFar;}
     this.mark.visible=ov;if(ov){this.mark.position.set(p.x*S,(p.z+75+Math.sin(performance.now()/180)*6)*S,p.y*S);}
     if(mode==='cockpit'){
-      const pm=this.meshes[this.pi];this.sc.updateMatrixWorld(true);const v=new THREE.Vector3(2,14.5,0);pm.body.localToWorld(v);this.cam.position.copy(v);
+      const pm=this.meshes[this.pi];this.sc.updateMatrixWorld(true);const v=new THREE.Vector3(2,pm.eye||14.5,0);pm.body.localToWorld(v);this.cam.position.copy(v);
       if(!this._qy)this._qy=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),-Math.PI/2);const q=new THREE.Quaternion();pm.body.getWorldQuaternion(q);this.cam.quaternion.copy(q).multiply(this._qy);
       if(g.shake)this.cam.rotateZ((Math.random()-0.5)*g.shake*0.002);
       const asp=this.cam.aspect||1,base=asp>=1?72:Math.min(92,2*Math.atan(Math.tan(39/57.3)/asp)*57.3);this.cam.fov=lerp(this.cam.fov,base+Math.min(p.speed,700)*0.003+(p.boostT>0?2.5:0),0.06);this.cam.updateProjectionMatrix();
@@ -1167,8 +1231,10 @@ function make3D(opt){
       if(g.T.canyon&&p.loc){const a=g.T.p[p.loc.i],ex=Math.abs(p.loc.d)-p.loc.w/2;if(ex>0){let ta=Math.atan2(a.ty,a.tx);if(Math.cos(ta-Math.atan2(ty,tx))<0)ta+=Math.PI;const w=clamp(ex/(g.T.canyon.from-10),0,1)*0.7;const hh=Math.atan2(ty,tx)+wrapA(ta-Math.atan2(ty,tx))*w;tx=Math.cos(hh);ty=Math.sin(hh);}}
       if(this.ch==null)this.ch=p.h;this.ch+=wrapA(Math.atan2(ty,tx)-this.ch)*Math.min(1,dt*CM.turn);
       const dx=Math.cos(this.ch),dy=Math.sin(this.ch);
-      let cx=p.x-dx*CM.back,cy=p.y-dy*CM.back;[cx,cy]=this.inWall(g,cx,cy,p.hint);const gz=Hxy(g.T,cx,cy,null);const cz=Math.max(p.z,gz)+CM.up;
-      this.cp.lerp(new THREE.Vector3(cx*S,cz*S,cy*S),k);const mg=(Hxy(g.T,this.cp.x/S,this.cp.z/S,null)+14)*S;if(this.cp.y<mg)this.cp.y=mg;
+      let cx=p.x-dx*CM.back,cy=p.y-dy*CM.back;[cx,cy]=this.inWall(g,cx,cy,p.hint);const T=g.T,cg=(x,y)=>groundAt(T,locate(T,x,y,null),true),gz=cg(cx,cy);let cz=Math.max(p.z,gz)+CM.up;
+      // 터널 근처: 카메라를 지붕 아래로 내려 터널 벽·지붕이 차를 가리지 않게
+      if(T.tun.length){const lc=locate(T,cx,cy,p.hint),inT=inTun(T,lc.s)||(p.loc&&inTun(T,p.loc.s));if(inT)cz=Math.min(cz,trackZ(T,lc)+62);}
+      this.cp.lerp(new THREE.Vector3(cx*S,cz*S,cy*S),k);const mg=(cg(this.cp.x/S,this.cp.z/S)+14)*S;if(this.cp.y<mg)this.cp.y=mg;
       let ax=p.x+dx*CM.ahead,ay=p.y+dy*CM.ahead;[ax,ay]=this.inWall(g,ax,ay,p.hint,g.T.canyon?g.T.canyon.from-12:0);
       this.lt.lerp(new THREE.Vector3(ax*S,(p.z+CM.lz)*S,ay*S),Math.min(1,k*2));
       this.cam.fov=lerp(this.cam.fov,CM.fov+p.speed*0.018,0.05);
@@ -1182,7 +1248,10 @@ function make3D(opt){
     this.drawMirrors(ck,W,H);
   },
   // 협곡에서는 카메라가 바위 벽 속으로 들어가지 않도록 길 쪽으로 당긴다
-  inWall(g,x,y,hint,lim0){const T=g.T,cy=T.canyon;if(!cy)return[x,y];const l=locate(T,x,y,hint);if(T.tun.length&&inTun(T,l.s))return[x,y];const lim=lim0==null?8:lim0,ex=Math.abs(l.d)-l.w/2;
+  // 터널 구간에서는 카메라가 터널 벽(소파·바위 등) 속에 들어가지 않도록 터널 안쪽으로 당긴다
+  inWall(g,x,y,hint,lim0){const T=g.T,cy=T.canyon;if(!cy&&!T.tun.length)return[x,y];const l=locate(T,x,y,hint);
+    if(T.tun.length&&inTun(T,l.s)){const ex=Math.abs(l.d)-l.w/2,lim=-14;if(ex<=lim)return[x,y];const a=T.p[l.i],sg=l.d<0?-1:1;return[x+a.ty*sg*(ex-lim),y-a.tx*sg*(ex-lim)];}
+    if(!cy)return[x,y];const lim=lim0==null?8:lim0,ex=Math.abs(l.d)-l.w/2;
     if(ex<=lim)return[x,y];const a=T.p[l.i],sg=l.d<0?-1:1;return[x+a.ty*sg*(ex-lim),y-a.tx*sg*(ex-lim)];},
   // 차 안 시점 사이드미러: 장면을 좌우 반전해 뒤쪽을 작은 화면에 그린다
   mirrorRects(W,H){
@@ -1292,6 +1361,8 @@ function wheel(sp,style){
   const lip=new THREE.Mesh(new THREE.TorusGeometry(R*.63,0.32,8,36),rimMat);face.add(lip);
   const hub=new THREE.Mesh(new THREE.CylinderGeometry(R*.14,R*.14,1,16),rimMat);hub.rotation.x=Math.PI/2;face.add(hub);
   const nut=new THREE.Mesh(new THREE.CylinderGeometry(R*.07,R*.07,1.3,6),M.paint(style.caliper,{envMap:null}));nut.rotation.x=Math.PI/2;face.add(nut);
+  // 몬스터 트럭: 큰 블록 트레드(좌우 엇갈림)
+  if(style.tread){const tm=M.rubber(),n=style.tread;for(let i=0;i<n;i++){const a=i/n*Math.PI*2;for(const sz of[1,-1]){const b=new THREE.Mesh(new THREE.BoxGeometry(2.4,1.3,tw*0.42),tm);const aa=a+(sz>0?0:Math.PI/n);b.position.set(Math.sin(aa)*(R-0.05),Math.cos(aa)*(R-0.05),sz*tw*0.24);b.rotation.z=-aa;g.add(b);}}}
   g.userData.face=face;return g;
 }
 function box(w,h,d,mat,x,y,z,parent,rz){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);if(rz)m.rotation.z=rz;m.castShadow=true;parent.add(m);return m;}
@@ -1300,7 +1371,7 @@ function wingFoil(chord,span,mat){const s=new THREE.Shape();s.moveTo(0,0);s.quad
   const g=new THREE.ExtrudeGeometry(s,{depth:span,bevelEnabled:false,curveSegments:12});g.translate(-chord,0,-span/2);const m=new THREE.Mesh(g,mat);m.castShadow=true;return m;}
 function cyl(r,h,mat,x,y,z,parent,axis){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,20),mat);if(axis==='x')m.rotation.z=Math.PI/2;if(axis==='z')m.rotation.x=Math.PI/2;m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;}
 
-// ---- 시안 7종 ----
+// ---- 시안 8종 ----
 const DESIGNS=[
  {k:'A',name:'미드나잇 GT',cls:'번개 · 기본형',desc:'긴 보닛과 패스트백 지붕, 큰 리어 윙을 단 GT 레이서. 짙은 남색 바탕에 주황 핀스트라이프 두 줄만 넣어 절제했어요.',
   sw:[['#1b2a44','미드나잇 네이비'],['#ff6a1a','시그널 오렌지'],['#1a1b1e','카본'],['#4b4f56','건메탈 휠']],parts:['패스트백 지붕','리어 윙 + 엔드플레이트','카본 스플리터','디퓨저 핀 4개','6스포크 휠'],
@@ -1412,6 +1483,36 @@ const DESIGNS=[
        tube([x-3.4,S.R-1.6,bz],[x,S.R-1.2,hz],0.38,cb);tube([x+3.4,S.R-1.6,bz],[x,S.R-1.2,hz],0.38,cb);tube([x,S.R-1,hz*0.92],[x+(x>0?-2:2),S.R+4.4,bz],0.32,mat.chrome);}
      // 노즈 아래 카메라 날개 + 리어 레인 라이트
      for(const s of[1,-1])box(1.6,0.5,1.2,cb,20,9.6,s*3.2,g0);box(0.6,1.4,1.4,M.glow(0xff2a2a),-22.4,9.8,0,g0);}}},
+ {k:'H',name:'미니 몬스터 트럭',cls:'빅풋 · 몬스터 트럭',desc:'커다란 블록 타이어 위로 높이 띄운 픽업 차체, 드러난 솔리드 액슬과 코일오버 쇽 8개, 짐칸 롤바와 지붕 LED 바. 건메탈 바탕에 시그널 옐로 사선 데칼.',
+  sw:[['#3a3f46','건메탈'],['#ffc21a','시그널 옐로'],['#16171a','블랙 프레임'],['#c9ccd1','폴리시드 휠']],parts:['솔리드 액슬 + 코일오버 8개','짐칸 롤바 + 라이트 포드','지붕 LED 바','앞 범퍼 LED','배기 스택 2개','블록 트레드 타이어'],
+  sp:{W:15,R:10.4,tw:9.4,yb:13,eye:22.5,track:13.6,noArch:true,axles:[-14,14.4],top:[[-21,13],[-21.6,19.4],[-20.8,20.6],[-7,20.6],[-6.2,22],[-5.6,29],[-4.4,30.2],[2.6,30.2],[4,29.2],[8.6,23.2],[10,22.6],[18.4,22],[21.4,20.8],[22,17.2],[21.4,13]],
+   win:[[-4.6,22.4],[-4.2,28.4],[2.4,28.6],[6.8,23]],ws:[[3.6,29.6],[8.8,23.4]],rw:[[-5.4,28.6],[-5.9,23.4]],
+   body:0x3a3f46,wheel:{rim:0xc9ccd1,caliper:0xffc21a,spokes:5,tread:16},
+   paint(p,S){p.band(0,1,'#3a3f46');p.band(0,.2,'#16171a');p.band(.2,.235,'#ffc21a',.02,.98);
+     for(let i=0;i<4;i++)p.poly([[.05+i*.075,.24],[.09+i*.075,.24],[.15+i*.075,.62],[.11+i*.075,.62]],'#ffc21a');
+     windowPaint(p,S.win,'#16171a');panelLines(p,[-5.8,7.6],21.8,13.6);roundel(p,.5,.42,.13,'#ffc21a','#16171a','88','#16171a');
+     p.text('BIGFOOT',.78,.5,.15,'#ffc21a','"Chakra Petch",sans-serif','center',true);p.text('PUFF 4X4 · RC',.78,.3,.065,'#c9ccd1');p.text('MONSTER',.22,.78,.06,'#8f949b');},
+   paintTop(p){p.band(0,1,'#3a3f46');p.poly([[0.02,.12],[.33,.12],[.33,.88],[0.02,.88]],'#1a1c1f');for(let k=0;k<5;k++)p.poly([[.04+k*.058,.14],[.06+k*.058,.14],[.06+k*.058,.86],[.04+k*.058,.86]],'#2a2c30');
+     p.poly([[.62,.42],[1,.42],[1,.47],[.62,.47]],'#ffc21a');p.poly([[.62,.53],[1,.53],[1,.58],[.62,.58]],'#ffc21a');},
+   extras(g,S,mat,g0){const tube=(a,b,r,m)=>{const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),L=A.distanceTo(B),t=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,10),m);t.position.copy(A).add(B).multiplyScalar(.5);t.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize());t.castShadow=true;g0.add(t);return t;};
+     const bk=mat.black,ch=mat.chrome,yl=M.paint(0xffc21a,{envMap:null}),R=S.R,tk=S.track;
+     // 프레임 레일 + 솔리드 액슬 + 디퍼렌셜
+     for(const z of[-4.6,4.6])box(42,2,1.6,bk,0,12.2,z,g0);
+     for(const x of S.axles){cyl(1.15,2*tk-5,bk,x,R,0,g0,'z');const df=new THREE.Mesh(new THREE.SphereGeometry(2.6,14,10),M.metal(0x6d7177));df.position.set(x,R,0.8);df.castShadow=true;g0.add(df);
+       // 링크 2개 + 코일오버(바퀴마다 둘)
+       for(const z of[-1,1]){tube([x,R,z*6],[x*0.35,12.2,z*4.6],0.5,bk);
+         for(const dx of[-2.4,2.4]){const a=[x+dx,R+0.6,z*(tk-6.4)],b=[x+dx*1.5,19.4,z*6.6];tube(a,b,0.42,ch);const m=[(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2];
+           const sp=tube([m[0]-(b[0]-a[0])*0.22,m[1]-(b[1]-a[1])*0.22,m[2]-(b[2]-a[2])*0.22],[m[0]+(b[0]-a[0])*0.22,m[1]+(b[1]-a[1])*0.22,m[2]+(b[2]-a[2])*0.22],0.95,yl);}}}
+     // 펜더 플레어
+     for(const x of S.axles)for(const z of[-1,1]){box(17,1,4.6,bk,x,21.9,z*(S.W/2+2.1),g0);box(1.6,3,4.6,bk,x-8.2,20.6,z*(S.W/2+2.1),g0);box(1.6,3,4.6,bk,x+8.2,20.6,z*(S.W/2+2.1),g0);}
+     // 짐칸 롤바 + 라이트 포드
+     const yr=18.3,yt=25.4;for(const z of[-1,1]){tube([-8.4,yr,z*6],[-9.4,yt,z*5.2],0.6,bk);tube([-19.6,yr,z*6],[-9.4,yt,z*5.2],0.55,bk);}tube([-9.4,yt,-5.2],[-9.4,yt,5.2],0.6,bk);
+     for(const z of[-3,3]){cyl(1.3,1,ch,-8.6,yt+1.2,z,g0,'x');cyl(1.05,1.1,mat.glowW,-8.2,yt+1.2,z,g0,'x');}
+     // 지붕 LED 바 + 앞 범퍼 + 범퍼 LED + 배기 스택
+     box(1.8,1.6,S.W-3,bk,2.4,25.9,0,g0);box(0.5,1,S.W-4,mat.glowW,3.4,25.9,0,g0);
+     box(2.2,2.6,S.W+3,bk,22.8,14.6,0,g0);box(0.5,1.1,S.W-1,mat.glowW,24,14.6,0,g0);for(const z of[-1,1])tube([22.8,13.4,z*5],[20.6,12.2,z*4.6],0.5,bk);
+     box(2,2.2,S.W+2,bk,-22.4,14.2,0,g0);
+     for(const z of[-5.4,5.4]){cyl(0.75,10,ch,-6.6,22.8,z,g0);cyl(0.9,0.8,bk,-6.6,27.9,z,g0);}}}},
 ];
 function ctxRect(p,u,v,w,h,col){p.ctx.fillStyle=col;p.ctx.fillRect(u*p.cw,(1-v-h)*p.ch,w*p.cw,h*p.ch);}
 
@@ -1442,7 +1543,7 @@ function buildCar(D){
   for(const x of S.axles)for(const s of[1,-1]){const piv=new THREE.Group();piv.position.set(x,S.R,s*(S.track||(S.W/2-S.tw/2+1.6)));inner.add(piv);
     const flip=new THREE.Group();if(s<0)flip.rotation.y=Math.PI;piv.add(flip);const wh=wheel(S,S.wheel);wh.position.set(0,0,0);wh.userData.sgn=s<0?-1:1;flip.add(wh);wheels.push(wh);if(x>0)fronts.push(piv);}
   root.traverse(o=>{if(o.isMesh)o.castShadow=true;});
-  return{g:root,body:g,wheels,fronts,cab:new THREE.Group()};
+  return{g:root,body:g,wheels,fronts,cab:new THREE.Group(),eye:S.eye||14.5};
 }
 
 const KIND={std:'A',low:'B',wide:'C',rocket:'D'};
@@ -1531,7 +1632,11 @@ const VARIANTS=[
  {id:'parking',name:'옥상 주차빌딩',view:'나선 램프 · 옥상 점프',desc:'해 질 녘 도심 주차빌딩. 나선 램프를 한 바퀴 돌아 옥상까지 오르고, 옥상 사이 틈을 뛰어넘은 뒤 1층 기둥 사이 터널로 내려와요. 칠한 주차장 바닥은 미끄러워요.',tags:['아스팔트·칠한 바닥','나선 램프','2랩'],dust:'#8e8f94',puff:'#d7d9de',th:THUMB('#8d9097','#3a3c41','#f2c230','grid'),
   R:opt3({sky:'#f0a884',fogFar:620,hemiSky:0xffd9c4,hemiGround:0x3a3a48,sun:0xffb98a,hemiI:0.7,sunI:0.8,paint:paintCity,road:'#3a3c41',road2:'#36383d',rampCol:'#c9a227',edge2:'parking',trees:'tower',treeCount:30,treeGap:120,propsOut:true,flatGround:true,lamps:true,gate:0x2e6da4,garage:[1300,-340,170],
    tunnel:{wall:0xa9a49b,roof:0x8a857c,portal:0xc9c4ba,ribs:true},
-   roadFn:(i,P,T)=>{const a=P[i];if(i<2)return i%2?'#222':'#f4f4f4';if(a.z-a.zb>2)return i%2?'#c9a227':'#b8921f';if(a.z-a.zb<-2)return '#55585e';if(a.zb>3)return i%9===0?'#e8e6de':(i%2?'#4f7f6c':'#4a7866');return i%6<3?'#3a3c41':'#36383d';}})},
+   roadFn:(i,P,T)=>{const a=P[i];if(i<2)return i%2?'#222':'#f4f4f4';if(a.z-a.zb>2)return i%2?'#c9a227':'#b8921f';if(a.z-a.zb<-2)return '#55585e';if(a.zb>3)return i%9===0?'#e8e6de':(i%2?'#4f7f6c':'#4a7866');return i%6<3?'#3a3c41':'#36383d';}})}, {id:'mine',name:'폐광 갱도',view:'갱도 터널 · 나무 다리',desc:'안개 낀 산속 폐광. 버팀목 갱도 터널 두 곳을 지나고, 난간 없는 나무 트레슬 다리로 깊은 골짜기를 건너요. 광차 레일 위는 아주 미끄럽고, 갱도 출구 내리막에서 크게 뛰어요.',tags:['석탄 흙길·레일','터널 2곳·나무 다리','2랩'],dust:'#5a524b',puff:'#c9c2b8',th:THUMB('#6f675c','#3e3833','#d9a441'),
+  R:opt3({sky:'#a9b2b7',fogFar:520,hemiSky:0xe4eaee,hemiGround:0x4a4038,sun:0xfff0dc,hemiI:0.7,sunI:0.6,grass:[0.44,0.46,0.35],edge:[0.26,0.23,0.21],road:'#4a4440',road2:'#45403c',rampCol:'#6b5a48',berm:'#2f2a27',edge2:'mine',trees:'pine',treeCount:70,hills:0.9,gate:0xd9a441,
+   mine:{river:[[40,170],[960,1520]],headframe:[380,-640],cart:0.725},
+   tunnel:{wall:0x4f453c,roof:0x3a3129,portal:0x7a5a38,ribs:true},
+   roadFn:(i,P,T)=>{const a=P[i],f=a.s/T.L;if(i<2)return i%2?'#222':'#f4f4f4';if(f>T.gorge.s0&&f<T.gorge.s1)return i%3===0?'#5c4128':(i%2?'#8a6a45':'#7d5f3d');if(Math.abs(f-T.rails[0])*T.L<26)return '#5d5a57';if(a.z-a.zb>2)return i%2?'#6b5a48':'#64543f';return i%6<3?'#4a4440':'#45403c';}})},
 ];
 const VI=Object.fromEntries(VARIANTS.map((v,i)=>[v.id,i]));
 const trackCache={};function getTrack(id){return trackCache[id]||(trackCache[id]=buildTrack(COURSES[id]));}
@@ -1734,7 +1839,8 @@ function hud(){
   const now=performance.now();
   if(now-(g.hudLast||0)>150){g.hudLast=now;
     const order=[...g.cars].sort((a,b)=>progressOf(b,T)-progressOf(a,T)),lead=order[0],rank=order.indexOf(p)+1;
-    const gapS=(a,b)=>{if(a.done&&b.done)return b.finishT-a.finishT;return Math.max(0,(progressOf(a,T)-progressOf(b,T))/Math.max(220,(a.speed+b.speed)/2));};
+    // 시간 차: 둘 다 결승 → 결승 시각 차 / 앞차만 결승 → 결승 뒤 흐른 시간 + 뒤차의 남은 거리 ÷ 속도
+    const fin=(T.laps+1)*T.L,gapS=(a,b)=>{if(a.done&&b.done)return b.finishT-a.finishT;if(a.done)return Math.max(0,g.t-a.finishT)+Math.max(0,fin-(b.lap*T.L+b.s))/Math.max(220,b.speed);return Math.max(0,(progressOf(a,T)-progressOf(b,T))/Math.max(220,(a.speed+b.speed)/2));};
     order.forEach((c,i)=>{const el=document.getElementById('tr'+g.cars.indexOf(c));el.style.top=(i*23)+'px';el.querySelector('b').textContent=i+1;el.querySelector('em').textContent=c.done?'완주':i===0?'선두':'+'+Math.min(99,gapS(lead,c)).toFixed(2);});
     $('#hPos').textContent='P'+rank;
     $('#hDots').innerHTML=order.map(c=>`<i${c===p?' class="me"':''} style="background:${c.col.body}"></i>`).join('');$('#hDots').setAttribute('aria-label','현재 순서 '+order.map((c,i)=>(i+1)+'위 '+c.name).join(', '));
@@ -1838,6 +1944,7 @@ const CARS=[
  {id:'classic',name:'클래식',design:'클래식 그린',kind:'E',col:{body:'#1f5c43',dark:'#efe6cf',light:'#5d8f78',mid:'#0f3b2a'},power:630,top:575,grip:1.05,mass:0.9,boost:2.3,desc:'둥근 앞코의 클래식 레이서. 조금 가볍고 잘 붙어서 굽은 길이 많은 코스에서 편해요.'},
  {id:'scarab',name:'스카라브',design:'데저트 버기',kind:'F',col:{body:'#c9a66b',dark:'#ff7a1a',light:'#f1e6c8',mid:'#2a2724'},power:600,top:530,grip:1,mass:1.15,boost:2.4,offM:0.4,susp:520,desc:'롤케이지를 드러낸 오프로드 버기. 최고 속도는 낮지만 길 밖 잔디·모래·진흙에서 덜 느려지고, 높은 점프도 튀지 않고 착지해요.'},
  {id:'stinger',name:'스팅어',design:'오픈휠 포뮬러',kind:'G',col:{body:'#b5121b',dark:'#16171a',light:'#f2f2f2',mid:'#7a0d13'},power:645,top:595,grip:1.25,mass:0.75,boost:2.3,offM:1.7,desc:'바퀴가 드러난 오픈휠 포뮬러. 접지력이 가장 좋아 코너를 빠르게 돌고 최고 속도도 높지만, 길 밖 잔디·모래에서는 크게 느려지고 가벼워서 부딪히면 잘 튕겨요.'},
+ {id:'bigfoot',name:'빅풋',design:'미니 몬스터 트럭',kind:'H',col:{body:'#3a3f46',dark:'#ffc21a',light:'#c9ccd1',mid:'#16171a'},power:555,top:535,grip:0.85,mass:1.75,boost:2.5,offM:0.3,susp:640,desc:'커다란 타이어의 미니 몬스터 트럭. 가장 무거워서 부딪히면 상대를 밀어내고, 높은 점프도 출렁이며 안정적으로 착지해요. 길 밖 흙·자갈에서도 거의 느려지지 않지만, 출발이 느리고 코너에서 잘 미끄러져요.'},
 ];
 const STAT_DEF=[['최고 속도',c=>(c.top-520)/100],['가속',c=>(c.power-540)/160],['접지력',c=>(c.grip-0.7)/0.5],['무게',c=>(c.mass-0.7)/1.0],['방구 부스터',c=>(c.boost-2)/1.1],['험로 주행',c=>c.offM?(1-c.offM)/0.7:0.1]];
 const SEL={car:0,course:0,load(){try{const s=JSON.parse(localStorage.getItem('rcgp-sel')||'{}');if(s.car>=0&&s.car<CARS.length)this.car=s.car;if(s.course>=0&&s.course<VARIANTS.length)this.course=s.course;}catch(_){}},save(){try{localStorage.setItem('rcgp-sel',JSON.stringify({car:this.car,course:this.course}));}catch(_){}}};
@@ -1846,7 +1953,7 @@ SEL.load();
 // ---- 모바일 디오라마 코스 선택 ----
 const TT={park:['#d7e8c6','#1d2a14','#6f9a4c','#4f7a34','#a5764c','#6a4529'],arcade:['#0c1230','#eef0ff','#141d52','#070b24','#cfd3e6','#e8433c'],toy:['#dff1e7','#14302a','#a8dcc1','#6fae8c','#f0d8a6','#e8433c'],
   hill:['#a9d2ec','#10202a','#5f9a4a','#4a7a3a','#45474c','#e8433c'],room:['#3a281a','#fbeedd','#b98252','#7d4f2c','#b98252','#ecdca9'],snow:['#d9e8f4','#14243a','#eef3f8','#b8c8d8','#8fa3ba','#ffffff'],
-  beach:['#bfe4f2','#0f2a3a','#ecd6a4','#c9ad74','#dcbb85','#a9874f'],canyon:['#f3c08a','#3a1608','#a8532f','#7a3a1f','#c0703f','#5f2a14'],garden:['#cfe9f7','#14301a','#6fae4e','#4f8a3a','#bdb6a8','#9b4b35'],site:['#e9d9b8','#2a2010','#9a8b70','#6e6250','#8f877a','#f2c230'],harbor:['#1b2742','#eef2ff','#4a515c','#2c323b','#3b3f46','#f2c230'],parking:['#f3c3a4','#2a1a24','#8d9097','#5d6068','#3a3c41','#f2c230']};
+  beach:['#bfe4f2','#0f2a3a','#ecd6a4','#c9ad74','#dcbb85','#a9874f'],canyon:['#f3c08a','#3a1608','#a8532f','#7a3a1f','#c0703f','#5f2a14'],garden:['#cfe9f7','#14301a','#6fae4e','#4f8a3a','#bdb6a8','#9b4b35'],site:['#e9d9b8','#2a2010','#9a8b70','#6e6250','#8f877a','#f2c230'],harbor:['#1b2742','#eef2ff','#4a515c','#2c323b','#3b3f46','#f2c230'],parking:['#f3c3a4','#2a1a24','#8d9097','#5d6068','#3a3c41','#f2c230'],mine:['#b7bfc3','#1e1a17','#6f675c','#4a433b','#3e3833','#d9a441']};
 const pathCache={};
 function trackSvg(id){
   if(pathCache[id])return pathCache[id];const T=getTrack(id),b=T.b,W=b.x1-b.x0,H=b.y1-b.y0,s=Math.min(100/W,70/H),ox=(100-W*s)/2,oy=(70-H*s)/2,P=T.p,st=Math.max(1,P.length/90|0);

@@ -201,7 +201,7 @@ body.fine .mm-keys{display:flex}
 #gStats{display:flex;flex-direction:column;gap:5px}
 .gs{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:8px;font-size:12px;color:#9db9a9}
 .gs i{height:8px;border-radius:4px;background:#0a1d16;overflow:hidden}.gs u{display:block;height:100%;background:var(--orange);text-decoration:none;transition:width .3s}
-#gPick{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+#gPick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px} /* v3.4 차 8대: 4열 × 2줄 */
 .gchip{appearance:none;border:2px solid transparent;border-radius:12px;background:#0a1d16;color:#eef4ec;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:4px;font:500 11px var(--f-body);cursor:pointer;min-height:44px}
 .gchip i{width:26px;height:12px;border-radius:4px;background:var(--c);box-shadow:inset 0 -4px 0 var(--d)}
 .gchip.on{border-color:var(--orange)}
@@ -329,7 +329,7 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 @media (orientation:portrait) and (max-height:600px){#gDesc{display:none}}
 /* v3.3 차 7대: 낮은 가로 화면은 칩을 색 견본만, 넓은 화면은 글자를 촘촘히 */
 @media (orientation:landscape){.gchip span{letter-spacing:-.06em}#gPick .gchip{padding-inline:0}}
-@media (orientation:landscape) and (max-height:440px){#gPick .gchip{min-height:30px;padding:6px 0}#gPick .gchip span{display:none}#gPick .gchip i{width:70%;height:14px}}
+@media (orientation:landscape) and (max-height:440px){#gPick{grid-template-columns:repeat(8,minmax(0,1fr))}#gPick .gchip{min-height:30px;padding:6px 0}#gPick .gchip span{display:none}#gPick .gchip i{width:70%;height:14px}}
 /* ---- 휴대폰 세로 리플레이: 태그를 라벨 아래로 (v2.4) ---- */
 @media (max-width:640px){#rpTag{top:calc(9vh + 40px);font-size:24px}}
 /* ---- 휴대폰 세로: 버튼이 겹치지 않게 재배치 ---- */
@@ -369,7 +369,9 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 @media (pointer:coarse) and (orientation:landscape){.cockpit #hint{top:calc(80px + env(safe-area-inset-top,0px))}#hMini{width:84px;height:84px;padding:4px;border-radius:14px}}
 @media (pointer:coarse) and (orientation:portrait){
   #hMini{right:auto;top:auto;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(182px + env(safe-area-inset-bottom,0px));width:96px;height:96px;padding:5px;border-radius:14px}
-  #hint{top:calc(290px + env(safe-area-inset-top,0px))}
+  /* v3.4 출발 안내는 순위표 바로 아래 작게, 카운트다운 숫자는 조금 아래로 — 서로 겹치지 않게 */
+  #hint{top:calc(192px + env(safe-area-inset-top,0px));font-size:12px;line-height:1.4;padding:5px 10px;max-width:calc(100vw - 28px)}
+  #count{padding-top:18vh;box-sizing:border-box}
   #tZone .tip{bottom:calc(300px + env(safe-area-inset-bottom,0px))}
 }
 /* ---- 휴대폰 세로 코스 고르기: 위쪽 빈 공간 정리 (v2.5.1) ---- */
@@ -520,14 +522,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v3.3 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v3.4 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.3</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.4</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v3.4</b><span>새 코스 13 폐광 갱도 — 안개 낀 산속 폐광에서 버팀목 갱도 터널 두 곳을 지나고, 난간 없는 나무 트레슬 다리로 깊은 골짜기를 건너요(떨어지면 바로 코스 복귀). 광차 레일 건널목은 아주 미끄럽고, 갱도 출구 내리막에서 크게 뛰어요. 여덟 번째 차 빅풋(미니 몬스터 트럭 — 가장 무겁고 점프 착지·험로 주행 최고, 대신 가속·접지력이 낮음), 차고 칩을 4열 × 2줄로. 선두가 결승한 뒤 순위표와 앞차·뒤차 칸이 모두 +99.00으로 굳던 문제 수정(남은 거리로 시간 차 계산). 터널 입구 모서리·옆벽에 차가 끼어 멈추던 문제 수정(벽을 따라 미끄러지며 입구 쪽으로 흘러가요), 터널 근처에서 카메라가 터널 벽 속에 묻히지 않게. AI가 산악 서킷·눈길의 높은 커브와 협곡 벽에서 덜 떨어지고 덜 끼이도록 개선. 휴대폰 세로 화면에서 출발 안내가 카운트다운 숫자를 가리지 않게.<em>2026.11.20</em></span></li>
         <li><b>v3.3</b><span>새 코스 12 옥상 주차빌딩 — 해 질 녘 도심에서 나선 램프를 한 바퀴 돌아 옥상까지 오르고, 옥상 사이 틈을 뛰어넘은 뒤 1층 기둥 사이 터널로 내려와요(칠한 주차장 바닥은 미끄럽고, 높은 층은 콘크리트 난간에 막혀요). 일곱 번째 차 스팅어(오픈휠 포뮬러 — 접지력 최고·가벼움, 길 밖에서는 크게 느려짐). 장난감 8자 트랙 다리 옆에서 차가 계속 튀어 오르며 갇히던 문제 수정(옆면은 벽처럼 막히고, 다리에서 떨어지면 바로 코스 복귀, 길 밖에서 5초 넘게 못 나아가면 자동 복귀). 벽에 스치기만 해도 멈춰 버리던 마찰 완화, AI가 빙판 앞에서 미리 속도를 줄이고 벽에 박히면 후진해 빠져나옴. 휴대폰 결과 화면 버튼을 아래에 고정, 휴대폰 가로 화면에서 '방구 부스터!' 글자와 구름 게이지가 겹치던 문제 수정.<em>2026.11.17</em></span></li>
         <li><b>v3.2</b><span>홈 화면 아이콘 추가 — 체커 무늬 바탕에 주황 엠블럼과 RC카. 휴대폰 '홈 화면에 추가' 시 이 아이콘과 'RC 그랑프리' 이름으로 저장되고, 홈 화면에서 열면 전체화면으로 실행돼요. 브라우저 탭 아이콘도 같은 그림으로 교체.<em>2026.11.16</em></span></li>
         <li><b>v3.1</b><span>붉은 협곡 벽 정리 — 길이 굽어 붙은 곳에서 화면의 바위 벽과 실제 충돌 벽이 어긋나 차가 바위 속으로 들어가 보이던 문제 수정. 벽에 부딪히면 타고 오르거나 튀어 오르지 않고 아래에서 '퉁' 막히며 되튕겨요(불꽃·충돌음). 카메라도 바위 속으로 들어가지 않고 길 위에 머물러요. 휴대폰 브레이크 칸을 가속 페달 왼쪽으로 옮김(누르거나 왼쪽으로 밀면 브레이크).<em>2026.11.16</em></span></li>
