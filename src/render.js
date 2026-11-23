@@ -92,10 +92,18 @@ function make3D(opt){
       for(const sd of[1,-1])for(let q=0;q<3;q++){const o=sd*(l0.w/2+6),pp=T.p.find(z=>z.s>=bb.s0+q*30)||l0;addMesh(new THREE.CylinderGeometry(3*S,3*S,22*S,8),lam(q%2?0x111111:0xf2c230),(pp.x+pp.nx*o)*S,(pp.z+11)*S,(pp.y+pp.ny*o)*S);}}
     // 가로등 (밤 항구)
     if(opt.lamps){const pm2=lam(0x3a3f47),hm=new THREE.MeshBasicMaterial({color:0xffd27a}),gm=new THREE.MeshBasicMaterial({color:0xffc260,transparent:true,opacity:0.18,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-5,polygonOffsetUnits:-5});
+      this.lamps=[];this.lampDark=lam(0x2a2d33);
       for(let i=3;i<N;i+=10){const a=P[i];if(a.tun||a.z<-4||(opt.garage&&a.zb>3))continue;const sd=(i/10|0)%2?1:-1,o=sd*(a.w/2+30),x=a.x+a.nx*o,y=a.y+a.ny*o,z=zAt(a,o);
-        addMesh(new THREE.CylinderGeometry(2.2*S,3*S,80*S,8),pm2,x*S,(z+40)*S,y*S);const arm=addMesh(new THREE.BoxGeometry(3*S,3*S,26*S),pm2,(x-a.nx*sd*12)*S,(z+80)*S,(y-a.ny*sd*12)*S,false);arm.rotation.y=-Math.atan2(a.ny,a.nx)+Math.PI/2;
-        addMesh(new THREE.BoxGeometry(10*S,4*S,10*S),hm,(x-a.nx*sd*24)*S,(z+78)*S,(y-a.ny*sd*24)*S,false);
-        const pool=new THREE.Mesh(new THREE.CircleGeometry(58*S,20),gm);pool.rotation.x=-Math.PI/2;pool.position.set((x-a.nx*sd*30)*S,(a.z+2.4)*S,(y-a.ny*sd*30)*S);sc.add(pool);}}
+        // 가로등: 밑동(stump) + 윗부분(top, 밑동 위에서 꺾이거나 통째로 날아감)
+        const base=new THREE.Group();base.position.set(x*S,z*S,y*S);sc.add(base);
+        const mk=(geo,mat,px,py,pz,par)=>{const m=new THREE.Mesh(geo,mat);m.position.set(px,py,pz);m.castShadow=true;par.add(m);return m;};
+        mk(new THREE.CylinderGeometry(2.8*S,3*S,16*S,8),pm2,0,8*S,0,base);
+        const top=new THREE.Group();top.position.y=16*S;base.add(top);
+        mk(new THREE.CylinderGeometry(2.2*S,2.8*S,64*S,8),pm2,0,32*S,0,top);
+        const ax=-a.nx*sd,ay=-a.ny*sd;const arm=mk(new THREE.BoxGeometry(3*S,3*S,26*S),pm2,ax*12*S,64*S,ay*12*S,top);arm.rotation.y=-Math.atan2(a.ny,a.nx)+Math.PI/2;
+        const head=mk(new THREE.BoxGeometry(10*S,4*S,10*S),hm,ax*24*S,62*S,ay*24*S,top);
+        const pool=new THREE.Mesh(new THREE.CircleGeometry(58*S,20),gm);pool.rotation.x=-Math.PI/2;pool.position.set((x-a.nx*sd*30)*S,(a.z+2.4)*S,(y-a.ny*sd*30)*S);sc.add(pool);
+        this.lamps.push({x,y,z,base,top,head,pool,st:0});}}
     // 주차빌딩: 층마다 창이 뚫린 외벽, 난간, 다리 구간 바닥판과 기둥, 가운데 계단실과 네온 간판
     if(opt.garage){const fac=[],fcol=[],cl=new THREE.Color(),RO=20,el=a=>a.zb>3&&!a.tun,lr=(()=>{let q=11;return()=>(q=(q*48271)%2147483647)/2147483647;})();
       const quad=(A,B,z0a,z1a,z0b,z1b,col)=>{cl.set(col);const q=[[A[0],z1a,A[1]],[B[0],z1b,B[1]],[A[0],z0a,A[1]],[B[0],z0b,B[1]]];for(const t of[q[0],q[2],q[1],q[1],q[2],q[3]]){fac.push(t[0]*S,t[1]*S,t[2]*S);fcol.push(cl.r,cl.g,cl.b);}};
@@ -243,7 +251,26 @@ function make3D(opt){
     if(mode!=='replay'&&mode!=='cockpit')this.prevMode=mode;
     this.camMode=mode;this._ov=null;
   },
-  draw(g,dt){
+  // ---- 가로등 충돌: 차 속도는 그대로, 느리면 밑동 위에서 꺾여 쓰러지고 빠르면 윗부분이 통째로 날아간다 ----
+  hitLamp(g,L,c){const S=this.S,v=Math.hypot(c.vx,c.vy);let dx=c.vx/(v||1),dy=c.vy/(v||1);if(v<20){dx=Math.cos(c.h);dy=Math.sin(c.h);}
+    L.axis=new THREE.Vector3(dy,0,-dx).normalize();L.head.material=this.lampDark;L.pool.visible=false;L.ang=0;L.t=0;
+    if(v<300){L.st=1;L.av=2.2+v/140;L.angMax=1.42+Math.random()*0.08;}
+    else{L.st=2;const wp=new THREE.Vector3();L.top.getWorldPosition(wp);this.sc.attach(L.top);L.top.quaternion.identity();
+      L.px=wp.x/S;L.py=wp.z/S;L.pz=wp.y/S;L.vx=c.vx*1.15+(Math.random()-0.5)*80;L.vy=c.vy*1.15+(Math.random()-0.5)*80;L.vz=200+v*0.4;L.spin=5+v/90;L.rot=0;}
+    if(typeof puff==='function'){for(let k=0;k<9;k++){const a=Math.random()*TAU;puff(L.x,L.y,L.z+10+Math.random()*20,k%3?'#9aa0a8':'#ffd27a',6+Math.random()*6,0.7,Math.cos(a)*70+c.vx*0.2,Math.sin(a)*70+c.vy*0.2,60+Math.random()*80,null);}}
+    if(c===g.player){g.shake=Math.max(g.shake||0,v<300?4:9);if(typeof AU!=='undefined'){AU.thump(Math.min(400,v));if(v>=300&&AU.crash)AU.crash(v);}}},
+  updLamps(g,dt){if(!this.lamps)return;const S=this.S,q=new THREE.Quaternion();
+    for(const L of this.lamps){
+      if(L.st===0){for(const c of g.cars){const dx=c.x-L.x,dy=c.y-L.y;if(dx*dx+dy*dy<15*15&&Math.abs(c.z-L.z)<34){this.hitLamp(g,L,c);break;}}continue;}
+      L.t+=dt;
+      if(L.st===1){L.av+=dt*7;L.ang+=L.av*dt;if(L.ang>=L.angMax){L.ang=L.angMax;if(L.av>1.2&&!L.bounced){L.av=-L.av*0.28;L.bounced=true;}else{L.av=0;L.st=3;}}
+        L.top.quaternion.setFromAxisAngle(L.axis,L.ang);}
+      else if(L.st===2){L.vz-=900*dt;L.px+=L.vx*dt;L.py+=L.vy*dt;L.pz+=L.vz*dt;L.rot+=L.spin*dt;
+        const gz=Hxy(g.T,L.px,L.py,null)+3;
+        if(L.pz<gz){L.pz=gz;if(L.vz<-140){L.vz*=-0.3;L.vx*=0.6;L.vy*=0.6;L.spin*=0.5;}else{L.vz=0;L.vx*=0.86;L.vy*=0.86;const tgt=Math.PI/2+Math.round((L.rot-Math.PI/2)/Math.PI)*Math.PI;L.rot+=(tgt-L.rot)*Math.min(1,dt*8);L.spin*=0.8;if(Math.hypot(L.vx,L.vy)<6&&Math.abs(tgt-L.rot)<0.02){L.rot=tgt;L.st=3;}}}
+        L.top.position.set(L.px*S,L.pz*S,L.py*S);L.top.quaternion.setFromAxisAngle(L.axis,L.rot);}
+    }},
+  draw(g,dt){this.updLamps(g,dt);
     const S=this.S,r=this.r,view=r.domElement.parentNode,W=view.clientWidth,H=view.clientHeight;
     if(this._w!==W||this._h!==H){r.setSize(W,H,false);this.cam.aspect=W/H;this.cam.updateProjectionMatrix();this._w=W;this._h=H;}
     const mode=this.camMode,ov=mode==='overview',vs=ov?1.8:1.4;
