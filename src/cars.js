@@ -89,7 +89,7 @@ function wingFoil(chord,span,mat){const s=new THREE.Shape();s.moveTo(0,0);s.quad
   const g=new THREE.ExtrudeGeometry(s,{depth:span,bevelEnabled:false,curveSegments:12});g.translate(-chord,0,-span/2);const m=new THREE.Mesh(g,mat);m.castShadow=true;return m;}
 function cyl(r,h,mat,x,y,z,parent,axis){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,20),mat);if(axis==='x')m.rotation.z=Math.PI/2;if(axis==='z')m.rotation.x=Math.PI/2;m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;}
 
-// ---- 시안 8종 ----
+// ---- 시안 9종 ----
 const DESIGNS=[
  {k:'A',name:'미드나잇 GT',cls:'번개 · 기본형',desc:'긴 보닛과 패스트백 지붕, 큰 리어 윙을 단 GT 레이서. 짙은 남색 바탕에 주황 핀스트라이프 두 줄만 넣어 절제했어요.',
   sw:[['#1b2a44','미드나잇 네이비'],['#ff6a1a','시그널 오렌지'],['#1a1b1e','카본'],['#4b4f56','건메탈 휠']],parts:['패스트백 지붕','리어 윙 + 엔드플레이트','카본 스플리터','디퓨저 핀 4개','6스포크 휠'],
@@ -231,6 +231,41 @@ const DESIGNS=[
      box(2.2,2.6,S.W+3,bk,22.8,14.6,0,g0);box(0.5,1.1,S.W-1,mat.glowW,24,14.6,0,g0);for(const z of[-1,1])tube([22.8,13.4,z*5],[20.6,12.2,z*4.6],0.5,bk);
      box(2,2.2,S.W+2,bk,-22.4,14.2,0,g0);
      for(const z of[-5.4,5.4]){cyl(0.75,10,ch,-6.6,22.8,z,g0);cyl(0.9,0.8,bk,-6.6,27.9,z,g0);}}}},
+  {k:'I',name:'레이싱 고카트',cls:'스파크 · 레이싱 고카트',desc:'바닥에 붙은 파이프 프레임에 앞 노즈 페어링과 양옆 사이드 포드, 버킷 시트와 작은 핸들. 뒤 범퍼 바와 옆으로 드러낸 엔진·배기. 매트 화이트 바탕에 딥 네이비 패널과 네온 옐로 포인트, 번호판 09.',
+   sw:[['#eceef0','매트 화이트'],['#14284b','딥 네이비'],['#d7ff2f','네온 옐로'],['#2b2d31','다크 휠']],parts:['파이프 프레임 + 뒤 범퍼 바','노즈 페어링 + 번호판','사이드 포드','버킷 시트 + 드라이버','옆 엔진 + 배기','넓은 슬릭 휠'],
+   sp:{W:10,R:4.8,tw:7.2,yb:2.4,eye:12.5,track:11.8,noArch:true,matte:true,axles:[-12.5,12],top:[[-16,2.4],[-16.4,4],[-13,4.6],[-4,4.6],[4,4.8],[9,6.6],[14,8.4],[18.6,8],[21.6,6],[22.2,2.4]],
+    win:[[0,3],[0.4,3.1],[0.8,3],[0.4,2.9]],ws:[[0,2.6],[0.4,2.6]],
+    body:0xeceef0,wheel:{rim:0x2b2d31,caliper:0xd7ff2f,spokes:5},
+    paint(p,S){p.band(0,1,'#eceef0');p.band(0,.32,'#14284b');p.poly([[.55,.32],[1,.32],[1,.4],[.6,.48]],'#d7ff2f');
+      p.poly([[.62,.5],[.98,.5],[.96,.9],[.7,.94]],'#eceef0');p.text('09',.82,.7,.34,'#14284b','"Chakra Petch",sans-serif','center',true);
+      p.text('SPARK',.36,.6,.16,'#14284b','"Chakra Petch",sans-serif','center',true);p.text('PUFF KART · RC',.32,.18,.07,'#d7ff2f');},
+    paintTop(p){p.band(0,1,'#eceef0');p.band(.42,.58,'#14284b');p.band(.48,.52,'#d7ff2f');p.poly([[.7,.2],[.98,.3],[.98,.7],[.7,.8]],'#14284b');},
+    extras(g,S,mat,g0){const tube=(a,b,r,m)=>{const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),L=A.distanceTo(B),t=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,10),m);t.position.copy(A).add(B).multiplyScalar(.5);t.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize());t.castShadow=true;g0.add(t);return t;};
+      const nv=M.paint(0x14284b,{shininess:20,reflectivity:.08}),ny=M.paint(0xd7ff2f,{envMap:null,shininess:20}),ch=mat.chrome,bk=mat.black,R=S.R,tk=S.track,fz=S.W/2+0.4;
+      // 파이프 프레임: 양옆 레일 + 앞뒤 가로대 + 바퀴 축까지 나온 스핀들
+      for(const z of[-1,1]){tube([-15,2.6,z*fz],[16,2.6,z*(fz-1.6)],0.55,ch);tube([16,2.6,z*(fz-1.6)],[20,3.2,z*2.6],0.5,ch);}
+      for(const x of S.axles){tube([x,R,-tk+2],[x,R,tk-2],0.6,bk);}
+      // 사이드 포드(바퀴 사이) + 네온 줄
+      for(const z of[-1,1]){box(15,3.4,3.2,nv,0,4.2,z*(fz+2.4),g0);box(15.2,0.6,3.3,ny,0,6,z*(fz+2.4),g0);box(1.2,3,3.4,bk,-7.6,4.2,z*(fz+2.4),g0);}
+      // 앞 범퍼 바 + 번호판 지지대
+      tube([23,3,-6],[23,3,6],0.6,ch);for(const z of[-1,1])tube([21.4,2.8,z*3],[23,3,z*5],0.45,ch);
+      // 뒤 범퍼 바(넓게, 뒷바퀴까지 감싼다)
+      tube([-19.6,4,-(tk+2.6)],[-19.6,4,tk+2.6],0.8,ch);for(const z of[-1,1]){tube([-19.6,4,z*(tk+2.6)],[-15,3,z*(tk+2.6)],0.7,ch);tube([-15,3,z*(tk+2.6)],[-13,2.8,z*fz],0.6,ch);tube([-19.6,4,z*3],[-15,2.6,z*3],0.6,ch);}
+      // 버킷 시트
+      box(7,1.2,8.6,bk,-6.4,4.6,0,g0);const sb=box(1.2,8,8.6,bk,-10.2,8.4,0,g0);sb.rotation.z=0.28;for(const z of[-1,1])box(6,4,0.8,bk,-7,7,z*4.4,g0);
+      // 드라이버: 몸통·다리·팔·헬멧(네온 옐로 + 짙은 바이저)
+      const suit=M.paint(0x14284b,{shininess:10,reflectivity:.04});const tr=box(4.4,8.4,6.4,suit,-7.4,10,0,g0);tr.rotation.z=0.26;
+      for(const z of[-1.8,1.8]){tube([-4.6,6.2,z],[6,5.6,z*1.1],1.3,suit);tube([-6,12.6,z*2.2],[1.2,9.6,z*2.4],0.9,suit);}
+      const hm=new THREE.Mesh(new THREE.SphereGeometry(3.4,20,16),M.paint(0xd7ff2f,{shininess:110}));hm.position.set(-7,16.6,0);hm.castShadow=true;g0.add(hm);
+      const vz=box(0.6,1.6,5,M.glass(),-3.8,16.8,0,g0);vz.rotation.z=0.1;box(4.2,0.7,0.5,nv,-7,17.2,0,g0);
+      // 핸들 + 스티어링 컬럼
+      tube([8.6,3,0],[2.6,8.8,0],0.45,ch);const sw=new THREE.Mesh(new THREE.TorusGeometry(2.4,0.5,8,18),bk);sw.position.set(2.4,9,0);sw.rotation.y=Math.PI/2;sw.rotation.x=0.5;g0.add(sw);
+      // 옆 엔진(오른쪽) + 배기 + 체인 가드 + 연료통
+      box(5.6,5,4,M.metal(0x8d9298),-11,6.4,-(fz+1.6),g0);box(6,0.8,4.4,ny,-11,9.2,-(fz+1.6),g0);for(let k=0;k<4;k++)box(0.4,4,4.4,bk,-13+k*1.4,6.4,-(fz+1.6),g0);
+      tube([-12,7.4,-(fz+3.8)],[-18,5.6,-(fz+3.6)],0.7,ch);cyl(1.2,4.4,M.metal(0x6d7177),-18.6,5.4,-(fz+3.6),g0,'x');
+      box(10,2.6,0.6,bk,-12.5,4.6,-(fz+0.2),g0);cyl(1.8,3.2,ny,3,5.6,0,g0);
+      // 뒤 번호판(작은 네이비 판 + 브레이크 등)
+      box(0.5,3.4,6,nv,-20.4,6.4,0,g0);box(0.6,0.9,2.4,M.glow(0xff2a2a),-20.7,7.6,0,g0);}}},
 ];
 function ctxRect(p,u,v,w,h,col){p.ctx.fillStyle=col;p.ctx.fillRect(u*p.cw,(1-v-h)*p.ch,w*p.cw,h*p.ch);}
 
@@ -253,9 +288,9 @@ function buildCar(D){
   box(4,1.6,S.W-6,mat.carbon,rear+1.6,S.yb-0.2,0,g);for(let i=0;i<4;i++)box(4,2.4,0.3,mat.carbon,rear+1.6,S.yb-0.4,(i-1.5)*3.6,g);
   for(const s of[1,-1])cyl(0.7,2.4,mat.chrome,rear-0.4,S.yb+1.2,s*3.4,g,'x');
   const fy=S.top.find(p=>p[0]>front-3&&p[1]>S.yb+2)||[front,S.yb+5];
-  if(D.k!=='E'&&D.k!=='F'&&D.k!=='G')for(const s of[1,-1])box(0.6,1.1,4.2,mat.glowW,front-0.2,fy[1]-0.4,s*(S.W/2-3.4),g);
+  if(D.k!=='E'&&D.k!=='F'&&D.k!=='G'&&D.k!=='I')for(const s of[1,-1])box(0.6,1.1,4.2,mat.glowW,front-0.2,fy[1]-0.4,s*(S.W/2-3.4),g);
   box(0.5,1,S.W-4,M.glow(0xff2a2a),rear-0.1,S.top[2][1]-1.2,0,g);
-  if(D.k!=='G')for(const s of[1,-1]){box(1.6,1.1,2.2,mat.body,S.ws[1][0]-1.4,S.ws[1][1]+0.4,s*(S.W/2+0.8),g);}
+  if(D.k!=='G'&&D.k!=='I')for(const s of[1,-1]){box(1.6,1.1,2.2,mat.body,S.ws[1][0]-1.4,S.ws[1][1]+0.4,s*(S.W/2+0.8),g);}
   const gx=new THREE.Group();gx.scale.y=SQ;gx.position.y=S.yb*(1-SQ);g.add(gx);S.extras(gx,S,mat,g);
   const wheels=[],fronts=[];
   for(const x of S.axles)for(const s of[1,-1]){const piv=new THREE.Group();piv.position.set(x,S.R,s*(S.track||(S.W/2-S.tw/2+1.6)));inner.add(piv);

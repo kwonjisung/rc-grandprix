@@ -8,13 +8,14 @@ const CARS=[
  {id:'scarab',name:'스카라브',design:'데저트 버기',kind:'F',col:{body:'#c9a66b',dark:'#ff7a1a',light:'#f1e6c8',mid:'#2a2724'},power:600,top:530,grip:1,mass:1.15,boost:2.4,offM:0.4,susp:520,desc:'롤케이지를 드러낸 오프로드 버기. 최고 속도는 낮지만 길 밖 잔디·모래·진흙에서 덜 느려지고, 높은 점프도 튀지 않고 착지해요.'},
  {id:'stinger',name:'스팅어',design:'오픈휠 포뮬러',kind:'G',col:{body:'#b5121b',dark:'#16171a',light:'#f2f2f2',mid:'#7a0d13'},power:645,top:595,grip:1.25,mass:0.75,boost:2.3,offM:1.7,desc:'바퀴가 드러난 오픈휠 포뮬러. 접지력이 가장 좋아 코너를 빠르게 돌고 최고 속도도 높지만, 길 밖 잔디·모래에서는 크게 느려지고 가벼워서 부딪히면 잘 튕겨요.'},
  {id:'bigfoot',name:'빅풋',design:'미니 몬스터 트럭',kind:'H',col:{body:'#3a3f46',dark:'#ffc21a',light:'#c9ccd1',mid:'#16171a'},power:555,top:535,grip:0.85,mass:1.75,boost:2.5,offM:0.3,susp:640,desc:'커다란 타이어의 미니 몬스터 트럭. 가장 무거워서 부딪히면 상대를 밀어내고, 높은 점프도 출렁이며 안정적으로 착지해요. 길 밖 흙·자갈에서도 거의 느려지지 않지만, 출발이 느리고 코너에서 잘 미끄러져요.'},
+ {id:'spark',name:'스파크',design:'레이싱 고카트',kind:'I',col:{body:'#eceef0',dark:'#14284b',light:'#d7ff2f',mid:'#2b2d31'},power:700,top:510,grip:1.1,mass:0.65,boost:2.2,offM:1.9,gaugeM:1.5,desc:'바닥에 붙은 레이싱 고카트. 출발이 가장 빠르고 방구 게이지가 1.5배 빨리 차서 부스터를 자주 써요. 최고 속도는 가장 낮고, 가벼워서 잘 밀리며 길 밖에서는 많이 느려져요.'},
 ];
-const STAT_DEF=[['최고 속도',c=>(c.top-520)/100],['가속',c=>(c.power-540)/160],['접지력',c=>(c.grip-0.7)/0.5],['무게',c=>(c.mass-0.7)/1.0],['방구 부스터',c=>(c.boost-2)/1.1],['험로 주행',c=>c.offM?(1-c.offM)/0.7:0.1]];
+const STAT_DEF=[['최고 속도',c=>(c.top-520)/100],['가속',c=>(c.power-540)/160],['접지력',c=>(c.grip-0.7)/0.5],['무게',c=>(c.mass-0.7)/1.0],['방구 부스터',c=>(c.boost-2)/1.1],['험로 주행',c=>c.offM?(1-c.offM)/0.7:0.1],['부스터 충전',c=>((c.gaugeM||1)-0.75)/0.85]];
 const SEL={car:0,course:0,load(){try{const s=JSON.parse(localStorage.getItem('rcgp-sel')||'{}');if(s.car>=0&&s.car<CARS.length)this.car=s.car;if(s.course>=0&&s.course<VARIANTS.length)this.course=s.course;}catch(_){}},save(){try{localStorage.setItem('rcgp-sel',JSON.stringify({car:this.car,course:this.course}));}catch(_){}}};
 SEL.load();
 
 // ---- 모바일 디오라마 코스 선택 ----
-const TT={park:['#d7e8c6','#1d2a14','#6f9a4c','#4f7a34','#a5764c','#6a4529'],arcade:['#0c1230','#eef0ff','#141d52','#070b24','#cfd3e6','#e8433c'],toy:['#dff1e7','#14302a','#a8dcc1','#6fae8c','#f0d8a6','#e8433c'],
+const TT={volcano:['#f2c3a8','#2a1410','#3d302c','#241c19','#6a5d58','#ff5a1a'],park:['#d7e8c6','#1d2a14','#6f9a4c','#4f7a34','#a5764c','#6a4529'],arcade:['#0c1230','#eef0ff','#141d52','#070b24','#cfd3e6','#e8433c'],toy:['#dff1e7','#14302a','#a8dcc1','#6fae8c','#f0d8a6','#e8433c'],
   hill:['#a9d2ec','#10202a','#5f9a4a','#4a7a3a','#45474c','#e8433c'],room:['#3a281a','#fbeedd','#b98252','#7d4f2c','#b98252','#ecdca9'],snow:['#d9e8f4','#14243a','#eef3f8','#b8c8d8','#8fa3ba','#ffffff'],
   beach:['#bfe4f2','#0f2a3a','#ecd6a4','#c9ad74','#dcbb85','#a9874f'],canyon:['#f3c08a','#3a1608','#a8532f','#7a3a1f','#c0703f','#5f2a14'],garden:['#cfe9f7','#14301a','#6fae4e','#4f8a3a','#bdb6a8','#9b4b35'],site:['#e9d9b8','#2a2010','#9a8b70','#6e6250','#8f877a','#f2c230'],harbor:['#1b2742','#eef2ff','#4a515c','#2c323b','#3b3f46','#f2c230'],parking:['#f3c3a4','#2a1a24','#8d9097','#5d6068','#3a3c41','#f2c230'],mine:['#b7bfc3','#1e1a17','#6f675c','#4a433b','#3e3833','#d9a441']};
 const pathCache={};

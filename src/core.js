@@ -37,6 +37,8 @@ function buildTrack(def){
   T.bumps=(def.bumps||[]).map(b=>({s0:b.s*s,prof:b.prof,end:b.prof[b.prof.length-1][0]}));
   T.tun=(def.tunnels||[]).map(t=>({s0:t[0]*s,s1:t[1]*s}));
   T.obstacles=def.obstacles||null;
+  // 장애물이 터널 안에 놓이면 차가 끼므로 경고 (v3.5)
+  if(T.obstacles&&T.tun.length&&typeof console!=='undefined')for(const o of T.obstacles){const l=locate(T,o.x+o.w/2,o.y+o.h/2,null);if(inTun(T,l.s)&&Math.abs(l.d)<l.w/2+40)console.warn('터널 안 장애물',o);}
   let mx=1e9,Mx=-1e9,my=1e9,My=-1e9,mz=0;
   for(const a of P){a.z=a.zb+bumpAt(T,a.s);a.tun=inTun(T,a.s);mz=Math.max(mz,a.z);mx=Math.min(mx,a.x-a.w);Mx=Math.max(Mx,a.x+a.w);my=Math.min(my,a.y-a.w);My=Math.max(My,a.y+a.w);}
   T.b={x0:mx,x1:Mx,y0:my,y1:My};T.maxZ=Math.max(1,mz);
@@ -96,7 +98,9 @@ function makeCar(T,idx,off,col,isAI,skill){
   const l=locate(T,c.x,c.y,idx);c.z=groundAt(T,l);c.gz=c.z;c.s=l.s;c.prevS=l.s;c.loc=l;c.surf=T.surface(c.x,c.y,l);return c;
 }
 function respawn(c,T){
-  const l=locate(T,c.x,c.y,c.hint),a=T.p[l.i];
+  const l=locate(T,c.x,c.y,c.hint);let a=T.p[l.i];
+  // 용암 점프 구간처럼 다시 놓으면 또 빠지는 곳은 건너편(착지 지점 뒤)에 놓는다
+  if(T.spawnSkip)for(const r of T.spawnSkip){const f=a.s/T.L;if(f>=r[0]&&f<r[1]){l.i=Math.round(r[1]*T.p.length)%T.p.length;a=T.p[l.i];break;}}
   c.x=a.x;c.y=a.y;c.h=Math.atan2(a.ty,a.tx);c.vx=c.vy=c.vz=0;c.yaw=0;c.spin=0;c.air=false;c.z=a.zb+bumpAt(T,a.s);c.gz=c.z;c.stuck=0;c.slow=0;c.pT=0;c.pS=a.s;c.flash=1.2;c.s=a.s;c.prevS=a.s;c.hint=l.i;c.resp++;
 }
 function collideObs(c,T){
@@ -188,9 +192,18 @@ function stepCar(c,inp,dt,T,racing){
   if(c.isAI&&racing&&c.speed<25)c.slow+=dt;else c.slow=0;
   // 앞으로 나아가지 못하는 시간: 길 밖에서 5초(AI는 어디서든 6초) 넘게 제자리면 코스로 복귀
   if(racing&&!c.done){let pd=((c.s-c.pS)%T.L+T.L)%T.L;if(pd>T.L/2)pd-=T.L;if(pd>80){c.pS=c.s;c.pT=0;}else{c.pT+=dt;if(pd<-200)c.pS=c.s;}}else c.pT=0;
+  // 용암: 바퀴가 닿으면 잠깐 뒤 연기와 함께 코스로 복귀
+  if(sf.lava&&!c.air){c.lavaT=(c.lavaT||0)+dt;if(c.lavaT>0.12){c.burnt=1;c.lavaT=0;c.burnX=c.x;c.burnY=c.y;respawn(c,T);}}else c.lavaT=0;
   if(c.stuck>0.8||c.slow>2.5||(c.off&&c.pT>5)||(c.isAI&&c.pT>6))respawn(c,T);
   c.flash=Math.max(0,c.flash-dt);
 }
+// 길 밖이 낭떠러지·가파른 비탈인 높은 구간인지 (AI 안전 운전·부스터 판단용)
+const AIP={pt:0.4,mg:20,vl:9999};
+function edgeDrop(T,a){return a.zb>14&&foAt(T,a.s)<70&&!a.tun&&!(T.rail&&a.zb>T.rail.minZ);}
+// AI 방구 부스터: 높은 길이나 큰 커브 앞에서는 쓰지 않는다
+function aiBoostOk(c,T){const N=T.p.length,a=T.p[c.hint];let h0=Math.atan2(a.ty,a.tx),mt=0,hi=false;
+  for(let k=6;k<=66;k+=6){const q=T.p[(c.hint+k)%N];mt=Math.max(mt,Math.abs(wrapA(Math.atan2(q.ty,q.tx)-h0)));if(edgeDrop(T,q))hi=true;}
+  if(hi)return mt<0.3&&c.loc&&Math.abs(c.loc.d)<c.loc.w*0.2;return true;}
 function aiInput(c,T,t){
   const N=T.p.length,sp=c.speed,look=5+Math.floor(sp/55);
   const a=T.p[(c.hint+look)%N],b=T.p[(c.hint+look+14)%N];
@@ -204,7 +217,7 @@ function aiInput(c,T,t){
   const want=Math.atan2(a.y+a.ny*lane-c.y,a.x+a.nx*lane-c.x),diff=wrapA(want-c.h);
   const turn=Math.abs(wrapA(Math.atan2(b.ty,b.tx)-Math.atan2(a.ty,a.tx)));
   // 앞길이 빙판처럼 미끄러우면 들어가기 전에 미리 속도를 줄인다
-  const sa=T.surface(a.x,a.y,{d:0,w:a.w}),sb=T.surface(b.x,b.y,{d:0,w:b.w}),icy=Math.min(sa.grip,sb.grip)<1.6;
+  const sa=T.surface(a.x,a.y,{d:0,w:a.w,s:a.s}),sb=T.surface(b.x,b.y,{d:0,w:b.w,s:b.s}),icy=Math.min(sa.lava?9:sa.grip,sb.lava?9:sb.grip)<1.6;
   const slip=c.surf?c.surf.grip<3:false;let lim=slip?0.5:0.6;if(icy)lim=Math.min(lim,0.36);if(high)lim-=0.08;
   const icyFast=icy&&sp>c.top*0.5&&turn>0.2;
   // 비탈 위 큰 커브 앞(점프 직후 포함): 들어가기 전에 미리 감속
@@ -212,7 +225,15 @@ function aiInput(c,T,t){
   // 벽에 코를 박고 멈췄으면 잠깐 후진하며 머리를 돌린다
   if(c.revUntil>t)return{steer:diff>0?-1:1,gas:false,brake:true,hand:false};
   if(Math.abs(c.vF||sp)<35&&Math.abs(diff)>0.7&&t>1){c.stall=(c.stall||0)+1;if(c.stall>40){c.stall=0;c.revUntil=t+0.9;}}else c.stall=0;
-  return{steer:clamp(diff*(high?3.2:2.6),-1,1),gas:!(turn>0.45&&sp>c.top*lim)&&!icyFast&&!hillFast&&(Math.abs(diff)<1.2||sp<130),brake:(turn>0.75&&sp>c.top*(lim+0.08))||(Math.abs(diff)>1.4&&sp>150)||(icyFast&&sp>c.top*0.6)||(hillFast&&turnFar>1.4&&sp>c.top*0.68*sk),hand:false};
+  let steer=clamp(diff*(high?3.2:2.6),-1,1),gas=!(turn>0.45&&sp>c.top*lim)&&!icyFast&&!hillFast&&(Math.abs(diff)<1.2||sp<130),brake=(turn>0.75&&sp>c.top*(lim+0.08))||(Math.abs(diff)>1.4&&sp>150)||(icyFast&&sp>c.top*0.6)||(hillFast&&turnFar>1.4&&sp>c.top*0.68*sk);
+  // v3.5 높은 길(옆이 낭떠러지·비탈) 가장자리 지키기: 0.4초 뒤 옆 위치를 예측해 가장자리에 닿기 전에 길 가운데로 되돌린다
+  const L0=c.loc;
+  if(L0&&!c.air&&edgeDrop(T,hp)){const vd=-c.vx*hp.ty+c.vy*hp.tx,dp=L0.d+vd*AIP.pt,lim2=L0.w/2-AIP.mg,rs=clamp((Math.abs(dp)-lim2)/34,0,1);
+    if(rs>0){const sg=dp>0?-1:1,toC=(Math.cos(c.h)*-hp.ty+Math.sin(c.h)*hp.tx)*sg;steer=lerp(steer,sg,rs);
+      // 이미 길 가운데 쪽을 보고 있으면 밟아서 되돌아오고(미끄러운 눈길에서 옆으로 흘러내리지 않게), 바깥을 보고 있을 때만 발을 뗀다
+      if(toC>0.25||sp<60){gas=true;brake=false;}else{if(rs>0.25)gas=false;if(rs>0.7&&sp>180&&!slip)brake=true;}}
+    if(Math.abs(c.vL||0)>AIP.vl&&sp>200)gas=false;}
+  return{steer,gas,brake,hand:false};
 }
 // 차 충돌: 회전한 직사각형(OBB) 두 개를 분리축으로 검사하고, 접촉점 기준 충격량으로 밀고 돌린다
 const CAR_HX=27,CAR_HY=14.5,CAR_I=(4*CAR_HX*CAR_HX+4*CAR_HY*CAR_HY)/12,CAR_E=0.45,CAR_MU=0.35;
@@ -266,6 +287,7 @@ const SF={
   stone:{grip:6.5,drag:0.35,name:'돌길'},lawn:{grip:4,drag:1.4,name:'잔디밭'},
   site:{grip:3.8,drag:0.5,name:'공사장 자갈'},mud:{grip:2.2,drag:2.4,name:'진흙'},
   coal:{grip:4.1,drag:0.44,name:'석탄 흙길'},scree:{grip:2.8,drag:1.7,name:'돌 부스러기'},plank:{grip:5.2,drag:0.32,name:'나무 다리'},rail:{grip:1.5,drag:0.2,name:'광차 레일'},
+  ash:{grip:4.0,drag:0.42,name:'화산재 흙길'},ashSlip:{grip:2.3,drag:0.3,name:'미끄러운 화산재'},basalt:{grip:6.6,drag:0.34,name:'현무암'},cinder:{grip:3,drag:1.8,name:'뜨거운 자갈'},lava:{grip:1,drag:4,name:'용암',lava:true},
   steel:{grip:2.3,drag:0.22,name:'젖은 철판'},epoxy:{grip:4.4,drag:0.28,name:'칠한 주차장 바닥'},dock:{grip:4.4,drag:1.3,name:'부두 콘크리트'},canal:{grip:1.6,drag:3.8,name:'운하 물'},
 };
 const ICE=[[700,0,190],[1080,425,150],[300,860,170],[900,1300,160]];
@@ -300,7 +322,7 @@ const COURSES={
     surface:(x,y,l)=>onTrack(l)?SF.stone:SF.lawn},
   site:{ctrl:[[0,0,0,170],[700,0,0,170],[1300,0,0,170],[1700,200,20,165],[1750,600,60,165],[1500,900,60,165],[1000,850,60,165],[650,1000,40,165],[700,1300,0,165],[300,1450,0,165],[-200,1300,0,165],[-350,900,0,165],[-150,600,0,165],[-450,300,0,165],[-300,50,0,170]],
     falloff:60,laps:2,tunnels:[[0.74,0.81]],bumps:[{s:0.08,prof:[[0,0],[80,34],[92,0]]},{s:0.39,prof:[[0,0],[6,-58],[110,-58],[270,0]]},{s:0.9,prof:[[0,0],[60,24],[110,24],[170,0]]}],
-    obstacles:[{x:1050,y:-70,w:24,h:24,kind:'cone',hgt:24},{x:1150,y:40,w:24,h:24,kind:'cone',hgt:24},{x:1250,y:-50,w:24,h:24,kind:'cone',hgt:24},{x:-360,y:1080,w:40,h:40,kind:'barrel'},{x:-250,y:840,w:40,h:40,kind:'barrel'}],
+    obstacles:[{x:1050,y:-70,w:24,h:24,kind:'cone',hgt:24},{x:1150,y:40,w:24,h:24,kind:'cone',hgt:24},{x:1250,y:-50,w:24,h:24,kind:'cone',hgt:24},{x:-153,y:1449,w:40,h:40,kind:'barrel'},{x:-71,y:664,w:40,h:40,kind:'barrel'}],
     surface:(x,y,l)=>onTrack(l)?SF.site:SF.mud},
   harbor:{ctrl:[[0,0,0,175],[780,0,0,175],[1430,-52,0,175],[1885,195,0,175],[1950,650,0,175],[1625,975,0,175],[1040,1040,0,175],[520,910,0,175],[130,1105,0,175],[-325,1066,0,175],[-650,780,0,175],[-676,325,0,175],[-455,65,0,175]],
     falloff:50,laps:3,shore:1290,canal:[700,810],steel:[[1780,2160,380,900],[-900,-560,450,900]],tunnels:[[0.5,0.57]],
@@ -318,5 +340,12 @@ const COURSES={
     falloff:150,laps:2,gorge:{s0:0.43,s1:0.535,fo:12,blend:110},tunnels:[[0.25,0.33],[0.815,0.882]],rails:[0.725],
     bumps:[{s:0.72,prof:[[0,0],[5,4],[10,0],[26,0],[31,4],[36,0]]},{s:0.925,prof:[[0,0],[46,18],[52,-4],[110,-4],[150,0]]},{s:0.1,prof:[[0,0],[60,22],[70,0]]}],
     surface(x,y,l){const f=l.s/this.L;if(onTrack(l)){for(const r of this.rails)if(Math.abs(f-r)*this.L<26)return SF.rail;if(f>this.gorge.s0&&f<this.gorge.s1)return SF.plank;return SF.coal;}return SF.scree;}},
+  // v3.5 화산섬: 분화구(1250,450) 가장자리를 나선으로 오르고, 화산재 내리막 끝에서 용암 강을 뛰어넘고, 용암 동굴을 지나 현무암 돌다리로 용암 웅덩이를 건넌다
+  volcano:{ctrl:[[0,0,0,165],[600,0,0,165],[1021,122,8,160],[1319,56,24,160],[1578,221,42,160],[1644,519,58,160],[1479,778,74,160],[1181,844,86,160],[880,930,62,158],[640,960,26,160],[420,960,0,162],[0,950,0,165],[-330,860,0,160],[-520,640,0,155],[-560,380,0,155],[-470,160,10,155],[-360,50,18,150],[-200,0,18,150]],
+    falloff:90,laps:3,crater:[1250,450,225,215],river:[236,312,620,1300],pool:[-420,-170,-50,130],tunnels:[[0.8,0.84]],gorge:{s0:0.925,s1:0.965,fo:12,blend:60},spawnSkip:[[0.6179,0.6673]],zSpiral:[0.18,0.49],zAsh:[0.49,0.617],
+    bumps:[{s:0.6179,prof:[[0,0],[90,34],[96,-26],[180,-26],[270,0]]},{s:0.1,prof:[[0,0],[50,16],[60,0]]},{s:0.86,prof:[[0,0],[10,6],[20,0],[40,0],[50,6],[60,0]]}],
+    surface(x,y,l){const f=l.s/this.L,R=this.river,Q=this.pool;if(x>R[0]&&x<R[1]&&y>R[2]&&y<R[3])return SF.lava;
+      if(!onTrack(l))return x>Q[0]&&x<Q[1]&&y>Q[2]&&y<Q[3]?SF.lava:SF.cinder;
+      if(f>this.gorge.s0-0.01&&f<this.gorge.s1+0.01)return SF.basalt;if(f>this.zSpiral[0]&&f<this.zSpiral[1])return SF.basalt;if(f>this.zAsh[0]&&f<this.zAsh[1])return SF.ashSlip;return SF.ash;}},
 };
 //#ENDCORE

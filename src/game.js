@@ -47,6 +47,16 @@ function paintCity(c,x0,x1,y0,y1){
   c.fillStyle='#6f7e66';c.beginPath();c.arc(1300,-340,190,0,TAU);c.fill();c.fillStyle='#5f6e58';for(let k=0;k<8;k++){c.beginPath();c.arc(1300+Math.cos(k*0.8)*140,-340+Math.sin(k*0.8)*140,22,0,TAU);c.fill();}
 }
 const BOOKS=['#c0392b','#2e6da4','#e2b33c','#3c8d5a','#7d4ea3'];
+function paintVolcano(c,x0,x1,y0,y1,T){
+  c.fillStyle='#3b312d';c.fillRect(x0,y0,x1-x0,y1-y0);
+  for(let i=0;i<1400;i++){const x=x0+((i*733)%1000)/1000*(x1-x0),y=y0+((i*397)%1000)/1000*(y1-y0);c.fillStyle=i%4?'rgba(20,14,12,.25)':'rgba(140,120,110,.18)';c.fillRect(x,y,10+(i%3)*6,8);}
+  // 식은 용암 흐름 자국(검은 띠) + 가장자리 붉은 빛
+  c.strokeStyle='rgba(18,12,10,.55)';c.lineWidth=60;c.lineCap='round';c.beginPath();c.moveTo(1250,450);c.bezierCurveTo(1900,700,2000,1200,1700,1500);c.stroke();c.beginPath();c.moveTo(1250,450);c.bezierCurveTo(800,300,500,500,274,640);c.stroke();
+  const lava=(x,y,w,h,r)=>{const g=c.createLinearGradient(x,y,x+w,y+h);g.addColorStop(0,'#ff7a1a');g.addColorStop(.5,'#ffb03a');g.addColorStop(1,'#ff5a14');c.fillStyle='rgba(255,90,20,.35)';c.beginPath();c.roundRect?c.roundRect(x-26,y-26,w+52,h+52,r+26):c.rect(x-26,y-26,w+52,h+52);c.fill();
+    c.fillStyle=g;c.beginPath();c.roundRect?c.roundRect(x,y,w,h,r):c.rect(x,y,w,h);c.fill();
+    c.fillStyle='rgba(60,20,10,.55)';for(let k=0;k<26;k++){const px=x+((k*137)%97)/97*w,py=y+((k*59)%89)/89*h;c.beginPath();c.ellipse(px,py,10+(k%4)*6,5+(k%3)*3,k,0,TAU);c.fill();}};
+  const R=T.river,Q=T.pool;lava(R[0],R[2],R[1]-R[0],R[3]-R[2],30);lava(Q[0],Q[2],Q[1]-Q[0],Q[3]-Q[2],60);
+}
 const THUMB=(bg,road,edge,pat)=>({bg,road,edge,pat});
 const VARIANTS=[
  {id:'park',name:'흙길 RC 파크',view:'테이블탑 · 더블 점프',desc:'RC 전용 흙길. 테이블탑과 더블 점프, 범프 구간이 이어지는 기본 코스예요.',tags:['흙길','점프 4곳','2랩'],dust:'#8b6a46',puff:'#b48a62',th:THUMB('#6f9a4c','#a5764c','#6a4529'),
@@ -85,6 +95,10 @@ const VARIANTS=[
    mine:{river:[[40,170],[960,1520]],headframe:[380,-640],cart:0.725},
    tunnel:{wall:0x4f453c,roof:0x3a3129,portal:0x7a5a38,ribs:true},
    roadFn:(i,P,T)=>{const a=P[i],f=a.s/T.L;if(i<2)return i%2?'#222':'#f4f4f4';if(f>T.gorge.s0&&f<T.gorge.s1)return i%3===0?'#5c4128':(i%2?'#8a6a45':'#7d5f3d');if(Math.abs(f-T.rails[0])*T.L<26)return '#5d5a57';if(a.z-a.zb>2)return i%2?'#6b5a48':'#64543f';return i%6<3?'#4a4440':'#45403c';}})},
+ {id:'volcano',name:'화산섬',view:'분화구 나선 · 용암 점프',desc:'해 질 녘 화산섬. 연기 나는 분화구 가장자리를 나선으로 반 바퀴 돌아 오르고, 미끄러운 화산재 내리막 끝에서 용암 강을 뛰어넘어요. 빛나는 용암 동굴을 지나 현무암 돌다리로 용암 웅덩이를 건너요. 용암에 닿으면 연기와 함께 코스로 복귀해요.',tags:['화산재·현무암','용암 점프·동굴','3랩'],dust:'#4a403c',puff:'#a39893',th:THUMB('#3b312d','#5a4f4a','#ff5a1a'),
+  R:opt3({sky:'#e98b6a',fogFar:560,hemiSky:0xffc9a8,hemiGround:0x3a2420,sun:0xffa66a,hemiI:0.72,sunI:0.75,paint:paintVolcano,road:'#4d4440',road2:'#48403c',rampCol:'#5c524d',berm:'#2a2220',edge2:'volcano',trees:'volcanic',treeCount:46,gate:0xff5a1a,volcano:true,
+   tunnel:{wall:0x2c2421,roof:0x221b19,portal:0x4a3c36,ribs:true},
+   roadFn:(i,P,T)=>{const a=P[i],f=a.s/T.L;if(i<2)return i%2?'#222':'#f4f4f4';if(a.z<-4)return null;if(f>T.gorge.s0-0.01&&f<T.gorge.s1+0.01)return i%3===0?'#2a2624':(i%2?'#3a3634':'#34302e');if(f>T.zSpiral[0]&&f<T.zSpiral[1])return i%2?'#3e3b3a':'#383534';if(a.z-a.zb>2)return i%2?'#5c524d':'#564c47';if(f>T.zAsh[0]&&f<T.zAsh[1])return i%6<3?'#77706b':'#6f6863';return i%6<3?'#4d4440':'#48403c';}})},
 ];
 const VI=Object.fromEntries(VARIANTS.map((v,i)=>[v.id,i]));
 const trackCache={};function getTrack(id){return trackCache[id]||(trackCache[id]=buildTrack(COURSES[id]));}
@@ -147,7 +161,7 @@ function startGame(vi,ci){
   const grid=[[pick[0],0.97],[pick[1],0.95],[CAR,0],[pick[2],0.92]];
   const cars=grid.map((d,k)=>makeCar(T,Math.round(N-2-(k>>1)*sp*1.4),k%2?-45:45,d[0].col,k!==2,d[1]));
   grid.forEach((d,k)=>{cars[k].kind=d[0].kind;cars[k].name=k===2?(PLAYER.name||('나 · '+CAR.name)):d[0].name;});
-  const pc=cars[2];Object.assign(pc,{power:CAR.power,top:CAR.top,gripM:CAR.grip,mass:CAR.mass,boostM:CAR.boost,offM:CAR.offM,susp:CAR.susp,kind:CAR.kind});
+  const pc=cars[2];Object.assign(pc,{power:CAR.power,top:CAR.top,gripM:CAR.grip,mass:CAR.mass,boostM:CAR.boost,offM:CAR.offM,susp:CAR.susp,gaugeM:CAR.gaugeM,kind:CAR.kind});
   G={V,vi,ci,T,cars,player:cars[2],parts:[],skids:[],t:0,state:'count',count:3.4,shake:0,order:[],rec:[],recAcc:0,ranks:[],finishShow:0};
   clearInterval(resTimer);
   $('#menu').hidden=true;$('#mmenu').hidden=true;$('#verBtn').hidden=true;$('#stage').hidden=false;$('#result').hidden=true;$('#replayUI').hidden=true;$('#hud').hidden=false;$('#touch').classList.remove('off');touch.g=0;$('#tZone').classList.remove('on');$('#view').innerHTML='';
@@ -175,11 +189,12 @@ function update(dt){
   const pin=playerInput();if(pin.boost&&!g.pb&&racing)fireBoost(g.player);g.pb=pin.boost;
   for(const c of g.cars){
     const auto=c.isAI||c.done,inp=auto?aiInput(c,T,g.t):pin;
-    if(running){c.gauge=Math.min(1,c.gauge+dt*0.07);if(c.isAI&&c.speed>220&&c.gauge>0.9&&Math.random()<0.004)fireBoost(c);}
+    if(running){c.gauge=Math.min(1,c.gauge+dt*0.07*(c.gaugeM||1));if(c.isAI&&c.speed>220&&c.gauge>0.9&&Math.random()<0.004&&aiBoostOk(c,T))fireBoost(c);}
     stepCar(c,inp,dt,T,running);
     if(lapTick(c,T,g.t))g.order.push(c);
     if(c.drift)c.driftT+=dt;if(c.air)c.maxAir=Math.max(c.maxAir,c.airT);
     carFx(g,c);
+    if(c.burnt){c.burnt=0;for(let k=0;k<12;k++){const a=Math.random()*TAU;puff(c.burnX,c.burnY,4,k%3?'#5a504c':'#ff8a3a',12+k,1.3,Math.cos(a)*50,Math.sin(a)*50,70,c);}if(c===g.player){bang('앗 뜨거!');g.shake=Math.max(g.shake,10);AU.thump(200);}}
     if(c.land>160){for(let k=0;k<8;k++){const a=Math.random()*TAU;puff(c.x,c.y,c.z+2,g.V.puff,10,1,Math.cos(a)*90,Math.sin(a)*90,30,c);}if(c===g.player){g.shake=Math.min(30,c.land/18);AU.thump(c.land);}}
     if(c.bump>120&&c===g.player){g.shake=Math.max(g.shake,c.bump/30);AU.thump(c.bump*0.6);}
     c.land=0;c.bump=0;

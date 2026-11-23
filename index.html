@@ -202,7 +202,7 @@ body.fine .mm-keys{display:flex}
 #gStats{display:flex;flex-direction:column;gap:5px}
 .gs{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:8px;font-size:12px;color:#9db9a9}
 .gs i{height:8px;border-radius:4px;background:#0a1d16;overflow:hidden}.gs u{display:block;height:100%;background:var(--orange);text-decoration:none;transition:width .3s}
-#gPick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px} /* v3.4 차 8대: 4열 × 2줄 */
+#gPick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px} /* v3.5 차 9대: 3열 × 3줄 */
 .gchip{appearance:none;border:2px solid transparent;border-radius:12px;background:#0a1d16;color:#eef4ec;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:4px;font:500 11px var(--f-body);cursor:pointer;min-height:44px}
 .gchip i{width:26px;height:12px;border-radius:4px;background:var(--c);box-shadow:inset 0 -4px 0 var(--d)}
 .gchip.on{border-color:var(--orange)}
@@ -320,17 +320,20 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 @media (orientation:portrait){
   .gx-main{grid-template-rows:minmax(120px,1fr) auto;gap:8px}
   .gx-side{align-self:end;max-height:100%;padding:12px 14px;gap:6px}
-  #gPick{grid-template-columns:repeat(4,minmax(0,1fr))}
-  .gchip{min-height:40px;flex-direction:row;justify-content:center;gap:5px;padding:4px 2px}
-  .gchip i{flex:none;width:20px}
+  #gPick{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+  .gchip{min-height:34px;flex-direction:row;justify-content:center;gap:5px;padding:3px 4px}
+  .gchip i{flex:none;width:18px;height:10px}
+  .gchip span{font-size:12.5px;letter-spacing:-.03em}
   #gName{font-size:clamp(24px,7.4vmin,34px)}#gDesc{font-size:12.5px;line-height:1.45}
   .gs{font-size:12px;grid-template-columns:76px 1fr}.gs i{height:8px}
   #gGo{margin-top:6px;height:52px;font-size:22px}
 }
-@media (orientation:portrait) and (max-height:600px){#gDesc{display:none}}
+@media (orientation:portrait) and (max-height:700px){#gDesc{display:none}.gx-side{gap:4px;padding:10px 12px}.gs{line-height:1.05;font-size:11.5px}#gName{font-size:24px}#gGo{height:46px;margin-top:4px}.gchip{min-height:31px}}
+/* v3.5 좁은 휴대폰(폭 360 이하) 차고 칩: 색 견본 대신 왼쪽 색 띠로 바꿔 이름이 다 보이게 */
+@media (orientation:portrait) and (max-width:360px){.gchip i{display:none}.gchip{box-shadow:inset 5px 0 0 var(--c);padding:3px 2px 3px 7px}.gchip span{font-size:12px;letter-spacing:-.05em;text-overflow:clip}}
 /* v3.3 차 7대: 낮은 가로 화면은 칩을 색 견본만, 넓은 화면은 글자를 촘촘히 */
 @media (orientation:landscape){.gchip span{letter-spacing:-.06em}#gPick .gchip{padding-inline:0}}
-@media (orientation:landscape) and (max-height:440px){#gPick{grid-template-columns:repeat(8,minmax(0,1fr))}#gPick .gchip{min-height:30px;padding:6px 0}#gPick .gchip span{display:none}#gPick .gchip i{width:70%;height:14px}}
+@media (orientation:landscape) and (max-height:440px){#gPick{grid-template-columns:repeat(9,minmax(0,1fr))}#gPick .gchip{min-height:30px;padding:6px 0}#gPick .gchip span{display:none}#gPick .gchip i{width:70%;height:14px}}
 /* ---- 휴대폰 세로 리플레이: 태그를 라벨 아래로 (v2.4) ---- */
 @media (max-width:640px){#rpTag{top:calc(9vh + 40px);font-size:24px}}
 /* ---- 휴대폰 세로: 버튼이 겹치지 않게 재배치 ---- */
@@ -430,11 +433,12 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 #touch.helptxt #cZone .zt{opacity:1}
 #touch.helptxt #cZone .zb svg,#touch.helptxt #cZone .chev{transform:translateY(-6px)}
 @media (pointer:coarse) and (orientation:landscape){
-  #hClouds{left:50%;right:auto;transform:translateX(-50%);bottom:calc(126px + env(safe-area-inset-bottom,0px))}
+  /* v3.5 방구 구름 게이지는 가속 존 바로 위(오른쪽)에 — 화면 가운데 카운트다운·코스를 가리지 않게 */
+  #hClouds,.cockpit #hClouds{left:auto;transform:none;right:max(16px,env(safe-area-inset-right,0px));width:186px;justify-content:center;bottom:calc(16px + 176px + 8px + env(safe-area-inset-bottom,0px))}
   .cockpit .speedo{right:calc(max(16px,env(safe-area-inset-right,0px)) + 250px)}
-  .cockpit #hClouds{left:auto;transform:none;right:calc(max(16px,env(safe-area-inset-right,0px)) + 250px);bottom:calc(124px + env(safe-area-inset-bottom,0px))}
 }
-@media (pointer:coarse) and (orientation:landscape) and (max-height:440px){#cZone{right:calc(max(14px,env(safe-area-inset-right,0px)) + 66px);height:min(166px,calc(100vh - 40px));width:180px}}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:440px){#cZone{right:calc(max(14px,env(safe-area-inset-right,0px)) + 66px);height:min(166px,calc(100vh - 40px));width:180px}
+  #hClouds,.cockpit #hClouds{right:calc(max(14px,env(safe-area-inset-right,0px)) + 66px);width:180px;bottom:calc(16px + min(166px,calc(100vh - 40px)) + 6px + env(safe-area-inset-bottom,0px))}}
 @media (pointer:coarse) and (orientation:portrait){
   #cZone{width:min(168px,calc(100vw - 196px));height:176px;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px))}
   #hClouds,.cockpit #hClouds{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
@@ -458,7 +462,7 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 <div id="menu">
   <div class="head">
     <div>
-      <div class="ruler">RC 1:10 · 코스 10개 · 기록 저장</div>
+      <div class="ruler">RC 1:10 · 코스 14개 · 기록 저장</div>
       <h1>미니 RC <em>그랑프리</em></h1>
     </div>
     <p class="lead">방구자동차처럼 가볍게 조종하는 RC카 레이싱. 흙길, 오락실 미로, 8자 다리, 산악 터널, 눈길, 해변, 협곡, 정원, 공사장까지 열 개 코스를 달리고, 결승선을 넘으면 하이라이트 리플레이와 평가가 나와요. 최고 기록은 코스마다 계속 쌓여요.</p>
@@ -523,14 +527,15 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
   </div>
 </div>
 
-<button id="verBtn" type="button" aria-haspopup="dialog">v3.4 · 정보</button>
+<button id="verBtn" type="button" aria-haspopup="dialog">v3.5 · 정보</button>
 <div id="verModal" hidden role="dialog" aria-modal="true" aria-labelledby="verTitle">
   <div class="vbox">
-    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.4</span>
+    <div class="vhead"><h3 id="verTitle">미니 RC 그랑프리</h3><span class="vtag">v3.5</span>
       <div class="vtabs" role="tablist"><button class="vtab" type="button" role="tab" aria-selected="true" data-p="vpHist">버전 기록</button><button class="vtab" type="button" role="tab" aria-selected="false" data-p="vpHow">작동 원리</button></div>
       <button id="verClose" type="button" aria-label="닫기">✕</button></div>
     <div class="vpane" id="vpHist">
       <ol class="vlist" reversed>
+        <li><b>v3.5</b><span>새 코스 14 화산섬 — 해 질 녘 화산섬에서 연기 나는 분화구 가장자리를 나선으로 반 바퀴 돌아 오르고(현무암 길), 미끄러운 화산재 내리막 끝 점프대에서 용암 강을 뛰어넘어요. 붉은 틈이 빛나는 용암 동굴을 지나 난간 없는 현무암 돌다리로 용암 웅덩이를 건너요. 용암에 닿으면 연기와 함께 건너편으로 복귀(3랩). 아홉 번째 차 스파크(레이싱 고카트 — 가속 최고·가장 가벼움·방구 게이지 1.5배 빨리 참, 최고 속도는 가장 낮고 길 밖에서 많이 느려짐), 차고 칩을 3열 × 3줄로, 능력치에 '부스터 충전' 추가. 공사장 점프 터널 입구 안쪽에 있던 드럼통 때문에 차가 끼어 멈추던 문제 수정(드럼통을 터널 밖 갓길로). AI가 장난감 8자 다리·눈길·공사장에서 덜 떨어지도록(가장자리에 닿기 전에 길 가운데로 되돌리고, 높은 길에서는 부스터를 아낌 — 코스 복귀 약 1/3로). 좁은 휴대폰 차고에서 차 이름이 잘리던 문제, 휴대폰 가로 화면에서 방구 구름 게이지가 카운트다운 숫자를 가리던 문제 수정(가속 존 위로 이동).<em>2026.11.23</em></span></li>
         <li><b>v3.4</b><span>새 코스 13 폐광 갱도 — 안개 낀 산속 폐광에서 버팀목 갱도 터널 두 곳을 지나고, 난간 없는 나무 트레슬 다리로 깊은 골짜기를 건너요(떨어지면 바로 코스 복귀). 광차 레일 건널목은 아주 미끄럽고, 갱도 출구 내리막에서 크게 뛰어요. 여덟 번째 차 빅풋(미니 몬스터 트럭 — 가장 무겁고 점프 착지·험로 주행 최고, 대신 가속·접지력이 낮음), 차고 칩을 4열 × 2줄로. 선두가 결승한 뒤 순위표와 앞차·뒤차 칸이 모두 +99.00으로 굳던 문제 수정(남은 거리로 시간 차 계산). 터널 입구 모서리·옆벽에 차가 끼어 멈추던 문제 수정(벽을 따라 미끄러지며 입구 쪽으로 흘러가요), 터널 근처에서 카메라가 터널 벽 속에 묻히지 않게. AI가 산악 서킷·눈길의 높은 커브와 협곡 벽에서 덜 떨어지고 덜 끼이도록 개선. 휴대폰 세로 화면에서 출발 안내가 카운트다운 숫자를 가리지 않게.<em>2026.11.20</em></span></li>
         <li><b>v3.3</b><span>새 코스 12 옥상 주차빌딩 — 해 질 녘 도심에서 나선 램프를 한 바퀴 돌아 옥상까지 오르고, 옥상 사이 틈을 뛰어넘은 뒤 1층 기둥 사이 터널로 내려와요(칠한 주차장 바닥은 미끄럽고, 높은 층은 콘크리트 난간에 막혀요). 일곱 번째 차 스팅어(오픈휠 포뮬러 — 접지력 최고·가벼움, 길 밖에서는 크게 느려짐). 장난감 8자 트랙 다리 옆에서 차가 계속 튀어 오르며 갇히던 문제 수정(옆면은 벽처럼 막히고, 다리에서 떨어지면 바로 코스 복귀, 길 밖에서 5초 넘게 못 나아가면 자동 복귀). 벽에 스치기만 해도 멈춰 버리던 마찰 완화, AI가 빙판 앞에서 미리 속도를 줄이고 벽에 박히면 후진해 빠져나옴. 휴대폰 결과 화면 버튼을 아래에 고정, 휴대폰 가로 화면에서 '방구 부스터!' 글자와 구름 게이지가 겹치던 문제 수정.<em>2026.11.17</em></span></li>
         <li><b>v3.2</b><span>홈 화면 아이콘 추가 — 체커 무늬 바탕에 주황 엠블럼과 RC카. 휴대폰 '홈 화면에 추가' 시 이 아이콘과 'RC 그랑프리' 이름으로 저장되고, 홈 화면에서 열면 전체화면으로 실행돼요. 브라우저 탭 아이콘도 같은 그림으로 교체.<em>2026.11.16</em></span></li>
@@ -677,6 +682,8 @@ function buildTrack(def){
   T.bumps=(def.bumps||[]).map(b=>({s0:b.s*s,prof:b.prof,end:b.prof[b.prof.length-1][0]}));
   T.tun=(def.tunnels||[]).map(t=>({s0:t[0]*s,s1:t[1]*s}));
   T.obstacles=def.obstacles||null;
+  // 장애물이 터널 안에 놓이면 차가 끼므로 경고 (v3.5)
+  if(T.obstacles&&T.tun.length&&typeof console!=='undefined')for(const o of T.obstacles){const l=locate(T,o.x+o.w/2,o.y+o.h/2,null);if(inTun(T,l.s)&&Math.abs(l.d)<l.w/2+40)console.warn('터널 안 장애물',o);}
   let mx=1e9,Mx=-1e9,my=1e9,My=-1e9,mz=0;
   for(const a of P){a.z=a.zb+bumpAt(T,a.s);a.tun=inTun(T,a.s);mz=Math.max(mz,a.z);mx=Math.min(mx,a.x-a.w);Mx=Math.max(Mx,a.x+a.w);my=Math.min(my,a.y-a.w);My=Math.max(My,a.y+a.w);}
   T.b={x0:mx,x1:Mx,y0:my,y1:My};T.maxZ=Math.max(1,mz);
@@ -736,7 +743,9 @@ function makeCar(T,idx,off,col,isAI,skill){
   const l=locate(T,c.x,c.y,idx);c.z=groundAt(T,l);c.gz=c.z;c.s=l.s;c.prevS=l.s;c.loc=l;c.surf=T.surface(c.x,c.y,l);return c;
 }
 function respawn(c,T){
-  const l=locate(T,c.x,c.y,c.hint),a=T.p[l.i];
+  const l=locate(T,c.x,c.y,c.hint);let a=T.p[l.i];
+  // 용암 점프 구간처럼 다시 놓으면 또 빠지는 곳은 건너편(착지 지점 뒤)에 놓는다
+  if(T.spawnSkip)for(const r of T.spawnSkip){const f=a.s/T.L;if(f>=r[0]&&f<r[1]){l.i=Math.round(r[1]*T.p.length)%T.p.length;a=T.p[l.i];break;}}
   c.x=a.x;c.y=a.y;c.h=Math.atan2(a.ty,a.tx);c.vx=c.vy=c.vz=0;c.yaw=0;c.spin=0;c.air=false;c.z=a.zb+bumpAt(T,a.s);c.gz=c.z;c.stuck=0;c.slow=0;c.pT=0;c.pS=a.s;c.flash=1.2;c.s=a.s;c.prevS=a.s;c.hint=l.i;c.resp++;
 }
 function collideObs(c,T){
@@ -828,9 +837,18 @@ function stepCar(c,inp,dt,T,racing){
   if(c.isAI&&racing&&c.speed<25)c.slow+=dt;else c.slow=0;
   // 앞으로 나아가지 못하는 시간: 길 밖에서 5초(AI는 어디서든 6초) 넘게 제자리면 코스로 복귀
   if(racing&&!c.done){let pd=((c.s-c.pS)%T.L+T.L)%T.L;if(pd>T.L/2)pd-=T.L;if(pd>80){c.pS=c.s;c.pT=0;}else{c.pT+=dt;if(pd<-200)c.pS=c.s;}}else c.pT=0;
+  // 용암: 바퀴가 닿으면 잠깐 뒤 연기와 함께 코스로 복귀
+  if(sf.lava&&!c.air){c.lavaT=(c.lavaT||0)+dt;if(c.lavaT>0.12){c.burnt=1;c.lavaT=0;c.burnX=c.x;c.burnY=c.y;respawn(c,T);}}else c.lavaT=0;
   if(c.stuck>0.8||c.slow>2.5||(c.off&&c.pT>5)||(c.isAI&&c.pT>6))respawn(c,T);
   c.flash=Math.max(0,c.flash-dt);
 }
+// 길 밖이 낭떠러지·가파른 비탈인 높은 구간인지 (AI 안전 운전·부스터 판단용)
+const AIP={pt:0.4,mg:20,vl:9999};
+function edgeDrop(T,a){return a.zb>14&&foAt(T,a.s)<70&&!a.tun&&!(T.rail&&a.zb>T.rail.minZ);}
+// AI 방구 부스터: 높은 길이나 큰 커브 앞에서는 쓰지 않는다
+function aiBoostOk(c,T){const N=T.p.length,a=T.p[c.hint];let h0=Math.atan2(a.ty,a.tx),mt=0,hi=false;
+  for(let k=6;k<=66;k+=6){const q=T.p[(c.hint+k)%N];mt=Math.max(mt,Math.abs(wrapA(Math.atan2(q.ty,q.tx)-h0)));if(edgeDrop(T,q))hi=true;}
+  if(hi)return mt<0.3&&c.loc&&Math.abs(c.loc.d)<c.loc.w*0.2;return true;}
 function aiInput(c,T,t){
   const N=T.p.length,sp=c.speed,look=5+Math.floor(sp/55);
   const a=T.p[(c.hint+look)%N],b=T.p[(c.hint+look+14)%N];
@@ -844,7 +862,7 @@ function aiInput(c,T,t){
   const want=Math.atan2(a.y+a.ny*lane-c.y,a.x+a.nx*lane-c.x),diff=wrapA(want-c.h);
   const turn=Math.abs(wrapA(Math.atan2(b.ty,b.tx)-Math.atan2(a.ty,a.tx)));
   // 앞길이 빙판처럼 미끄러우면 들어가기 전에 미리 속도를 줄인다
-  const sa=T.surface(a.x,a.y,{d:0,w:a.w}),sb=T.surface(b.x,b.y,{d:0,w:b.w}),icy=Math.min(sa.grip,sb.grip)<1.6;
+  const sa=T.surface(a.x,a.y,{d:0,w:a.w,s:a.s}),sb=T.surface(b.x,b.y,{d:0,w:b.w,s:b.s}),icy=Math.min(sa.lava?9:sa.grip,sb.lava?9:sb.grip)<1.6;
   const slip=c.surf?c.surf.grip<3:false;let lim=slip?0.5:0.6;if(icy)lim=Math.min(lim,0.36);if(high)lim-=0.08;
   const icyFast=icy&&sp>c.top*0.5&&turn>0.2;
   // 비탈 위 큰 커브 앞(점프 직후 포함): 들어가기 전에 미리 감속
@@ -852,7 +870,15 @@ function aiInput(c,T,t){
   // 벽에 코를 박고 멈췄으면 잠깐 후진하며 머리를 돌린다
   if(c.revUntil>t)return{steer:diff>0?-1:1,gas:false,brake:true,hand:false};
   if(Math.abs(c.vF||sp)<35&&Math.abs(diff)>0.7&&t>1){c.stall=(c.stall||0)+1;if(c.stall>40){c.stall=0;c.revUntil=t+0.9;}}else c.stall=0;
-  return{steer:clamp(diff*(high?3.2:2.6),-1,1),gas:!(turn>0.45&&sp>c.top*lim)&&!icyFast&&!hillFast&&(Math.abs(diff)<1.2||sp<130),brake:(turn>0.75&&sp>c.top*(lim+0.08))||(Math.abs(diff)>1.4&&sp>150)||(icyFast&&sp>c.top*0.6)||(hillFast&&turnFar>1.4&&sp>c.top*0.68*sk),hand:false};
+  let steer=clamp(diff*(high?3.2:2.6),-1,1),gas=!(turn>0.45&&sp>c.top*lim)&&!icyFast&&!hillFast&&(Math.abs(diff)<1.2||sp<130),brake=(turn>0.75&&sp>c.top*(lim+0.08))||(Math.abs(diff)>1.4&&sp>150)||(icyFast&&sp>c.top*0.6)||(hillFast&&turnFar>1.4&&sp>c.top*0.68*sk);
+  // v3.5 높은 길(옆이 낭떠러지·비탈) 가장자리 지키기: 0.4초 뒤 옆 위치를 예측해 가장자리에 닿기 전에 길 가운데로 되돌린다
+  const L0=c.loc;
+  if(L0&&!c.air&&edgeDrop(T,hp)){const vd=-c.vx*hp.ty+c.vy*hp.tx,dp=L0.d+vd*AIP.pt,lim2=L0.w/2-AIP.mg,rs=clamp((Math.abs(dp)-lim2)/34,0,1);
+    if(rs>0){const sg=dp>0?-1:1,toC=(Math.cos(c.h)*-hp.ty+Math.sin(c.h)*hp.tx)*sg;steer=lerp(steer,sg,rs);
+      // 이미 길 가운데 쪽을 보고 있으면 밟아서 되돌아오고(미끄러운 눈길에서 옆으로 흘러내리지 않게), 바깥을 보고 있을 때만 발을 뗀다
+      if(toC>0.25||sp<60){gas=true;brake=false;}else{if(rs>0.25)gas=false;if(rs>0.7&&sp>180&&!slip)brake=true;}}
+    if(Math.abs(c.vL||0)>AIP.vl&&sp>200)gas=false;}
+  return{steer,gas,brake,hand:false};
 }
 // 차 충돌: 회전한 직사각형(OBB) 두 개를 분리축으로 검사하고, 접촉점 기준 충격량으로 밀고 돌린다
 const CAR_HX=27,CAR_HY=14.5,CAR_I=(4*CAR_HX*CAR_HX+4*CAR_HY*CAR_HY)/12,CAR_E=0.45,CAR_MU=0.35;
@@ -906,6 +932,7 @@ const SF={
   stone:{grip:6.5,drag:0.35,name:'돌길'},lawn:{grip:4,drag:1.4,name:'잔디밭'},
   site:{grip:3.8,drag:0.5,name:'공사장 자갈'},mud:{grip:2.2,drag:2.4,name:'진흙'},
   coal:{grip:4.1,drag:0.44,name:'석탄 흙길'},scree:{grip:2.8,drag:1.7,name:'돌 부스러기'},plank:{grip:5.2,drag:0.32,name:'나무 다리'},rail:{grip:1.5,drag:0.2,name:'광차 레일'},
+  ash:{grip:4.0,drag:0.42,name:'화산재 흙길'},ashSlip:{grip:2.3,drag:0.3,name:'미끄러운 화산재'},basalt:{grip:6.6,drag:0.34,name:'현무암'},cinder:{grip:3,drag:1.8,name:'뜨거운 자갈'},lava:{grip:1,drag:4,name:'용암',lava:true},
   steel:{grip:2.3,drag:0.22,name:'젖은 철판'},epoxy:{grip:4.4,drag:0.28,name:'칠한 주차장 바닥'},dock:{grip:4.4,drag:1.3,name:'부두 콘크리트'},canal:{grip:1.6,drag:3.8,name:'운하 물'},
 };
 const ICE=[[700,0,190],[1080,425,150],[300,860,170],[900,1300,160]];
@@ -940,7 +967,7 @@ const COURSES={
     surface:(x,y,l)=>onTrack(l)?SF.stone:SF.lawn},
   site:{ctrl:[[0,0,0,170],[700,0,0,170],[1300,0,0,170],[1700,200,20,165],[1750,600,60,165],[1500,900,60,165],[1000,850,60,165],[650,1000,40,165],[700,1300,0,165],[300,1450,0,165],[-200,1300,0,165],[-350,900,0,165],[-150,600,0,165],[-450,300,0,165],[-300,50,0,170]],
     falloff:60,laps:2,tunnels:[[0.74,0.81]],bumps:[{s:0.08,prof:[[0,0],[80,34],[92,0]]},{s:0.39,prof:[[0,0],[6,-58],[110,-58],[270,0]]},{s:0.9,prof:[[0,0],[60,24],[110,24],[170,0]]}],
-    obstacles:[{x:1050,y:-70,w:24,h:24,kind:'cone',hgt:24},{x:1150,y:40,w:24,h:24,kind:'cone',hgt:24},{x:1250,y:-50,w:24,h:24,kind:'cone',hgt:24},{x:-360,y:1080,w:40,h:40,kind:'barrel'},{x:-250,y:840,w:40,h:40,kind:'barrel'}],
+    obstacles:[{x:1050,y:-70,w:24,h:24,kind:'cone',hgt:24},{x:1150,y:40,w:24,h:24,kind:'cone',hgt:24},{x:1250,y:-50,w:24,h:24,kind:'cone',hgt:24},{x:-153,y:1449,w:40,h:40,kind:'barrel'},{x:-71,y:664,w:40,h:40,kind:'barrel'}],
     surface:(x,y,l)=>onTrack(l)?SF.site:SF.mud},
   harbor:{ctrl:[[0,0,0,175],[780,0,0,175],[1430,-52,0,175],[1885,195,0,175],[1950,650,0,175],[1625,975,0,175],[1040,1040,0,175],[520,910,0,175],[130,1105,0,175],[-325,1066,0,175],[-650,780,0,175],[-676,325,0,175],[-455,65,0,175]],
     falloff:50,laps:3,shore:1290,canal:[700,810],steel:[[1780,2160,380,900],[-900,-560,450,900]],tunnels:[[0.5,0.57]],
@@ -958,6 +985,13 @@ const COURSES={
     falloff:150,laps:2,gorge:{s0:0.43,s1:0.535,fo:12,blend:110},tunnels:[[0.25,0.33],[0.815,0.882]],rails:[0.725],
     bumps:[{s:0.72,prof:[[0,0],[5,4],[10,0],[26,0],[31,4],[36,0]]},{s:0.925,prof:[[0,0],[46,18],[52,-4],[110,-4],[150,0]]},{s:0.1,prof:[[0,0],[60,22],[70,0]]}],
     surface(x,y,l){const f=l.s/this.L;if(onTrack(l)){for(const r of this.rails)if(Math.abs(f-r)*this.L<26)return SF.rail;if(f>this.gorge.s0&&f<this.gorge.s1)return SF.plank;return SF.coal;}return SF.scree;}},
+  // v3.5 화산섬: 분화구(1250,450) 가장자리를 나선으로 오르고, 화산재 내리막 끝에서 용암 강을 뛰어넘고, 용암 동굴을 지나 현무암 돌다리로 용암 웅덩이를 건넌다
+  volcano:{ctrl:[[0,0,0,165],[600,0,0,165],[1021,122,8,160],[1319,56,24,160],[1578,221,42,160],[1644,519,58,160],[1479,778,74,160],[1181,844,86,160],[880,930,62,158],[640,960,26,160],[420,960,0,162],[0,950,0,165],[-330,860,0,160],[-520,640,0,155],[-560,380,0,155],[-470,160,10,155],[-360,50,18,150],[-200,0,18,150]],
+    falloff:90,laps:3,crater:[1250,450,225,215],river:[236,312,620,1300],pool:[-420,-170,-50,130],tunnels:[[0.8,0.84]],gorge:{s0:0.925,s1:0.965,fo:12,blend:60},spawnSkip:[[0.6179,0.6673]],zSpiral:[0.18,0.49],zAsh:[0.49,0.617],
+    bumps:[{s:0.6179,prof:[[0,0],[90,34],[96,-26],[180,-26],[270,0]]},{s:0.1,prof:[[0,0],[50,16],[60,0]]},{s:0.86,prof:[[0,0],[10,6],[20,0],[40,0],[50,6],[60,0]]}],
+    surface(x,y,l){const f=l.s/this.L,R=this.river,Q=this.pool;if(x>R[0]&&x<R[1]&&y>R[2]&&y<R[3])return SF.lava;
+      if(!onTrack(l))return x>Q[0]&&x<Q[1]&&y>Q[2]&&y<Q[3]?SF.lava:SF.cinder;
+      if(f>this.gorge.s0-0.01&&f<this.gorge.s1+0.01)return SF.basalt;if(f>this.zSpiral[0]&&f<this.zSpiral[1])return SF.basalt;if(f>this.zAsh[0]&&f<this.zAsh[1])return SF.ashSlip;return SF.ash;}},
 };
 //#ENDCORE
 // ---- 3D 렌더러 ----
@@ -1022,6 +1056,11 @@ function make3D(opt){
       ribbon(a=>a.w/2,a=>a.w/2+18,1.2,i=>gz(i)?null:opt.berm);ribbon(a=>-a.w/2-18,a=>-a.w/2,1.2,i=>gz(i)?null:opt.berm);
       ribbon(a=>a.w/2,a=>a.w/2+7,3.2,i=>gz(i)?'#4a3420':null,true);ribbon(a=>-a.w/2-7,a=>-a.w/2,3.2,i=>gz(i)?'#4a3420':null,true);
       ribbon(a=>-a.w/2-7,a=>a.w/2+7,-6,i=>gz(i)?'#3a2a1a':null,true);}
+    else if(ed==='volcano'){const gz=i=>{const f=P[i].s/T.L;return T.gorge&&f>T.gorge.s0-0.004&&f<T.gorge.s1+0.004;};
+      // 땅 위는 검은 현무암 둔덕, 돌다리 위는 낮은 돌 턱(난간 없음) + 다리 아래 돌판
+      ribbon(a=>a.w/2,a=>a.w/2+18,1.2,i=>gz(i)?null:opt.berm);ribbon(a=>-a.w/2-18,a=>-a.w/2,1.2,i=>gz(i)?null:opt.berm);
+      ribbon(a=>a.w/2,a=>a.w/2+8,3.4,i=>gz(i)?((i>>1)%2?'#4a4340':'#3c3634'):null,true);ribbon(a=>-a.w/2-8,a=>-a.w/2,3.4,i=>gz(i)?((i>>1)%2?'#4a4340':'#3c3634'):null,true);
+      ribbon(a=>-a.w/2-8,a=>a.w/2+8,-7,i=>gz(i)?'#241e1c':null,true);}
     else if(ed==='dock'){ribbon(a=>a.w/2,a=>a.w/2+12,1.6,stripe('#f2c230','#30343b'));ribbon(a=>-a.w/2-12,a=>-a.w/2,1.6,stripe('#f2c230','#30343b'));}
     else if(ed==='tape'){ribbon(a=>a.w/2-6,a=>a.w/2+6,1.8,()=>'#ecdca9');ribbon(a=>-a.w/2-6,a=>-a.w/2+6,1.8,()=>'#ecdca9');}
     else{ribbon(a=>a.w/2,a=>a.w/2+20,1.2,()=>opt.berm);ribbon(a=>-a.w/2-20,a=>-a.w/2,1.2,()=>opt.berm);}
@@ -1108,12 +1147,34 @@ function make3D(opt){
         addMesh(new THREE.BoxGeometry(5*S,62*S,5*S),wd,x*S,(z+31)*S,y*S);const arm=addMesh(new THREE.BoxGeometry(22*S,4*S,4*S),wd,(x-a.nx*sd*9)*S,(z+60)*S,(y-a.ny*sd*9)*S,false);arm.rotation.y=-Math.atan2(a.ny,a.nx);
         addMesh(new THREE.BoxGeometry(7*S,10*S,7*S),lm,(x-a.nx*sd*18)*S,(z+52)*S,(y-a.ny*sd*18)*S,false);
         const pool=new THREE.Mesh(new THREE.CircleGeometry(46*S,18),gm);pool.rotation.x=-Math.PI/2;pool.position.set((x-a.nx*sd*24)*S,(a.z+2.4)*S,(y-a.ny*sd*24)*S);sc.add(pool);}}
+    // 화산섬: 분화구 산 + 용암(강·웅덩이·분화구) + 연기 + 돌다리 기둥 + 용암 동굴 빛 틈
+    if(opt.volcano){const rnd=(()=>{let q=29;return()=>(q=(q*16807)%2147483647)/2147483647;})();
+      const lvM=new THREE.MeshBasicMaterial({color:0xff7a1a});this.lavaM=lvM;const lvG=new THREE.MeshBasicMaterial({color:0xff5a14,transparent:true,opacity:0.35,depthWrite:false});
+      const pl=(x0,x1,y0,y1,z,m,pad)=>{const w=new THREE.Mesh(new THREE.PlaneGeometry((x1-x0+2*(pad||0))*S,(y1-y0+2*(pad||0))*S),m);w.rotation.x=-Math.PI/2;w.position.set((x0+x1)/2*S,z*S,(y0+y1)/2*S);sc.add(w);return w;};
+      for(const R of[T.river,[T.pool[0],T.pool[1],T.pool[2],T.pool[3]]]){const[x0,x1,y0,y1]=R;pl(x0,x1,y0,y1,1.2,lvM);pl(x0,x1,y0,y1,1.6,lvG,10);
+        const ck=lam(0x2a201d);for(let k=0;k<14;k++){const b=addMesh(new THREE.DodecahedronGeometry((6+rnd()*10)*S,0),ck,lerp(x0,x1,rnd())*S,2*S,lerp(y0,y1,rnd())*S,false);b.scale.y=0.4;}}
+      // 분화구 산: 거친 원뿔 + 꼭대기 용암 + 붉은 테두리
+      const[ccx,ccy,cr,chh]=T.crater,cg=new THREE.ConeGeometry(cr*S,chh*S,22,6,true),cp=cg.attributes.position;
+      for(let k=0;k<cp.count;k++){const y=cp.getY(k);if(y<chh*S/2-0.01){const f=1+(rnd()-0.5)*0.14;cp.setX(k,cp.getX(k)*f);cp.setZ(k,cp.getZ(k)*f);}}cg.computeVertexNormals();
+      const cone=addMesh(cg,lam(0x3a2e2a),ccx*S,chh/2*S,ccy*S);cone.scale.set(1,1,1);
+      const top=new THREE.Mesh(new THREE.CircleGeometry(cr*0.3*S,20),lvM);top.rotation.x=-Math.PI/2;top.position.set(ccx*S,(chh*0.72)*S,ccy*S);sc.add(top);
+      const lip=addMesh(new THREE.TorusGeometry(cr*0.3*S,8*S,6,20),lam(0x5a2a1e),ccx*S,(chh*0.72)*S,ccy*S,false);lip.rotation.x=Math.PI/2;
+      // 산허리를 흘러내리는 용암 줄기 두 개
+      for(const a0 of[0.6,2.4]){for(let k=0;k<6;k++){const t=k/6,r=lerp(cr*0.3,cr*0.95,t),h=lerp(chh*0.72,chh*0.04,t);const st=addMesh(new THREE.BoxGeometry(14*S,3*S,(cr*0.12)*S),lvM,(ccx+Math.cos(a0+t*0.3)*r)*S,(h+2)*S,(ccy+Math.sin(a0+t*0.3)*r)*S,false);st.rotation.y=-(a0+t*0.3);st.rotation.z=0;}}
+      // 분화구 연기 (매 프레임 위로 피어오름)
+      const tex=puffTexture();this.smoke=[];for(let k=0;k<9;k++){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false,color:0x8a7f7a,opacity:0.5}));sc.add(sp);this.smoke.push({sp,ph:k/9});}
+      this.smokeAt=[ccx*S,chh*0.72*S,ccy*S];
+      // 돌다리 아래 현무암 기둥
+      const bm=lam(0x2c2624);for(let i=0;i<N;i+=4){const a=P[i],f=a.s/T.L;if(!(f>T.gorge.s0&&f<T.gorge.s1))continue;for(const sd of[1,-1]){const o=sd*(a.w/2-14);addMesh(new THREE.CylinderGeometry(9*S,11*S,a.z*S,6),bm,(a.x+a.nx*o)*S,a.z/2*S,(a.y+a.ny*o)*S);}}
+      // 용암 동굴: 벽 아래 붉게 빛나는 틈 + 동굴을 덮는 바위 둔덕
+      const gm2=new THREE.MeshBasicMaterial({color:0xff6a1a});for(let i=0;i<N;i++){const a=P[i];if(!a.tun||i%3)continue;const ang=-Math.atan2(a.ty,a.tx);for(const sd of[1,-1]){const o=sd*(a.w/2+1.5),m=addMesh(new THREE.BoxGeometry(a.len*3*S,3*S,2*S),gm2,(a.x+a.nx*o)*S,(a.z+8+((i/3)%2)*14)*S,(a.y+a.ny*o)*S,false);m.rotation.y=ang;}}
+      const rk=lam(0x2e2522);for(let i=0;i<N;i+=3){const a=P[i];if(!a.tun)continue;for(const sd of[1,-1]){const o=sd*(a.w/2+60+rnd()*30);const r=addMesh(new THREE.DodecahedronGeometry((50+rnd()*30)*S,0),rk,(a.x+a.nx*o)*S,(a.z+30)*S,(a.y+a.ny*o)*S);r.rotation.set(rnd(),rnd(),rnd());}}}
     // 빙판
     if(T.ice){const im=new THREE.MeshLambertMaterial({color:0xbfe6ff,transparent:true,opacity:0.6,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4});for(const c of T.ice){const l=locate(T,c[0],c[1],null),z=trackZ(T,l);const d=new THREE.Mesh(new THREE.CircleGeometry(c[2]*0.8*S,28),im);d.rotation.x=-Math.PI/2;d.position.set(c[0]*S,(z+2.2)*S,c[1]*S);sc.add(d);}}
     // 소품
     const rand=(()=>{let s=7;return()=>(s=(s*16807)%2147483647)/2147483647;})();
     const tt=opt.trees===true?'pine':opt.trees;
-    if(tt){const mk={
+    if(tt){const MK={
         pine:()=>{const g=new THREE.Group(),c1=new THREE.Mesh(new THREE.ConeGeometry(30,95,7),lam(rand()<0.5?0x3d7a3c:0x2f6533));c1.position.y=73;c1.castShadow=true;const t1=new THREE.Mesh(new THREE.CylinderGeometry(5,6,26,6),lam(0x6b4a2e));t1.position.y=13;g.add(c1,t1);return g;},
         snow:()=>{const g=new THREE.Group(),c1=new THREE.Mesh(new THREE.ConeGeometry(30,95,7),lam(0x2f5a45));c1.position.y=73;c1.castShadow=true;const c2=new THREE.Mesh(new THREE.ConeGeometry(17,40,7),lam(0xf4f8fb));c2.position.y=104;const t1=new THREE.Mesh(new THREE.CylinderGeometry(5,6,26,6),lam(0x5a4030));t1.position.y=13;g.add(c1,c2,t1);return g;},
         cactus:()=>{const g=new THREE.Group(),m=lam(0x4f7a3a),b=new THREE.Mesh(new THREE.CylinderGeometry(9,10,80,8),m);b.position.y=40;b.castShadow=true;g.add(b);for(const sd of[-1,1]){const a=new THREE.Mesh(new THREE.CylinderGeometry(6,6,30,8),m);a.position.set(sd*16,50+sd*8,0);a.castShadow=true;const e=new THREE.Mesh(new THREE.CylinderGeometry(6,6,16,8),m);e.rotation.z=Math.PI/2;e.position.set(sd*9,36+sd*8,0);g.add(a,e);}return g;},
@@ -1132,7 +1193,9 @@ function make3D(opt){
           if(rand()<0.35){const nc=[0xff5fa8,0x5fd0ff,0xffe066][(rand()*3)|0],sg=new THREE.Mesh(new THREE.BoxGeometry(w*0.7,22,3),new THREE.MeshBasicMaterial({color:nc}));sg.position.set(0,h+26,d/2);g.add(sg);}
           else if(rand()<0.5){const wt=new THREE.Mesh(new THREE.CylinderGeometry(16,16,30,12),lam(0x6f8fa8));wt.position.set(w*0.2,h+21,0);g.add(wt);}
           return g;},
-        piles:()=>{const g=new THREE.Group(),p=new THREE.Mesh(new THREE.ConeGeometry(60+rand()*30,50+rand()*20,9),lam(rand()<0.5?0xb89a6a:0x9a8a74));p.position.y=28;p.castShadow=true;g.add(p);return g;}}[tt];
+        volcanic:()=>{if(rand()<0.3)return MK.palm();const g=new THREE.Group(),n=3+(rand()*4|0);for(let k=0;k<n;k++){const h=30+rand()*70,c=new THREE.Mesh(new THREE.CylinderGeometry(10,11,h,6),lam(rand()<0.5?0x2e2826:0x3a3330));c.position.set((rand()-0.5)*40,h/2,(rand()-0.5)*40);c.castShadow=true;g.add(c);
+          const t=new THREE.Mesh(new THREE.CylinderGeometry(10,10,2,6),lam(0x554c48));t.position.set(c.position.x,h+1,c.position.z);g.add(t);}return g;},
+        piles:()=>{const g=new THREE.Group(),p=new THREE.Mesh(new THREE.ConeGeometry(60+rand()*30,50+rand()*20,9),lam(rand()<0.5?0xb89a6a:0x9a8a74));p.position.y=28;p.castShadow=true;g.add(p);return g;}},mk=MK[tt];
       const cnt=opt.treeCount||70;
       for(let k=0,tries=0;k<cnt&&tries<1500;tries++){const x=lerp(bx0+200,bx1-200,rand()),y=lerp(by0+200,by1-200,rand());if(opt.sea&&y>T.shore-60)continue;if(T.canal&&x>T.canal[0]-90&&x<T.canal[1]+90&&Math.abs(y)<340)continue;if(opt.propsOut&&x>T.b.x0-60&&x<T.b.x1+60&&y>T.b.y0-60&&y<T.b.y1+60)continue;const th=terrainH(T,x,y);if(th.ex<T.falloff+40+(opt.treeGap||0)+(T.canyon?T.canyon.from+T.canyon.ramp:0))continue;
         const gT=mk();gT.scale.setScalar(S*(0.8+rand()*0.7));gT.rotation.y=rand()*TAU;gT.position.set(x*S,th.h*S,y*S);sc.add(gT);k++;}}
@@ -1242,6 +1305,8 @@ function make3D(opt){
     if(mode!=='cockpit'){const sh=g.shake*0.004;this.cam.position.set(this.cp.x+(Math.random()-0.5)*sh,this.cp.y+(Math.random()-0.5)*sh,this.cp.z);this.cam.lookAt(this.lt);this.cam.updateProjectionMatrix();}
     if(!ov){this.dl.position.set(p.x*S+25,p.z*S+60,p.y*S+15);this.dl.target.position.set(p.x*S,p.z*S,p.y*S);}
     if(this.canalW)this.canalW.position.y=(-20+Math.sin(performance.now()/600)*0.8)*S;
+    if(this.lavaM){const t=performance.now()/600;this.lavaM.color.setRGB(1,0.42+Math.sin(t)*0.06+Math.sin(t*2.7)*0.03,0.1);}
+    if(this.smoke){const t=performance.now()/1000,[sx,sy,sz]=this.smokeAt;for(const q of this.smoke){const u=(t*0.12+q.ph)%1;q.sp.position.set(sx+Math.sin(q.ph*9+t*0.3)*u*1.5,sy+u*9,sz+u*2.5);const sc2=(1.5+u*6);q.sp.scale.set(sc2,sc2,1);q.sp.material.opacity=0.55*(1-u);}}
     if(this.sea)this.sea.position.y=(1+Math.sin(performance.now()/700)*0.8)*S;
     const ck=mode==='cockpit';for(let i=0;i<this.spr.length;i++){const s=this.spr[i],q=g.parts[i];if(!q||(ck&&q.o===p)){s.visible=false;continue;}s.visible=true;s.position.set(q.x*S,(q.z+q.r*0.4)*S,q.y*S);const sc=q.r*2.2*S*(ov?1.6:1);s.scale.set(sc,sc,1);s.material.color.set(q.col);s.material.opacity=(q.life/q.max)*0.6;}
     r.render(this.sc,this.cam);
@@ -1371,7 +1436,7 @@ function wingFoil(chord,span,mat){const s=new THREE.Shape();s.moveTo(0,0);s.quad
   const g=new THREE.ExtrudeGeometry(s,{depth:span,bevelEnabled:false,curveSegments:12});g.translate(-chord,0,-span/2);const m=new THREE.Mesh(g,mat);m.castShadow=true;return m;}
 function cyl(r,h,mat,x,y,z,parent,axis){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,20),mat);if(axis==='x')m.rotation.z=Math.PI/2;if(axis==='z')m.rotation.x=Math.PI/2;m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;}
 
-// ---- 시안 8종 ----
+// ---- 시안 9종 ----
 const DESIGNS=[
  {k:'A',name:'미드나잇 GT',cls:'번개 · 기본형',desc:'긴 보닛과 패스트백 지붕, 큰 리어 윙을 단 GT 레이서. 짙은 남색 바탕에 주황 핀스트라이프 두 줄만 넣어 절제했어요.',
   sw:[['#1b2a44','미드나잇 네이비'],['#ff6a1a','시그널 오렌지'],['#1a1b1e','카본'],['#4b4f56','건메탈 휠']],parts:['패스트백 지붕','리어 윙 + 엔드플레이트','카본 스플리터','디퓨저 핀 4개','6스포크 휠'],
@@ -1513,6 +1578,41 @@ const DESIGNS=[
      box(2.2,2.6,S.W+3,bk,22.8,14.6,0,g0);box(0.5,1.1,S.W-1,mat.glowW,24,14.6,0,g0);for(const z of[-1,1])tube([22.8,13.4,z*5],[20.6,12.2,z*4.6],0.5,bk);
      box(2,2.2,S.W+2,bk,-22.4,14.2,0,g0);
      for(const z of[-5.4,5.4]){cyl(0.75,10,ch,-6.6,22.8,z,g0);cyl(0.9,0.8,bk,-6.6,27.9,z,g0);}}}},
+  {k:'I',name:'레이싱 고카트',cls:'스파크 · 레이싱 고카트',desc:'바닥에 붙은 파이프 프레임에 앞 노즈 페어링과 양옆 사이드 포드, 버킷 시트와 작은 핸들. 뒤 범퍼 바와 옆으로 드러낸 엔진·배기. 매트 화이트 바탕에 딥 네이비 패널과 네온 옐로 포인트, 번호판 09.',
+   sw:[['#eceef0','매트 화이트'],['#14284b','딥 네이비'],['#d7ff2f','네온 옐로'],['#2b2d31','다크 휠']],parts:['파이프 프레임 + 뒤 범퍼 바','노즈 페어링 + 번호판','사이드 포드','버킷 시트 + 드라이버','옆 엔진 + 배기','넓은 슬릭 휠'],
+   sp:{W:10,R:4.8,tw:7.2,yb:2.4,eye:12.5,track:11.8,noArch:true,matte:true,axles:[-12.5,12],top:[[-16,2.4],[-16.4,4],[-13,4.6],[-4,4.6],[4,4.8],[9,6.6],[14,8.4],[18.6,8],[21.6,6],[22.2,2.4]],
+    win:[[0,3],[0.4,3.1],[0.8,3],[0.4,2.9]],ws:[[0,2.6],[0.4,2.6]],
+    body:0xeceef0,wheel:{rim:0x2b2d31,caliper:0xd7ff2f,spokes:5},
+    paint(p,S){p.band(0,1,'#eceef0');p.band(0,.32,'#14284b');p.poly([[.55,.32],[1,.32],[1,.4],[.6,.48]],'#d7ff2f');
+      p.poly([[.62,.5],[.98,.5],[.96,.9],[.7,.94]],'#eceef0');p.text('09',.82,.7,.34,'#14284b','"Chakra Petch",sans-serif','center',true);
+      p.text('SPARK',.36,.6,.16,'#14284b','"Chakra Petch",sans-serif','center',true);p.text('PUFF KART · RC',.32,.18,.07,'#d7ff2f');},
+    paintTop(p){p.band(0,1,'#eceef0');p.band(.42,.58,'#14284b');p.band(.48,.52,'#d7ff2f');p.poly([[.7,.2],[.98,.3],[.98,.7],[.7,.8]],'#14284b');},
+    extras(g,S,mat,g0){const tube=(a,b,r,m)=>{const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),L=A.distanceTo(B),t=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,10),m);t.position.copy(A).add(B).multiplyScalar(.5);t.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize());t.castShadow=true;g0.add(t);return t;};
+      const nv=M.paint(0x14284b,{shininess:20,reflectivity:.08}),ny=M.paint(0xd7ff2f,{envMap:null,shininess:20}),ch=mat.chrome,bk=mat.black,R=S.R,tk=S.track,fz=S.W/2+0.4;
+      // 파이프 프레임: 양옆 레일 + 앞뒤 가로대 + 바퀴 축까지 나온 스핀들
+      for(const z of[-1,1]){tube([-15,2.6,z*fz],[16,2.6,z*(fz-1.6)],0.55,ch);tube([16,2.6,z*(fz-1.6)],[20,3.2,z*2.6],0.5,ch);}
+      for(const x of S.axles){tube([x,R,-tk+2],[x,R,tk-2],0.6,bk);}
+      // 사이드 포드(바퀴 사이) + 네온 줄
+      for(const z of[-1,1]){box(15,3.4,3.2,nv,0,4.2,z*(fz+2.4),g0);box(15.2,0.6,3.3,ny,0,6,z*(fz+2.4),g0);box(1.2,3,3.4,bk,-7.6,4.2,z*(fz+2.4),g0);}
+      // 앞 범퍼 바 + 번호판 지지대
+      tube([23,3,-6],[23,3,6],0.6,ch);for(const z of[-1,1])tube([21.4,2.8,z*3],[23,3,z*5],0.45,ch);
+      // 뒤 범퍼 바(넓게, 뒷바퀴까지 감싼다)
+      tube([-19.6,4,-(tk+2.6)],[-19.6,4,tk+2.6],0.8,ch);for(const z of[-1,1]){tube([-19.6,4,z*(tk+2.6)],[-15,3,z*(tk+2.6)],0.7,ch);tube([-15,3,z*(tk+2.6)],[-13,2.8,z*fz],0.6,ch);tube([-19.6,4,z*3],[-15,2.6,z*3],0.6,ch);}
+      // 버킷 시트
+      box(7,1.2,8.6,bk,-6.4,4.6,0,g0);const sb=box(1.2,8,8.6,bk,-10.2,8.4,0,g0);sb.rotation.z=0.28;for(const z of[-1,1])box(6,4,0.8,bk,-7,7,z*4.4,g0);
+      // 드라이버: 몸통·다리·팔·헬멧(네온 옐로 + 짙은 바이저)
+      const suit=M.paint(0x14284b,{shininess:10,reflectivity:.04});const tr=box(4.4,8.4,6.4,suit,-7.4,10,0,g0);tr.rotation.z=0.26;
+      for(const z of[-1.8,1.8]){tube([-4.6,6.2,z],[6,5.6,z*1.1],1.3,suit);tube([-6,12.6,z*2.2],[1.2,9.6,z*2.4],0.9,suit);}
+      const hm=new THREE.Mesh(new THREE.SphereGeometry(3.4,20,16),M.paint(0xd7ff2f,{shininess:110}));hm.position.set(-7,16.6,0);hm.castShadow=true;g0.add(hm);
+      const vz=box(0.6,1.6,5,M.glass(),-3.8,16.8,0,g0);vz.rotation.z=0.1;box(4.2,0.7,0.5,nv,-7,17.2,0,g0);
+      // 핸들 + 스티어링 컬럼
+      tube([8.6,3,0],[2.6,8.8,0],0.45,ch);const sw=new THREE.Mesh(new THREE.TorusGeometry(2.4,0.5,8,18),bk);sw.position.set(2.4,9,0);sw.rotation.y=Math.PI/2;sw.rotation.x=0.5;g0.add(sw);
+      // 옆 엔진(오른쪽) + 배기 + 체인 가드 + 연료통
+      box(5.6,5,4,M.metal(0x8d9298),-11,6.4,-(fz+1.6),g0);box(6,0.8,4.4,ny,-11,9.2,-(fz+1.6),g0);for(let k=0;k<4;k++)box(0.4,4,4.4,bk,-13+k*1.4,6.4,-(fz+1.6),g0);
+      tube([-12,7.4,-(fz+3.8)],[-18,5.6,-(fz+3.6)],0.7,ch);cyl(1.2,4.4,M.metal(0x6d7177),-18.6,5.4,-(fz+3.6),g0,'x');
+      box(10,2.6,0.6,bk,-12.5,4.6,-(fz+0.2),g0);cyl(1.8,3.2,ny,3,5.6,0,g0);
+      // 뒤 번호판(작은 네이비 판 + 브레이크 등)
+      box(0.5,3.4,6,nv,-20.4,6.4,0,g0);box(0.6,0.9,2.4,M.glow(0xff2a2a),-20.7,7.6,0,g0);}}},
 ];
 function ctxRect(p,u,v,w,h,col){p.ctx.fillStyle=col;p.ctx.fillRect(u*p.cw,(1-v-h)*p.ch,w*p.cw,h*p.ch);}
 
@@ -1535,9 +1635,9 @@ function buildCar(D){
   box(4,1.6,S.W-6,mat.carbon,rear+1.6,S.yb-0.2,0,g);for(let i=0;i<4;i++)box(4,2.4,0.3,mat.carbon,rear+1.6,S.yb-0.4,(i-1.5)*3.6,g);
   for(const s of[1,-1])cyl(0.7,2.4,mat.chrome,rear-0.4,S.yb+1.2,s*3.4,g,'x');
   const fy=S.top.find(p=>p[0]>front-3&&p[1]>S.yb+2)||[front,S.yb+5];
-  if(D.k!=='E'&&D.k!=='F'&&D.k!=='G')for(const s of[1,-1])box(0.6,1.1,4.2,mat.glowW,front-0.2,fy[1]-0.4,s*(S.W/2-3.4),g);
+  if(D.k!=='E'&&D.k!=='F'&&D.k!=='G'&&D.k!=='I')for(const s of[1,-1])box(0.6,1.1,4.2,mat.glowW,front-0.2,fy[1]-0.4,s*(S.W/2-3.4),g);
   box(0.5,1,S.W-4,M.glow(0xff2a2a),rear-0.1,S.top[2][1]-1.2,0,g);
-  if(D.k!=='G')for(const s of[1,-1]){box(1.6,1.1,2.2,mat.body,S.ws[1][0]-1.4,S.ws[1][1]+0.4,s*(S.W/2+0.8),g);}
+  if(D.k!=='G'&&D.k!=='I')for(const s of[1,-1]){box(1.6,1.1,2.2,mat.body,S.ws[1][0]-1.4,S.ws[1][1]+0.4,s*(S.W/2+0.8),g);}
   const gx=new THREE.Group();gx.scale.y=SQ;gx.position.y=S.yb*(1-SQ);g.add(gx);S.extras(gx,S,mat,g);
   const wheels=[],fronts=[];
   for(const x of S.axles)for(const s of[1,-1]){const piv=new THREE.Group();piv.position.set(x,S.R,s*(S.track||(S.W/2-S.tw/2+1.6)));inner.add(piv);
@@ -1599,6 +1699,16 @@ function paintCity(c,x0,x1,y0,y1){
   c.fillStyle='#6f7e66';c.beginPath();c.arc(1300,-340,190,0,TAU);c.fill();c.fillStyle='#5f6e58';for(let k=0;k<8;k++){c.beginPath();c.arc(1300+Math.cos(k*0.8)*140,-340+Math.sin(k*0.8)*140,22,0,TAU);c.fill();}
 }
 const BOOKS=['#c0392b','#2e6da4','#e2b33c','#3c8d5a','#7d4ea3'];
+function paintVolcano(c,x0,x1,y0,y1,T){
+  c.fillStyle='#3b312d';c.fillRect(x0,y0,x1-x0,y1-y0);
+  for(let i=0;i<1400;i++){const x=x0+((i*733)%1000)/1000*(x1-x0),y=y0+((i*397)%1000)/1000*(y1-y0);c.fillStyle=i%4?'rgba(20,14,12,.25)':'rgba(140,120,110,.18)';c.fillRect(x,y,10+(i%3)*6,8);}
+  // 식은 용암 흐름 자국(검은 띠) + 가장자리 붉은 빛
+  c.strokeStyle='rgba(18,12,10,.55)';c.lineWidth=60;c.lineCap='round';c.beginPath();c.moveTo(1250,450);c.bezierCurveTo(1900,700,2000,1200,1700,1500);c.stroke();c.beginPath();c.moveTo(1250,450);c.bezierCurveTo(800,300,500,500,274,640);c.stroke();
+  const lava=(x,y,w,h,r)=>{const g=c.createLinearGradient(x,y,x+w,y+h);g.addColorStop(0,'#ff7a1a');g.addColorStop(.5,'#ffb03a');g.addColorStop(1,'#ff5a14');c.fillStyle='rgba(255,90,20,.35)';c.beginPath();c.roundRect?c.roundRect(x-26,y-26,w+52,h+52,r+26):c.rect(x-26,y-26,w+52,h+52);c.fill();
+    c.fillStyle=g;c.beginPath();c.roundRect?c.roundRect(x,y,w,h,r):c.rect(x,y,w,h);c.fill();
+    c.fillStyle='rgba(60,20,10,.55)';for(let k=0;k<26;k++){const px=x+((k*137)%97)/97*w,py=y+((k*59)%89)/89*h;c.beginPath();c.ellipse(px,py,10+(k%4)*6,5+(k%3)*3,k,0,TAU);c.fill();}};
+  const R=T.river,Q=T.pool;lava(R[0],R[2],R[1]-R[0],R[3]-R[2],30);lava(Q[0],Q[2],Q[1]-Q[0],Q[3]-Q[2],60);
+}
 const THUMB=(bg,road,edge,pat)=>({bg,road,edge,pat});
 const VARIANTS=[
  {id:'park',name:'흙길 RC 파크',view:'테이블탑 · 더블 점프',desc:'RC 전용 흙길. 테이블탑과 더블 점프, 범프 구간이 이어지는 기본 코스예요.',tags:['흙길','점프 4곳','2랩'],dust:'#8b6a46',puff:'#b48a62',th:THUMB('#6f9a4c','#a5764c','#6a4529'),
@@ -1637,6 +1747,10 @@ const VARIANTS=[
    mine:{river:[[40,170],[960,1520]],headframe:[380,-640],cart:0.725},
    tunnel:{wall:0x4f453c,roof:0x3a3129,portal:0x7a5a38,ribs:true},
    roadFn:(i,P,T)=>{const a=P[i],f=a.s/T.L;if(i<2)return i%2?'#222':'#f4f4f4';if(f>T.gorge.s0&&f<T.gorge.s1)return i%3===0?'#5c4128':(i%2?'#8a6a45':'#7d5f3d');if(Math.abs(f-T.rails[0])*T.L<26)return '#5d5a57';if(a.z-a.zb>2)return i%2?'#6b5a48':'#64543f';return i%6<3?'#4a4440':'#45403c';}})},
+ {id:'volcano',name:'화산섬',view:'분화구 나선 · 용암 점프',desc:'해 질 녘 화산섬. 연기 나는 분화구 가장자리를 나선으로 반 바퀴 돌아 오르고, 미끄러운 화산재 내리막 끝에서 용암 강을 뛰어넘어요. 빛나는 용암 동굴을 지나 현무암 돌다리로 용암 웅덩이를 건너요. 용암에 닿으면 연기와 함께 코스로 복귀해요.',tags:['화산재·현무암','용암 점프·동굴','3랩'],dust:'#4a403c',puff:'#a39893',th:THUMB('#3b312d','#5a4f4a','#ff5a1a'),
+  R:opt3({sky:'#e98b6a',fogFar:560,hemiSky:0xffc9a8,hemiGround:0x3a2420,sun:0xffa66a,hemiI:0.72,sunI:0.75,paint:paintVolcano,road:'#4d4440',road2:'#48403c',rampCol:'#5c524d',berm:'#2a2220',edge2:'volcano',trees:'volcanic',treeCount:46,gate:0xff5a1a,volcano:true,
+   tunnel:{wall:0x2c2421,roof:0x221b19,portal:0x4a3c36,ribs:true},
+   roadFn:(i,P,T)=>{const a=P[i],f=a.s/T.L;if(i<2)return i%2?'#222':'#f4f4f4';if(a.z<-4)return null;if(f>T.gorge.s0-0.01&&f<T.gorge.s1+0.01)return i%3===0?'#2a2624':(i%2?'#3a3634':'#34302e');if(f>T.zSpiral[0]&&f<T.zSpiral[1])return i%2?'#3e3b3a':'#383534';if(a.z-a.zb>2)return i%2?'#5c524d':'#564c47';if(f>T.zAsh[0]&&f<T.zAsh[1])return i%6<3?'#77706b':'#6f6863';return i%6<3?'#4d4440':'#48403c';}})},
 ];
 const VI=Object.fromEntries(VARIANTS.map((v,i)=>[v.id,i]));
 const trackCache={};function getTrack(id){return trackCache[id]||(trackCache[id]=buildTrack(COURSES[id]));}
@@ -1699,7 +1813,7 @@ function startGame(vi,ci){
   const grid=[[pick[0],0.97],[pick[1],0.95],[CAR,0],[pick[2],0.92]];
   const cars=grid.map((d,k)=>makeCar(T,Math.round(N-2-(k>>1)*sp*1.4),k%2?-45:45,d[0].col,k!==2,d[1]));
   grid.forEach((d,k)=>{cars[k].kind=d[0].kind;cars[k].name=k===2?(PLAYER.name||('나 · '+CAR.name)):d[0].name;});
-  const pc=cars[2];Object.assign(pc,{power:CAR.power,top:CAR.top,gripM:CAR.grip,mass:CAR.mass,boostM:CAR.boost,offM:CAR.offM,susp:CAR.susp,kind:CAR.kind});
+  const pc=cars[2];Object.assign(pc,{power:CAR.power,top:CAR.top,gripM:CAR.grip,mass:CAR.mass,boostM:CAR.boost,offM:CAR.offM,susp:CAR.susp,gaugeM:CAR.gaugeM,kind:CAR.kind});
   G={V,vi,ci,T,cars,player:cars[2],parts:[],skids:[],t:0,state:'count',count:3.4,shake:0,order:[],rec:[],recAcc:0,ranks:[],finishShow:0};
   clearInterval(resTimer);
   $('#menu').hidden=true;$('#mmenu').hidden=true;$('#verBtn').hidden=true;$('#stage').hidden=false;$('#result').hidden=true;$('#replayUI').hidden=true;$('#hud').hidden=false;$('#touch').classList.remove('off');touch.g=0;$('#tZone').classList.remove('on');$('#view').innerHTML='';
@@ -1727,11 +1841,12 @@ function update(dt){
   const pin=playerInput();if(pin.boost&&!g.pb&&racing)fireBoost(g.player);g.pb=pin.boost;
   for(const c of g.cars){
     const auto=c.isAI||c.done,inp=auto?aiInput(c,T,g.t):pin;
-    if(running){c.gauge=Math.min(1,c.gauge+dt*0.07);if(c.isAI&&c.speed>220&&c.gauge>0.9&&Math.random()<0.004)fireBoost(c);}
+    if(running){c.gauge=Math.min(1,c.gauge+dt*0.07*(c.gaugeM||1));if(c.isAI&&c.speed>220&&c.gauge>0.9&&Math.random()<0.004&&aiBoostOk(c,T))fireBoost(c);}
     stepCar(c,inp,dt,T,running);
     if(lapTick(c,T,g.t))g.order.push(c);
     if(c.drift)c.driftT+=dt;if(c.air)c.maxAir=Math.max(c.maxAir,c.airT);
     carFx(g,c);
+    if(c.burnt){c.burnt=0;for(let k=0;k<12;k++){const a=Math.random()*TAU;puff(c.burnX,c.burnY,4,k%3?'#5a504c':'#ff8a3a',12+k,1.3,Math.cos(a)*50,Math.sin(a)*50,70,c);}if(c===g.player){bang('앗 뜨거!');g.shake=Math.max(g.shake,10);AU.thump(200);}}
     if(c.land>160){for(let k=0;k<8;k++){const a=Math.random()*TAU;puff(c.x,c.y,c.z+2,g.V.puff,10,1,Math.cos(a)*90,Math.sin(a)*90,30,c);}if(c===g.player){g.shake=Math.min(30,c.land/18);AU.thump(c.land);}}
     if(c.bump>120&&c===g.player){g.shake=Math.max(g.shake,c.bump/30);AU.thump(c.bump*0.6);}
     c.land=0;c.bump=0;
@@ -1945,13 +2060,14 @@ const CARS=[
  {id:'scarab',name:'스카라브',design:'데저트 버기',kind:'F',col:{body:'#c9a66b',dark:'#ff7a1a',light:'#f1e6c8',mid:'#2a2724'},power:600,top:530,grip:1,mass:1.15,boost:2.4,offM:0.4,susp:520,desc:'롤케이지를 드러낸 오프로드 버기. 최고 속도는 낮지만 길 밖 잔디·모래·진흙에서 덜 느려지고, 높은 점프도 튀지 않고 착지해요.'},
  {id:'stinger',name:'스팅어',design:'오픈휠 포뮬러',kind:'G',col:{body:'#b5121b',dark:'#16171a',light:'#f2f2f2',mid:'#7a0d13'},power:645,top:595,grip:1.25,mass:0.75,boost:2.3,offM:1.7,desc:'바퀴가 드러난 오픈휠 포뮬러. 접지력이 가장 좋아 코너를 빠르게 돌고 최고 속도도 높지만, 길 밖 잔디·모래에서는 크게 느려지고 가벼워서 부딪히면 잘 튕겨요.'},
  {id:'bigfoot',name:'빅풋',design:'미니 몬스터 트럭',kind:'H',col:{body:'#3a3f46',dark:'#ffc21a',light:'#c9ccd1',mid:'#16171a'},power:555,top:535,grip:0.85,mass:1.75,boost:2.5,offM:0.3,susp:640,desc:'커다란 타이어의 미니 몬스터 트럭. 가장 무거워서 부딪히면 상대를 밀어내고, 높은 점프도 출렁이며 안정적으로 착지해요. 길 밖 흙·자갈에서도 거의 느려지지 않지만, 출발이 느리고 코너에서 잘 미끄러져요.'},
+ {id:'spark',name:'스파크',design:'레이싱 고카트',kind:'I',col:{body:'#eceef0',dark:'#14284b',light:'#d7ff2f',mid:'#2b2d31'},power:700,top:510,grip:1.1,mass:0.65,boost:2.2,offM:1.9,gaugeM:1.5,desc:'바닥에 붙은 레이싱 고카트. 출발이 가장 빠르고 방구 게이지가 1.5배 빨리 차서 부스터를 자주 써요. 최고 속도는 가장 낮고, 가벼워서 잘 밀리며 길 밖에서는 많이 느려져요.'},
 ];
-const STAT_DEF=[['최고 속도',c=>(c.top-520)/100],['가속',c=>(c.power-540)/160],['접지력',c=>(c.grip-0.7)/0.5],['무게',c=>(c.mass-0.7)/1.0],['방구 부스터',c=>(c.boost-2)/1.1],['험로 주행',c=>c.offM?(1-c.offM)/0.7:0.1]];
+const STAT_DEF=[['최고 속도',c=>(c.top-520)/100],['가속',c=>(c.power-540)/160],['접지력',c=>(c.grip-0.7)/0.5],['무게',c=>(c.mass-0.7)/1.0],['방구 부스터',c=>(c.boost-2)/1.1],['험로 주행',c=>c.offM?(1-c.offM)/0.7:0.1],['부스터 충전',c=>((c.gaugeM||1)-0.75)/0.85]];
 const SEL={car:0,course:0,load(){try{const s=JSON.parse(localStorage.getItem('rcgp-sel')||'{}');if(s.car>=0&&s.car<CARS.length)this.car=s.car;if(s.course>=0&&s.course<VARIANTS.length)this.course=s.course;}catch(_){}},save(){try{localStorage.setItem('rcgp-sel',JSON.stringify({car:this.car,course:this.course}));}catch(_){}}};
 SEL.load();
 
 // ---- 모바일 디오라마 코스 선택 ----
-const TT={park:['#d7e8c6','#1d2a14','#6f9a4c','#4f7a34','#a5764c','#6a4529'],arcade:['#0c1230','#eef0ff','#141d52','#070b24','#cfd3e6','#e8433c'],toy:['#dff1e7','#14302a','#a8dcc1','#6fae8c','#f0d8a6','#e8433c'],
+const TT={volcano:['#f2c3a8','#2a1410','#3d302c','#241c19','#6a5d58','#ff5a1a'],park:['#d7e8c6','#1d2a14','#6f9a4c','#4f7a34','#a5764c','#6a4529'],arcade:['#0c1230','#eef0ff','#141d52','#070b24','#cfd3e6','#e8433c'],toy:['#dff1e7','#14302a','#a8dcc1','#6fae8c','#f0d8a6','#e8433c'],
   hill:['#a9d2ec','#10202a','#5f9a4a','#4a7a3a','#45474c','#e8433c'],room:['#3a281a','#fbeedd','#b98252','#7d4f2c','#b98252','#ecdca9'],snow:['#d9e8f4','#14243a','#eef3f8','#b8c8d8','#8fa3ba','#ffffff'],
   beach:['#bfe4f2','#0f2a3a','#ecd6a4','#c9ad74','#dcbb85','#a9874f'],canyon:['#f3c08a','#3a1608','#a8532f','#7a3a1f','#c0703f','#5f2a14'],garden:['#cfe9f7','#14301a','#6fae4e','#4f8a3a','#bdb6a8','#9b4b35'],site:['#e9d9b8','#2a2010','#9a8b70','#6e6250','#8f877a','#f2c230'],harbor:['#1b2742','#eef2ff','#4a515c','#2c323b','#3b3f46','#f2c230'],parking:['#f3c3a4','#2a1a24','#8d9097','#5d6068','#3a3c41','#f2c230'],mine:['#b7bfc3','#1e1a17','#6f675c','#4a433b','#3e3833','#d9a441']};
 const pathCache={};
