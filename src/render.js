@@ -92,7 +92,7 @@ function make3D(opt){
       for(const sd of[1,-1])for(let q=0;q<3;q++){const o=sd*(l0.w/2+6),pp=T.p.find(z=>z.s>=bb.s0+q*30)||l0;addMesh(new THREE.CylinderGeometry(3*S,3*S,22*S,8),lam(q%2?0x111111:0xf2c230),(pp.x+pp.nx*o)*S,(pp.z+11)*S,(pp.y+pp.ny*o)*S);}}
     // 가로등 (밤 항구)
     if(opt.lamps){const pm2=lam(0x3a3f47),hm=new THREE.MeshBasicMaterial({color:0xffd27a}),gm=new THREE.MeshBasicMaterial({color:0xffc260,transparent:true,opacity:0.18,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-5,polygonOffsetUnits:-5});
-      this.lamps=[];this.lampDark=lam(0x2a2d33);
+      if(!this.lamps){this.lamps=[];this.lampDark=lam(0x2a2d33);}
       for(let i=3;i<N;i+=10){const a=P[i];if(a.tun||a.z<-4||(opt.garage&&a.zb>3))continue;const sd=(i/10|0)%2?1:-1,o=sd*(a.w/2+30),x=a.x+a.nx*o,y=a.y+a.ny*o,z=zAt(a,o);
         // 가로등: 밑동(stump) + 윗부분(top, 밑동 위에서 꺾이거나 통째로 날아감)
         const base=new THREE.Group();base.position.set(x*S,z*S,y*S);sc.add(base);
@@ -156,9 +156,17 @@ function make3D(opt){
       const lm=new THREE.MeshBasicMaterial({color:0xffc46a}),gm=new THREE.MeshBasicMaterial({color:0xffb04a,transparent:true,opacity:0.2,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-5,polygonOffsetUnits:-5});
       for(let i=6;i<N;i+=11){const a=P[i];const sd=(i/11|0)%2?1:-1,o=sd*(a.w/2+(inG(a)?-4:26)),x=a.x+a.nx*o,y=a.y+a.ny*o,z=a.tun||inG(a)?a.z:zAt(a,o);
         if(a.tun){addMesh(new THREE.BoxGeometry(6*S,6*S,6*S),lm,x*S,(a.z+70)*S,y*S,false);continue;}
-        addMesh(new THREE.BoxGeometry(5*S,62*S,5*S),wd,x*S,(z+31)*S,y*S);const arm=addMesh(new THREE.BoxGeometry(22*S,4*S,4*S),wd,(x-a.nx*sd*9)*S,(z+60)*S,(y-a.ny*sd*9)*S,false);arm.rotation.y=-Math.atan2(a.ny,a.nx);
-        addMesh(new THREE.BoxGeometry(7*S,10*S,7*S),lm,(x-a.nx*sd*18)*S,(z+52)*S,(y-a.ny*sd*18)*S,false);
-        const pool=new THREE.Mesh(new THREE.CircleGeometry(46*S,18),gm);pool.rotation.x=-Math.PI/2;pool.position.set((x-a.nx*sd*24)*S,(a.z+2.4)*S,(y-a.ny*sd*24)*S);sc.add(pool);}}
+        // 나무 기둥 랜턴: 밑동 + 윗부분(부딪히면 꺾이거나 날아감 — 가로등과 같은 처리)
+        if(!this.lamps){this.lamps=[];this.lampDark=lam(0x2a2d33);}
+        const base=new THREE.Group();base.position.set(x*S,z*S,y*S);sc.add(base);
+        const mk=(geo,mat,px,py,pz,par)=>{const m=new THREE.Mesh(geo,mat);m.position.set(px,py,pz);m.castShadow=true;par.add(m);return m;};
+        mk(new THREE.BoxGeometry(5.6*S,14*S,5.6*S),wd,0,7*S,0,base);
+        const top=new THREE.Group();top.position.y=14*S;base.add(top);
+        mk(new THREE.BoxGeometry(5*S,48*S,5*S),wd,0,24*S,0,top);
+        const ax=-a.nx*sd,ay=-a.ny*sd;const arm=mk(new THREE.BoxGeometry(22*S,4*S,4*S),wd,ax*9*S,46*S,ay*9*S,top);arm.rotation.y=-Math.atan2(a.ny,a.nx);
+        const head=mk(new THREE.BoxGeometry(7*S,10*S,7*S),lm,ax*18*S,38*S,ay*18*S,top);
+        const pool=new THREE.Mesh(new THREE.CircleGeometry(46*S,18),gm);pool.rotation.x=-Math.PI/2;pool.position.set((x-a.nx*sd*24)*S,(a.z+2.4)*S,(y-a.ny*sd*24)*S);sc.add(pool);
+        this.lamps.push({x,y,z,base,top,head,pool,st:0});}}
     // 화산섬: 분화구 산 + 용암(강·웅덩이·분화구) + 연기 + 돌다리 기둥 + 용암 동굴 빛 틈
     if(opt.volcano){const rnd=(()=>{let q=29;return()=>(q=(q*16807)%2147483647)/2147483647;})();
       const lvM=new THREE.MeshBasicMaterial({color:0xff7a1a});this.lavaM=lvM;const lvG=new THREE.MeshBasicMaterial({color:0xff5a14,transparent:true,opacity:0.35,depthWrite:false});
