@@ -454,6 +454,9 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
 .mm-top #mmRecSum{white-space:nowrap}
 @media (pointer:coarse) and (orientation:portrait){.mm-top{gap:8px}.mm-top .mm-logo{font-size:17px}#nameChip{margin-left:0;height:28px;padding:0 10px;font-size:12px;max-width:34vw}.mm-top #mmRecSum{font-size:12px;padding:5px 10px}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* ---- 개발 번호 (footer, 흐리게) ---- */
+#devNo{position:fixed;left:0;right:0;bottom:calc(3px + env(safe-area-inset-bottom,0px));z-index:30;text-align:center;font:600 10px/1 var(--f-num);letter-spacing:.2em;color:currentColor;opacity:.32;pointer-events:none;user-select:none}
+body:has(#stage:not([hidden])) #devNo{display:none}
 #camToast{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%) scale(.9);background:rgba(16,24,28,.62);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:10px 22px;font-family:var(--f-disp);font-size:clamp(18px,5vmin,26px);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 #camToast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 @media (prefers-reduced-motion:reduce){.go{transition:none}}
@@ -500,6 +503,7 @@ body.mobile #verBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));top
     <button type="submit" class="go" id="nameOk">이 이름으로 시작</button>
   </form>
 </div>
+<div id="devNo" aria-hidden="true">003</div>
 <div id="intro" hidden aria-label="인트로: 하이라이트 영상">
   <div class="ci-bar t"><span class="ci-rec"><i></i>REPLAY CAM</span><span id="ciCourse"></span><span id="ciTc">00:00:00</span></div>
   <span id="ciTag" hidden>SLOW-MO</span>
